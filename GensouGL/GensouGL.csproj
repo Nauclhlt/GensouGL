@@ -6,4 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Audio\" />
+    <Folder Include="Collision\" />
+    <Folder Include="Core\" />
+    <Folder Include="Graphics\HighLevel\" />
+    <Folder Include="Graphics\LowLevel\" />
+    <Folder Include="Graphics\Text\" />
+    <Folder Include="Graphics\Video\" />
+    <Folder Include="Math\" />
+    <Folder Include="Scene\" />
+    <Folder Include="UI\" />
+  </ItemGroup>
+
 </Project>
