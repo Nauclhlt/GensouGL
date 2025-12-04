@@ -21,6 +21,7 @@ class GensouGL
  - UseVSync() : Game
  - UseFullscreen() : Game
  - HideCursor() : Game
+ - Run() : void
 
 class DebugLog
  - static Info(string message) : void
@@ -66,7 +67,7 @@ interface IScreen
  - Height : int
 
 // Represents a frame buffer. (if the id is 0, it represents the default frame buffer)
-class Screen : IScreen, IDisposable
+class Screen : IScreen, ITexture, IDisposable
  - Screen(int width, int height)
  - static Default : Screen
 
@@ -97,6 +98,10 @@ class Camera
  - Camera(float x, float y, float scaleX, float scaleY, float rot)
  - internal GetMVPMatrix() : Matrix4
 
+class Shader
+ - Shader(string vertexSource, string fragmentSource)
+ - Bind() : void
+ - Unbind() : void
 ## Texture
 
 static class TextureService
@@ -158,7 +163,6 @@ struct Circle
 struct Key
 struct MouseButton
 struct GVector2
-struct GVector3
 
 
 ## Utility
