@@ -24,9 +24,24 @@ public class Scene
         return new QuickRenderer(_game, screen);
     }
 
+    protected BatchTextRenderer CreateBatchTextRenderer(Screen screen)
+    {
+        return new BatchTextRenderer(_game, screen);
+    }
+
+    protected BatchBulletRenderer CreateBatchBulletRenderer(Screen screen)
+    {
+        return new BatchBulletRenderer(_game, screen);
+    }
+
     protected void RegisterPersistentResource(IDisposable resource)
     {
         PersistentResourceService.Register(resource);
+    }
+
+    protected void ExitGame()
+    {
+        _game.ExitGame();
     }
 
     public virtual void Update(float deltaTime)

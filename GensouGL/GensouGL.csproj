@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Graphics\Shaders\Bullet.frag" />
+    <None Remove="Graphics\Shaders\Bullet.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\SimpleShape.vert" />
     <None Remove="Graphics\Shaders\SimpleTexture.frag" />
@@ -14,6 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Graphics\Shaders\Bullet.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Bullet.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleShape.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.frag" />

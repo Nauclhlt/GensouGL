@@ -91,15 +91,18 @@ public sealed class Shader : IDisposable
 
     private static Shader s_simpleShape;
     private static Shader s_simpleTexture;
+    private static Shader s_Bullet;
 
     internal static Shader SimpleShape => s_simpleShape;
     internal static Shader SimpleTexture => s_simpleTexture;
+    internal static Shader Bullet => s_Bullet;
 
     internal static void LoadShaders()
     {
         Assembly asm = typeof(Shader).Assembly;
         s_simpleShape = Gen(asm, "SimpleShape");
         s_simpleTexture = Gen(asm, "SimpleTexture");
+        s_Bullet = Gen(asm, "Bullet");
     }
 
     private static Shader Gen(Assembly asm, string name)

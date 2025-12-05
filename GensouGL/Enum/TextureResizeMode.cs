@@ -1,4 +1,4 @@
-﻿namespace GensouGL;
+﻿namespace GensouGL.Core;
 
 public enum TextureResizeMode
 {

@@ -63,10 +63,14 @@ public sealed class QuickRenderer : Renderer
             lowerRight.Rf, lowerRight.Gf, lowerRight.Bf, lowerRight.Af,
         ];
 
+        LoadState();
+
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
         _buffer.Draw(PrimitiveType.TriangleStrip, va, ca);
+
+        RestoreState();
     }
 
     public void DrawWireRect(Rect rect, Color color)
@@ -114,12 +118,16 @@ public sealed class QuickRenderer : Renderer
             upperLeft.Rf, upperLeft.Gf, upperLeft.Bf, upperLeft.Af
         ];
 
+        LoadState();
+
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
         GL.LineWidth(lineWidth);
 
         _buffer.Draw(PrimitiveType.LineStrip, va, ca);
+
+        RestoreState();
     }
 
     #endregion
@@ -167,10 +175,14 @@ public sealed class QuickRenderer : Renderer
             bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af
         };
 
+        LoadState();
+
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
         _buffer.Draw(PrimitiveType.Lines, va, ca);
+
+        RestoreState();
     }
 
     #endregion
@@ -208,10 +220,14 @@ public sealed class QuickRenderer : Renderer
             cColor.Rf, cColor.Gf, cColor.Bf, cColor.Af,
         };
 
+        LoadState();
+
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
         _buffer.Draw(PrimitiveType.Triangles, va, ca);
+
+        RestoreState();
     }
 
     public void DrawWireTriangle(Point a, Point b, Point c, Color color)
@@ -259,10 +275,14 @@ public sealed class QuickRenderer : Renderer
             aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
         };
 
+        LoadState();
+
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
         _buffer.Draw(PrimitiveType.LineStrip, va, ca);
+
+        RestoreState();
     }
 
     #endregion
@@ -320,10 +340,14 @@ public sealed class QuickRenderer : Renderer
             cur++;
         }
 
+        LoadState();
+
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
         _buffer.Draw(PrimitiveType.TriangleFan, va, ca);
+
+        RestoreState();
     }
 
     #endregion
@@ -371,6 +395,8 @@ public sealed class QuickRenderer : Renderer
             texture.Coords.Right, texture.Coords.Bottom
         };
 
+        LoadState();
+
         Shader.SimpleTexture.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
@@ -379,6 +405,8 @@ public sealed class QuickRenderer : Renderer
         _buffer.Draw(PrimitiveType.TriangleStrip, va, ca, ta);
 
         TextureService.Pop();
+
+        RestoreState();
     }
 
     #endregion

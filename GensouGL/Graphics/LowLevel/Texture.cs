@@ -103,7 +103,8 @@ public sealed class Texture : ITexture, IDisposable
     {
         byte[] pixels = GetPixelData();
 
-        using var image = IMS.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels);
+        using var image = IMS.Image.LoadPixelData<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels, _width, _height);
+        image.Mutate(x => x.Flip(FlipMode.Vertical));
 
         image.Mutate(x => x.Flip(FlipMode.Vertical));
 
@@ -114,7 +115,8 @@ public sealed class Texture : ITexture, IDisposable
     {
         byte[] pixels = GetPixelData();
 
-        using var image = IMS.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels);
+        using var image = IMS.Image.LoadPixelData<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels, _width, _height);
+        image.Mutate(x => x.Flip(FlipMode.Vertical));
 
         image.Mutate(x => x.Flip(FlipMode.Vertical));
 

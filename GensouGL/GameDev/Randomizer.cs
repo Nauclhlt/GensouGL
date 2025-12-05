@@ -9,6 +9,11 @@ public static class Randomizer
         return _random.NextDouble();
     }
 
+    public static float NextFloat()
+    {
+        return _random.NextSingle();
+    }
+
     public static int NextInt(int min, int max)
     {
         return _random.Next(min, max);

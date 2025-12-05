@@ -99,22 +99,33 @@ public sealed class Game
         
         Shader.LoadShaders();
         QuickRenderer.Initialize();
+        BatchTextRenderer.Initialize();
+        BatchBulletRenderer.Initialize();
     }
 
     private void InitializeOpenGL()
     {
-        GL.Viewport(0, 0, _windowWidth, _windowHeight);
+        GL.Viewport(0, 0, _window.Size.X, _window.Size.Y);
         GL.Enable(EnableCap.Texture2D);
         GL.Enable(EnableCap.Blend);
         GL.Disable(EnableCap.DepthTest);
         GL.Disable(EnableCap.StencilTest);
+        GL.Enable(EnableCap.Blend);
     }
 
     private void FinalizeEngineCore()
     {
         QuickRenderer.Release();
+        BatchTextRenderer.Release();
+        BatchBulletRenderer.Release();
         PersistentResourceService.ReleaseAll();
     }
+
+    internal void ExitGame()
+    {
+        _window.Close();
+    }
+
 
 
 
@@ -201,6 +212,9 @@ public sealed class Game
 
         _window.UpdateFrame += OnUpdateWindow;
         _window.RenderFrame += OnRenderWindow;
+
+        _windowWidth = _window.Size.X;
+        _windowHeight = _window.Size.Y;
 
 
 

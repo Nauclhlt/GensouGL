@@ -8,28 +8,29 @@ DebugLog.WriteToConsole = true;
 Gensou.Create()
     .WithTitle("GensouGL Test")
     .WithWindowSize(640, 480)
-    .WithScreenSize(640, 480)
-    .WithFps(60.0)
+    .UseFullscreen()
+    .WithScreenSize(960, 540)
+    .UseVSync()
     .WithInitialScene(new TestScene())
     .Run();
 
 class TestScene : Scene
 {
     private float _elapsed = 0.0f;
-    private bool _flg = false;
 
-    private Texture _testImage;
-
-    private QuickRenderer _qr;
+    private BatchBulletRenderer _br;
+    private List<Bullet> _bullets = new();
+    private Texture _image;
 
     public override void OnInitialize()
     {
         DebugLog.User("TestScene initialized.");
 
-        _qr = CreateQuickRenderer(Screen.Default);
+        _br = CreateBatchBulletRenderer(Screen.Default);
 
-        _testImage = new Texture(@"C:\Users\PC_User\Downloads\t9PP3kCh_400x400.jpg");
-        RegisterPersistentResource(_testImage);
+        _image = new(@"C:\Users\PC_User\Downloads\red.png");
+        _image.ResizeMode = TextureResizeMode.NearestNeighbor;
+        RegisterPersistentResource(_image);
     }
 
     public override void OnEnter()
@@ -44,17 +45,74 @@ class TestScene : Scene
 
     public override void Update(float deltaTime)
     {
-        _elapsed += deltaTime;
+        for (int i = _bullets.Count - 1; i >= 0; i--)
+        {
+            if (_bullets[i].KillFlag)
+            {
+                _bullets[i] = _bullets[^1];
+                _bullets.RemoveAt(_bullets.Count - 1);
+            }
+            else
+            {
+                _bullets[i].Update(deltaTime);
+            }
+        }
+
+        if (Input.IsKeyDown(Key.Enter))
+        {
+            float cx = 960f * Randomizer.NextFloat();
+            float cy = 540f * Randomizer.NextFloat();
+
+            GVector2 v = new GVector2(0, 220f);
+            for (int i = 0; i < 12; i++)
+            {
+                _bullets.Add(new Bullet(new GVector2(cx, cy) - v.Normalize() * 80f, v));
+                v = v.Rotate(MathF.PI * 2 / 12);
+            }
+        }
+        
+        if (Input.IsKeyPressed(Key.Escape))
+        {
+            ExitGame();
+        }
     }
 
     public override void Render(float deltaTime)
     {
-        //_qr.DrawWireRect(245, 165, 150, 150, Color.Aqua);
-        //_qr.DrawLine(320, 240, 640, 480, Color.Lime);
-        //_qr.DrawTriangle(0, 0, 0, 240, 320, 0, Color.Red);
-        //_qr.DrawWireTriangle(320, 480, 640, 480, 640, 240, Color.Magenta);
-        //_qr.DrawEllipse(320 - 50, 240 - 50, 100, 100, Color.White, div: 10);
+        _br.Begin(_image);
+        for (int i = 0; i < _bullets.Count; i++)
+        {
+            _bullets[i].Render(_br, _image);
+        }
+        _br.End();
+    }
+}
 
-        _qr.DrawTexture(0, 0, _testImage.Width, _testImage.Height, _testImage, Color.White);
+public sealed class Bullet
+{
+    public bool KillFlag { get; set; } = false;
+
+    private GVector2 _position;
+    private GVector2 _velocity;
+
+    public Bullet(GVector2 pos,  GVector2 velocity)
+    {
+        _position = pos;
+        _velocity= velocity;
+    }
+
+    public void Update(float deltaTime)
+    {
+        if (_position.X < -50 || _position.Y < -50 || _position.X >= 1000 || _position.Y >= 600)
+        {
+            KillFlag = true;
+        }
+
+        _position += _velocity * deltaTime;
+    }
+
+    public void Render(BatchBulletRenderer br, Texture texture)
+    {
+        br.Draw(_position.X, _position.Y, 12, 12, Color.White, texture);
     }
 }
