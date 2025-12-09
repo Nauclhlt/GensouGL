@@ -106,7 +106,7 @@ internal sealed class WavePcmSource : StreamingSource
         return clamp;
     }
 
-    public override void Seek(int position)
+    public override void Seek(long position)
     {
         _reader.BaseStream.Seek(_pcmHead + position, SeekOrigin.Begin);
     }

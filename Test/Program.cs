@@ -40,8 +40,11 @@ class TestScene : Scene
         _testAudio.Loop = true;
         RegisterPersistentResource(_testAudio);
 
-        //_testStream = StreamingAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
-        _testStream = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
+        _testStream = StreamingAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
+        //_testStream = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
+        _testStream.Loop = true;
+        _testStream.LoopStart = 10f;
+        _testStream.LoopEnd = 20f;
         RegisterPersistentResource(_testStream);
     }
 
@@ -91,6 +94,11 @@ class TestScene : Scene
         if (Input.IsKeyPressed(Key.B))
         {
             _testStream.Stop();
+        }
+
+        if (Input.IsKeyPressed(Key.C))
+        {
+            _testStream.Seek(10f);
         }
         
         if (Input.IsKeyPressed(Key.Escape))

@@ -27,7 +27,7 @@ internal sealed class MpegFileAdapter : StreamingSource
         return _mpegFile.ReadSamplesInt16(buffer, 0, length);
     }
 
-    public override void Seek(int position)
+    public override void Seek(long position)
     {
         _mpegFile.Position = position;
     }
