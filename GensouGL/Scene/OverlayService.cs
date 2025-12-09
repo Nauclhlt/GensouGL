@@ -3,17 +3,28 @@
 public sealed class OverlayService
 {
     private readonly List<Overlay> _overlays = new();
+    private Game _game;
     
     public bool Any => _overlays.Count > 0;
     public int Count => _overlays.Count;
 
-    internal OverlayService()
+    internal OverlayService(Game game)
     {
+        _game = game;
     }
 
     public void Show(Overlay overlay)
     {
         ArgumentNullException.ThrowIfNull(overlay);
+        if (!overlay.Initialized)
+        {
+            overlay._sceneManager = null;
+            overlay._overlayService = _game._overlayService;
+            overlay._input = _game._inputService;
+            overlay._game = _game;
+            overlay.OnInitialize();
+            overlay.Initialized = true;
+        }
         overlay.OnEnter();
         _overlays.Add(overlay);
     }

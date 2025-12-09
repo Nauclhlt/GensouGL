@@ -92,7 +92,7 @@ public sealed class Game
 
     private void InitializeEngineCore()
     {
-        _overlayService = new();
+        _overlayService = new(this);
         _inputService = new(this);
 
         _sceneManager = new(this);
@@ -101,6 +101,7 @@ public sealed class Game
         QuickRenderer.Initialize();
         BatchTextRenderer.Initialize();
         BatchBulletRenderer.Initialize();
+        AudioPlayer.Initialize();
     }
 
     private void InitializeOpenGL()
@@ -118,6 +119,7 @@ public sealed class Game
         QuickRenderer.Release();
         BatchTextRenderer.Release();
         BatchBulletRenderer.Release();
+        AudioPlayer.Release();
         PersistentResourceService.ReleaseAll();
     }
 
@@ -132,6 +134,8 @@ public sealed class Game
     private void OnUpdateWindow(FrameEventArgs args)
     {
         float deltaTime = (float)args.Time;
+
+        AudioPlayer.Update();
 
         _sceneManager.Update(deltaTime);
 

@@ -18,3 +18,4 @@ global using OpenTK.Windowing.Desktop;
 global using OpenTK.Input;
 global using OpenTK.Graphics;
 global using OpenTK.Graphics.OpenGL4;
+global using NLayer;

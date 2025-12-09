@@ -7,6 +7,8 @@ public abstract class Renderer
     protected Camera _camera;
     protected RenderState _state;
     private OpenTK.Mathematics.Matrix4 _projMatrix;
+    private int _viewportWidth;
+    private int _viewportHeight;
 
     public Camera Camera
     {
@@ -35,6 +37,8 @@ public abstract class Renderer
         _screen = screen;
         _camera = Camera.Default;
         _state = RenderState.Default;
+        _viewportWidth = _screen.ScreenId == 0 ? _game.WindowWidth : _screen.Width;
+        _viewportHeight = _screen.ScreenId == 0 ? _game.WindowHeight : _screen.Height;
         int w = _screen.ScreenId == 0 ? _game.ScreenWidth : _screen.Width;
         int h = _screen.ScreenId == 0 ? _game.ScreenHeight : _screen.Height;
         _projMatrix = OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0, w, h, 0, -1, 1);
@@ -49,6 +53,7 @@ public abstract class Renderer
     {
         _state.LoadBlendMode();
         FramebufferService.PushAndBind(_screen.ScreenId);
+        GL.Viewport(0, 0, _viewportWidth, _viewportHeight);
     }
 
     protected void RestoreState()

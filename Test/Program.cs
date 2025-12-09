@@ -7,10 +7,9 @@ using GensouGL.IO;
 DebugLog.WriteToConsole = true;
 Gensou.Create()
     .WithTitle("GensouGL Test")
-    .WithWindowSize(640, 480)
-    .UseFullscreen()
+    .WithWindowSize(960, 540)
     .WithScreenSize(960, 540)
-    .UseVSync()
+    .WithFps(120.0)
     .WithInitialScene(new TestScene())
     .Run();
 
@@ -19,18 +18,31 @@ class TestScene : Scene
     private float _elapsed = 0.0f;
 
     private BatchBulletRenderer _br;
+    private QuickRenderer _qr;
     private List<Bullet> _bullets = new();
     private Texture _image;
+    private MemoryAudio _testAudio;
+    private StreamingAudio _testStream;
 
     public override void OnInitialize()
     {
         DebugLog.User("TestScene initialized.");
 
         _br = CreateBatchBulletRenderer(Screen.Default);
+        _qr = CreateQuickRenderer(Screen.Default);
 
         _image = new(@"C:\Users\PC_User\Downloads\red.png");
         _image.ResizeMode = TextureResizeMode.NearestNeighbor;
         RegisterPersistentResource(_image);
+
+        //_testAudio = MemoryAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
+        _testAudio = MemoryAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
+        _testAudio.Loop = true;
+        RegisterPersistentResource(_testAudio);
+
+        //_testStream = StreamingAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
+        _testStream = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
+        RegisterPersistentResource(_testStream);
     }
 
     public override void OnEnter()
@@ -69,6 +81,16 @@ class TestScene : Scene
                 _bullets.Add(new Bullet(new GVector2(cx, cy) - v.Normalize() * 80f, v));
                 v = v.Rotate(MathF.PI * 2 / 12);
             }
+        }
+
+        if (Input.IsKeyPressed(Key.A))
+        {
+            _testStream.Play();
+        }
+
+        if (Input.IsKeyPressed(Key.B))
+        {
+            _testStream.Stop();
         }
         
         if (Input.IsKeyPressed(Key.Escape))

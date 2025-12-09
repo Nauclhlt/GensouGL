@@ -51,7 +51,7 @@ public sealed class BatchBulletRenderer : Renderer
         if (_globalTexture is not null)
         {
 #if DEBUG
-            DebugLog.Error("BatchBulletRenderer : Begin() called before End().");
+            DebugLog.Error("BatchBulletRenderer: Begin() called before End().");
 #endif
             return;
         }
@@ -79,7 +79,7 @@ public sealed class BatchBulletRenderer : Renderer
         if (_globalTexture is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchBulletRenderer : Draw() called before Begin().");
+            DebugLog.Error("BatchBulletRenderer: Draw() called before Begin().");
 #endif
             return;
         }
@@ -87,7 +87,7 @@ public sealed class BatchBulletRenderer : Renderer
         if (_globalTexture.TextureId != texture.TextureId)
         {
 #if DEBUG
-            DebugLog.Error("BatchBulletRenderer : Inconsistent texture IDs between the global texture and the given texture.");
+            DebugLog.Error("BatchBulletRenderer: Inconsistent texture IDs between the global texture and the given texture.");
 #endif
             return;
         }
@@ -123,7 +123,7 @@ public sealed class BatchBulletRenderer : Renderer
         if (_globalTexture is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchBulletRenderer : End() called before Begin().");
+            DebugLog.Error("BatchBulletRenderer: End() called before Begin().");
 #endif
             return;
         }

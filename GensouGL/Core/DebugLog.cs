@@ -6,6 +6,7 @@ public static class DebugLog
     private static readonly StringWriter _writer;
 
     public static bool WriteToConsole { get; set; } = false;
+    public static bool ColoredConsoleLog { get; set; } = true;
 
     static DebugLog()
     {
@@ -15,26 +16,41 @@ public static class DebugLog
 
     internal static void Info(string message)
     {
-        if (WriteToConsole) Console.WriteLine($"[INFO] {message}");
+        if (WriteToConsole) ConsoleLog($"[INFO] {message}", ConsoleColor.White);
         _writer.Write($"[INFO] {message}");
     }
 
     internal static void Warn(string message)
     {
-        if (WriteToConsole) Console.WriteLine($"[WARN] {message}");
+        if (WriteToConsole) ConsoleLog($"[WARN] {message}", ConsoleColor.Yellow);
         _writer.Write($"[WARN] {message}");
     }
 
     internal static void Error(string message)
     {
-        if (WriteToConsole) Console.WriteLine($"[ERROR] {message}");
+        if (WriteToConsole) ConsoleLog($"[ERROR] {message}", ConsoleColor.Red);
         _writer.Write($"[ERROR] {message}");
     }
 
     public static void User(string message)
     {
-        if (WriteToConsole) Console.WriteLine($"[USER] {message}");
+        if (WriteToConsole) ConsoleLog($"[USER] {message}", ConsoleColor.Cyan);
         _writer.Write($"[USER] {message}");
+    }
+
+    private static void ConsoleLog(string message, ConsoleColor color)
+    {
+        if (ColoredConsoleLog)
+        {
+            ConsoleColor cache = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ForegroundColor = cache;
+        }
+        else
+        {
+            Console.WriteLine(message);
+        }
     }
 
     public static void Clear()

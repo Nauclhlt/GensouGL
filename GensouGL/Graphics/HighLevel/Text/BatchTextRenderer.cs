@@ -38,7 +38,7 @@ public sealed class BatchTextRenderer : Renderer
         if (_currentFont is not null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer : Begin() called before End().");
+            DebugLog.Error("BatchTextRenderer: Begin() called before End().");
 #endif
             return;
         }
@@ -60,7 +60,7 @@ public sealed class BatchTextRenderer : Renderer
         if (_currentFont is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer : Draw() called before Begin().");
+            DebugLog.Error("BatchTextRenderer: Draw() called before Begin().");
 #endif
             return;
         }
@@ -81,7 +81,7 @@ public sealed class BatchTextRenderer : Renderer
         if (_currentFont is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer : Draw() called before Begin().");
+            DebugLog.Error("BatchTextRenderer: Draw() called before Begin().");
 #endif
             return;
         }
@@ -136,7 +136,7 @@ public sealed class BatchTextRenderer : Renderer
         if (_currentFont is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer : End() called before Begin().");
+            DebugLog.Error("BatchTextRenderer: End() called before Begin().");
 #endif
             return;
         }
