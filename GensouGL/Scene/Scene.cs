@@ -14,6 +14,9 @@ public class Scene
     internal InputService _input;
     internal Game _game;
 
+    protected Rect ScreenBounds => new Rect(0, 0, _game.ScreenWidth, _game.ScreenHeight);
+    protected Rect WindowBounds => new Rect(0, 0, _game.WindowWidth, _game.WindowHeight);
+    protected Point ScreenCenter => new Point(_game.ScreenWidth / 2f, _game.ScreenHeight / 2f);
     protected SceneManager SceneManager => _sceneManager;
     protected OverlayService OverlayService => _overlayService;
     protected InputService Input => _input;

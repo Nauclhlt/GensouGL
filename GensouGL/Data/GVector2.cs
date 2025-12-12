@@ -69,5 +69,6 @@ public struct GVector2
     public static GVector2 operator +(GVector2 a, GVector2 b) => new (a.X + b.X, a.Y + b.Y);
     public static GVector2 operator -(GVector2 a, GVector2 b) => new (a.X - b.X, a.Y - b.Y);
     public static GVector2 operator *(GVector2 v, float scalar) => new (v.X * scalar, v.Y * scalar);
+    public static GVector2 operator *(float scalar, GVector2 v) => new(v.X * scalar, v.Y * scalar);
     public static GVector2 operator /(GVector2 v, float scalar) => new (v.X / scalar, v.Y / scalar);
 }

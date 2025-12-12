@@ -19,6 +19,7 @@ class TestScene : Scene
 
     private BatchBulletRenderer _br;
     private QuickRenderer _qr;
+    private Texture _backgroundImage;
     private List<Bullet> _bullets = new();
     private Texture _image;
     private MemoryAudio _testAudio;
@@ -46,6 +47,9 @@ class TestScene : Scene
         _testStream.LoopStart = 10f;
         _testStream.LoopEnd = 20f;
         RegisterPersistentResource(_testStream);
+
+        _backgroundImage = new(@"C:\Users\PC_User\OneDrive\画像\Screenshots\スクリーンショット 2025-03-30 142858.png");
+        RegisterPersistentResource(_backgroundImage);
     }
 
     public override void OnEnter()
@@ -105,10 +109,13 @@ class TestScene : Scene
         {
             ExitGame();
         }
+
+        _elapsed += deltaTime;
     }
 
     public override void Render(float deltaTime)
     {
+        _qr.DrawTexture(ScreenBounds, _backgroundImage);
         _br.Begin(_image);
         for (int i = 0; i < _bullets.Count; i++)
         {

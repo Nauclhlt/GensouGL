@@ -11,6 +11,7 @@ public sealed class MemoryAudio : Audio, IDisposable
     private bool _disposed = false;
 
     public int Buffer => _buffer;
+    public float Position => AL.GetSource(_source, ALSourcef.SecOffset);
 
     public bool Loop
     {

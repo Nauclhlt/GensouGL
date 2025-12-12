@@ -31,6 +31,7 @@ public struct Circle
     {
         float dx = point.X - X;
         float dy = point.Y - Y;
+        
         return (dx * dx + dy * dy) <= (Radius * Radius);
     }
 
