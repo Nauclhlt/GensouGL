@@ -15,6 +15,11 @@ public sealed class Texture : ITexture, IDisposable
 
     private bool _disposed = false;
 
+    public static Texture Empty
+    {
+        get;
+    } = new Texture(32, 32);
+
     private Texture()
     {
 
@@ -67,8 +72,10 @@ public sealed class Texture : ITexture, IDisposable
     public Texture(byte[] byteArray) : this(new TextureSource(byteArray)) { }
 
     public int TextureId => _id;
-    public int Width => _width;
-    public int Height => _height;
+    public int BaseWidth => _width;
+    public int BaseHeight => _height;
+    public float Width => _width;
+    public float Height => _height;
     public Rect Coords => _coords;
     public TextureResizeMode ResizeMode
     {
@@ -88,7 +95,7 @@ public sealed class Texture : ITexture, IDisposable
 
     private byte[] GetPixelData()
     {
-        byte[] pixels = new byte[Width * Height * 4];
+        byte[] pixels = new byte[_width * _height * 4];
 
         TextureService.PushAndBind(_id);
 

@@ -51,9 +51,8 @@ public sealed class BatchBulletRenderer : Renderer
         if (_globalTexture is not null)
         {
 #if DEBUG
-            DebugLog.Error("BatchBulletRenderer: Begin() called before End().");
+            DebugLog.Warn("BatchBulletRenderer: Begin() called before End().");
 #endif
-            return;
         }
 
         _globalTexture = globalTexture;

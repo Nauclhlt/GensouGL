@@ -102,11 +102,12 @@ public sealed class Game
         BatchTextRenderer.Initialize();
         BatchBulletRenderer.Initialize();
         AudioPlayer.Initialize();
+        InGameDebug.Initialize(this);
     }
 
     private void InitializeOpenGL()
     {
-        GL.Viewport(0, 0, _window.Size.X, _window.Size.Y);
+        GL.Viewport(0, 0, _window.ClientSize.X, _window.ClientSize.Y);
         GL.Enable(EnableCap.Texture2D);
         GL.Enable(EnableCap.Blend);
         GL.Disable(EnableCap.DepthTest);
@@ -120,6 +121,7 @@ public sealed class Game
         BatchTextRenderer.Release();
         BatchBulletRenderer.Release();
         AudioPlayer.Release();
+        InGameDebug.Release();
         PersistentResourceService.ReleaseAll();
     }
 
@@ -150,6 +152,10 @@ public sealed class Game
         }
 
         if (_overlayService.Any) _overlayService.CheckState();
+
+#if DEBUG
+        InGameDebug.Update(deltaTime);
+#endif
     }
 
     private void OnRenderWindow(FrameEventArgs args)
@@ -171,6 +177,10 @@ public sealed class Game
         {
             _sceneManager.FocusRender(deltaTime);
         }
+
+#if DEBUG
+        InGameDebug.RenderDebugOverlay(deltaTime);
+#endif
 
         _window.SwapBuffers();
     }
@@ -217,8 +227,8 @@ public sealed class Game
         _window.UpdateFrame += OnUpdateWindow;
         _window.RenderFrame += OnRenderWindow;
 
-        _windowWidth = _window.Size.X;
-        _windowHeight = _window.Size.Y;
+        _windowWidth = _window.ClientSize.X;
+        _windowHeight = _window.ClientSize.Y;
 
 
 

@@ -16,8 +16,8 @@ public sealed class DynamicTextureAtlas : IDisposable
 
     public int Count => _items.Length;
     public Texture AtlasTexture => _atlasTexture;
-    public int AtlasWidth => _atlasTexture.Width;
-    public int AtlasHeight => _atlasTexture.Height;
+    public int AtlasWidth => _atlasTexture.BaseWidth;
+    public int AtlasHeight => _atlasTexture.BaseHeight;
 
     public ITexture this[int index]
     {

@@ -50,6 +50,8 @@ class TestScene : Scene
 
         _backgroundImage = new(@"C:\Users\PC_User\OneDrive\画像\Screenshots\スクリーンショット 2025-03-30 142858.png");
         RegisterPersistentResource(_backgroundImage);
+
+        InGameDebug.Enable();
     }
 
     public override void OnEnter()
@@ -108,6 +110,11 @@ class TestScene : Scene
         if (Input.IsKeyPressed(Key.Escape))
         {
             ExitGame();
+        }
+
+        if (Input.IsKeyPressed(Key.D))
+        {
+            InGameDebug.ShowOrHideOverlay();
         }
 
         _elapsed += deltaTime;

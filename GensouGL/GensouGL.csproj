@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Core\Debug\JetBrainsMono-Light.ttf" />
+    <None Remove="Core\CoreDebug\JetBrainsMono-Light.ttf" />
     <None Remove="Graphics\Shaders\Bullet.frag" />
     <None Remove="Graphics\Shaders\Bullet.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Core\Debug\JetBrainsMono-Light.ttf" />
+    <EmbeddedResource Include="Core\CoreDebug\JetBrainsMono-Light.ttf" />
     <EmbeddedResource Include="Graphics\Shaders\Bullet.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Bullet.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleShape.frag" />
@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <Folder Include="Collision\" />
-    <Folder Include="Graphics\HighLevel\Animation\" />
     <Folder Include="Graphics\Text\" />
     <Folder Include="Graphics\Video\" />
     <Folder Include="UI\" />

@@ -38,9 +38,8 @@ public sealed class BatchTextRenderer : Renderer
         if (_currentFont is not null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer: Begin() called before End().");
+            DebugLog.Warn("BatchTextRenderer: Begin() called before End().");
 #endif
-            return;
         }
 
         _currentFont = font;

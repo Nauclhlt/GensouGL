@@ -15,8 +15,8 @@ public sealed class TiledTextureAtlas : IDisposable
     public int TileHeight => _tileHeight;
     public int CountX => _countX;
     public int CountY => _countY;
-    public int AtlasWidth => _atlasTexture.Width;
-    public int AtlasHeight => _atlasTexture.Height;
+    public int AtlasWidth => _atlasTexture.BaseWidth;
+    public int AtlasHeight => _atlasTexture.BaseHeight;
     public int TileCount => _countX * _countY;
 
     public TiledTextureAtlas(Texture atlas, int tileWidth, int tileHeight)
@@ -34,8 +34,8 @@ public sealed class TiledTextureAtlas : IDisposable
         _atlasTexture = atlas;
         _tileWidth = tileWidth;
         _tileHeight = tileHeight;
-        _countX = _atlasTexture.Width / tileWidth;
-        _countY = _atlasTexture.Height / tileHeight;
+        _countX = _atlasTexture.BaseWidth / tileWidth;
+        _countY = _atlasTexture.BaseHeight / tileHeight;
     }
 
     public ITexture Get(int x, int y)
