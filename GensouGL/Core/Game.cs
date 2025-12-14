@@ -101,6 +101,7 @@ public sealed class Game
         QuickRenderer.Initialize();
         BatchTextRenderer.Initialize();
         BatchBulletRenderer.Initialize();
+        FullscreenQuadRenderer.Initialize();
         AudioPlayer.Initialize();
         InGameDebug.Initialize(this);
     }
@@ -120,6 +121,7 @@ public sealed class Game
         QuickRenderer.Release();
         BatchTextRenderer.Release();
         BatchBulletRenderer.Release();
+        FullscreenQuadRenderer.Release();
         AudioPlayer.Release();
         InGameDebug.Release();
         PersistentResourceService.ReleaseAll();
@@ -234,6 +236,8 @@ public sealed class Game
 
         InitializeOpenGL();
         InitializeEngineCore();
+
+        Screen.Default = new(0, _screenWidth, _screenHeight);
 
         
         _sceneManager.Navigate(_initialScene);

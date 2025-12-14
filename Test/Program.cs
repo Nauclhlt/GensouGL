@@ -24,6 +24,7 @@ class TestScene : Scene
     private Texture _image;
     private MemoryAudio _testAudio;
     private StreamingAudio _testStream;
+    private BloomEffect _bloom;
 
     public override void OnInitialize()
     {
@@ -41,8 +42,8 @@ class TestScene : Scene
         _testAudio.Loop = true;
         RegisterPersistentResource(_testAudio);
 
-        _testStream = StreamingAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
-        //_testStream = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
+        //_testStream = StreamingAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
+        _testStream = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
         _testStream.Loop = true;
         _testStream.LoopStart = 10f;
         _testStream.LoopEnd = 20f;
@@ -50,6 +51,8 @@ class TestScene : Scene
 
         _backgroundImage = new(@"C:\Users\PC_User\OneDrive\画像\Screenshots\スクリーンショット 2025-03-30 142858.png");
         RegisterPersistentResource(_backgroundImage);
+
+        _bloom = new(0.4f, 1.0f, 0.3f, 3.0f);
 
         InGameDebug.Enable();
     }
@@ -123,12 +126,16 @@ class TestScene : Scene
     public override void Render(float deltaTime)
     {
         _qr.DrawTexture(ScreenBounds, _backgroundImage);
-        _br.Begin(_image);
-        for (int i = 0; i < _bullets.Count; i++)
+        
+        using (_br.BeginPostProc(_bloom))
         {
-            _bullets[i].Render(_br, _image);
+            _br.Begin(_image);
+            for (int i = 0; i < _bullets.Count; i++)
+            {
+                _bullets[i].Render(_br, _image);
+            }
+            _br.End();
         }
-        _br.End();
     }
 }
 

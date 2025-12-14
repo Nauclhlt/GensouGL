@@ -50,7 +50,7 @@ public sealed class Animator
 
     private static bool ValidateClip(AnimationClip clip)
     {
-        return clip.Frames is not null && clip.Texture is not null;
+        return clip is not null && clip.Frames is not null && clip.Texture is not null;
     }
 
     public void Remove(string name)

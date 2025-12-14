@@ -2,11 +2,13 @@
 
 public sealed class Screen : IScreen, IDisposable
 {
-    public static Screen Default { get; } = new(0);
+    public static Screen Default { get; internal set; } = new Screen(0, 0, 0);
 
 
     private int _framebuffer;
     private Texture _texture;
+    private int _renderingWidth;
+    private int _renderingHeight;
     private int _width;
     private int _height;
 
@@ -17,17 +19,17 @@ public sealed class Screen : IScreen, IDisposable
     public int Width => _width;
     public int Height => _height;
 
-    private Screen(int framebuffer)
+    internal Screen(int framebuffer, int width, int height)
     {
         _framebuffer = framebuffer;
-        _width = 0;
-        _height = 0;
+        _width = width;
+        _height = height;
         _texture = null;
     }
 
     public Screen(int width, int height)
     {
-        if (width < 0 || height < 0)
+        if (width <= 0 || height <= 0)
         {
             throw new ArgumentException("Width and height need to be positiove integers.");
         }
@@ -67,7 +69,8 @@ public sealed class Screen : IScreen, IDisposable
                 _texture?.Dispose();
             }
 
-            GL.DeleteFramebuffer(_framebuffer);
+            if (_framebuffer != 0)
+                GL.DeleteFramebuffer(_framebuffer);
 
             _disposed = true;
         }

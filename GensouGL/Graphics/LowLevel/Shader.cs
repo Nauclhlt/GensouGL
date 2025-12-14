@@ -64,6 +64,20 @@ public sealed class Shader : IDisposable
         GL.UseProgram(0);
     }
 
+    public void SetUniformFloat(string name, float value)
+    {
+        GL.UseProgram(_program);
+        int loc = GL.GetUniformLocation(_program, name);
+        GL.Uniform1(loc, value);
+    }
+
+    public void SetUniformVector2(string name, float x, float y)
+    {
+        GL.UseProgram(_program);
+        int loc = GL.GetUniformLocation(_program, name);
+        GL.Uniform2(loc, x, y);
+    }
+
     internal static void SendMatrix0(OpenTK.Mathematics.Matrix4 matrix)
     {
         GL.UniformMatrix4(0, false, ref matrix);
@@ -91,24 +105,30 @@ public sealed class Shader : IDisposable
 
     private static Shader s_simpleShape;
     private static Shader s_simpleTexture;
-    private static Shader s_Bullet;
+    private static Shader s_bullet;
+    private static Shader s_brightPass;
+    private static Shader s_bloomBlur;
 
     internal static Shader SimpleShape => s_simpleShape;
     internal static Shader SimpleTexture => s_simpleTexture;
-    internal static Shader Bullet => s_Bullet;
+    internal static Shader Bullet => s_bullet;
+    internal static Shader BrightPass => s_brightPass;
+    internal static Shader BloomBlur => s_bloomBlur;
 
     internal static void LoadShaders()
     {
         Assembly asm = typeof(Shader).Assembly;
         s_simpleShape = Gen(asm, "SimpleShape");
         s_simpleTexture = Gen(asm, "SimpleTexture");
-        s_Bullet = Gen(asm, "Bullet");
+        s_bullet = Gen(asm, "Bullet");
+        s_brightPass = Gen(asm, "BrightPass");
+        s_bloomBlur = Gen(asm, "BrightPass", "BloomBlur");
     }
 
-    private static Shader Gen(Assembly asm, string name)
+    private static Shader Gen(Assembly asm, string vert, string frag = null)
     {
-        using Stream vstream = asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.{name}.vert");
-        using Stream fstream = asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.{name}.frag");
+        using Stream vstream = asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.{vert}.vert");
+        using Stream fstream = asm.GetManifestResourceStream(frag is null ? $"GensouGL.Graphics.Shaders.{vert}.frag" : $"GensouGL.Graphics.Shaders.{frag}.frag");
 
         using StreamReader vreader = new StreamReader(vstream);
         using StreamReader freader = new StreamReader(fstream);

@@ -63,7 +63,7 @@ public struct Color
 
     #region Default Colors
 
-    public static readonly Color Transparent = new(255, 255, 255);
+    public static readonly Color Transparent = new(0, 0, 0, 0);
     public static readonly Color AliceBlue = new(240, 248, 255);
     public static readonly Color AntiqueWhite = new(250, 235, 215);
     public static readonly Color Aqua = new(0, 255, 255);
