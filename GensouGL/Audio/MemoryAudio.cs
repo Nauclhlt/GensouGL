@@ -23,14 +23,11 @@ public sealed class MemoryAudio : Audio, IDisposable
     {
     }
 
-    private MemoryAudio(int buffer, int source, int sampleRate, int channels, int bitsPerSample, float duration)
+    private MemoryAudio(int buffer, int source, AudioInfo info)
     {
         _buffer = buffer;
         _source = source;
-        _sampleRate = sampleRate;
-        _channels = channels;
-        _bitsPerSample = bitsPerSample;
-        _duration = duration;
+        _info = info;
     }
 
 
@@ -51,7 +48,7 @@ public sealed class MemoryAudio : Audio, IDisposable
 
     public void Seek(float position)
     {
-        if (position < 0 || position >= _duration)
+        if (position < 0 || position >= Duration)
         {
 #if DEBUG
             DebugLog.Error("MemoryAudio: Specified position is out of range.");
@@ -69,53 +66,35 @@ public sealed class MemoryAudio : Audio, IDisposable
 
 
 
+    public static MemoryAudio From(AudioSource source)
+    {
+        (byte[] pcm, AudioInfo info) = source.CreateCompleteData();
+        return BufferCreate(pcm, info);
+    }
 
     public static MemoryAudio FromMp3(string filename)
-    {
-        using (var fs = File.OpenRead(filename))
-        {
-            return FromMp3(fs);
-        }
-    }
+         => From(AudioSource.FromMp3(filename));
 
     public static MemoryAudio FromMp3(Stream stream)
-    {
-        var mp3 = new MpegFile(stream);
-        int sampleRate = mp3.SampleRate;
-        int channels = mp3.Channels;
-
-        byte[] pcm = new byte[mp3.Length];
-        int read = mp3.ReadSamplesInt16(pcm, 0, pcm.Length);
-
-        return BufferCreate(pcm, channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, sampleRate, channels, 16, (float)mp3.Duration.TotalSeconds);
-    }
+        => From(AudioSource.FromMp3(stream));
 
     public static MemoryAudio FromWave(string filename)
-    {
-        using (var fs = File.OpenRead(filename))
-        {
-            return FromWave(fs);
-        }
-    }
+        => From(AudioSource.FromWave(filename));
 
     public static MemoryAudio FromWave(Stream stream)
-    {
-        WavPcmDecoder decoder = new();
-        decoder.Load(stream);
+        => From(AudioSource.FromWave(stream));
 
-        return BufferCreate(decoder.PcmData, Audio.ToFormat(decoder.Channels, decoder.BitsPerSample), decoder.SampleRate, decoder.Channels, decoder.BitsPerSample, decoder.Duration);
-    }
-
-    private static MemoryAudio BufferCreate(byte[] pcm, ALFormat format, int sampleRate, int channels, int bitsPerSample, float duration)
+    private static MemoryAudio BufferCreate(byte[] pcm, AudioInfo info)
     {
         int buffer = AL.GenBuffer();
         int source = AL.GenSource();
 
-        AL.BufferData(buffer, format, pcm, sampleRate);
+        ALFormat format = info.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16;
+        AL.BufferData(buffer, format, pcm, info.SampleRate);
 
         AL.Source(source, ALSourcei.Buffer, buffer);
 
-        return new(buffer, source, sampleRate, channels, bitsPerSample, duration);
+        return new(buffer, source, info);
     }
 
     private void Dispose(bool disposing)

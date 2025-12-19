@@ -20,3 +20,4 @@ global using GensouGL.Helpers;
 global using GensouGL.IO;
 global using GensouGL.Core;
 global using GensouGL.Graphics;
+global using GensouGL.Core.AsyncLoaders;

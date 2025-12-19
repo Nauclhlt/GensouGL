@@ -371,6 +371,7 @@ public sealed class QuickRenderer : Renderer
 
     public void DrawTexture(float x, float y, float width, float height, ITexture texture, Color color)
     {
+        texture ??= Texture.Empty;
         float[] va =
         {
             x, y,

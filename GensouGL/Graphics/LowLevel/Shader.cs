@@ -78,6 +78,13 @@ public sealed class Shader : IDisposable
         GL.Uniform2(loc, x, y);
     }
 
+    public void SetUniformVector4(string name, float x, float y, float z, float w)
+    {
+        GL.UseProgram(_program);
+        int loc = GL.GetUniformLocation(_program, name);
+        GL.Uniform4(loc, new OpenTK.Mathematics.Vector4(x, y, z, w));
+    }
+
     internal static void SendMatrix0(OpenTK.Mathematics.Matrix4 matrix)
     {
         GL.UniformMatrix4(0, false, ref matrix);
@@ -108,12 +115,14 @@ public sealed class Shader : IDisposable
     private static Shader s_bullet;
     private static Shader s_brightPass;
     private static Shader s_bloomBlur;
+    private static Shader s_blindfold;
 
     internal static Shader SimpleShape => s_simpleShape;
     internal static Shader SimpleTexture => s_simpleTexture;
     internal static Shader Bullet => s_bullet;
     internal static Shader BrightPass => s_brightPass;
     internal static Shader BloomBlur => s_bloomBlur;
+    internal static Shader Blindfold => s_blindfold;
 
     internal static void LoadShaders()
     {
@@ -123,6 +132,7 @@ public sealed class Shader : IDisposable
         s_bullet = Gen(asm, "Bullet");
         s_brightPass = Gen(asm, "BrightPass");
         s_bloomBlur = Gen(asm, "BrightPass", "BloomBlur");
+        s_blindfold = Gen(asm, "BrightPass", "Blindfold");
     }
 
     private static Shader Gen(Assembly asm, string vert, string frag = null)

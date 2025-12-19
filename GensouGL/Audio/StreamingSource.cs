@@ -8,7 +8,7 @@ public abstract class StreamingSource : IDisposable
 
     public abstract int Read(byte[] buffer, int length);
     public abstract void Seek(long position);
-    public abstract void GetInfo(out int sampleRate, out int bitsPerSample, out int channels, out float duration);
+    public abstract AudioInfo GetInfo();
 
     public void Dispose()
     {

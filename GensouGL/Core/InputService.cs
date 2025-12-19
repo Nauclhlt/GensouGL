@@ -52,4 +52,16 @@ public sealed class InputService
         Point pos = GetMousePosition();
         return new Point(pos.X / _game.WindowWidth * _game.ScreenWidth, pos.Y / _game.WindowHeight * _game.ScreenHeight);
     }
+
+    public TextInputListener CreateTextInputListener()
+    {
+        TextInputListener listener = new();
+        _game.RegisterTextInputListener(listener);
+        return listener;
+    }
+
+    public void DestroyTextInputListener(TextInputListener listener)
+    {
+        _game.UnregisterTextInputListener(listener);
+    }
 }

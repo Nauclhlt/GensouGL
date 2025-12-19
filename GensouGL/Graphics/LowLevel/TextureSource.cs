@@ -1,12 +1,15 @@
 ﻿namespace GensouGL.Graphics;
 
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+
 public sealed class TextureSource
 {
     private TextureSourceType _type;
     private string _filename;
     private Stream _stream = null;
     private byte[] _byteArray = null;
-    private SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> _image = null;
+    private Image<Rgba32> _image = null;
 
     public TextureSourceType Type => _type;
     public string Filename => _filename;
@@ -31,21 +34,33 @@ public sealed class TextureSource
         _type = TextureSourceType.ByteArray;
     }
 
-    internal TextureSource(SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image)
+    internal TextureSource(Image<Rgba32> image)
     {
         _image = image;
         _type = TextureSourceType.Temporary;
     }
 
-    internal SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> LoadImageSharpImage()
+    internal Image<Rgba32> LoadImageSharpImage()
     {
         return _type switch
         {
-            TextureSourceType.File => SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(_filename),
-            TextureSourceType.Stream => SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(_stream),
-            TextureSourceType.ByteArray => SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(_byteArray),
+            TextureSourceType.File => Image.Load<Rgba32>(_filename),
+            TextureSourceType.Stream => Image.Load<Rgba32>(_stream),
+            TextureSourceType.ByteArray => Image.Load<Rgba32>(_byteArray),
             TextureSourceType.Temporary => _image,
             _ => throw new InvalidOperationException("Invalid TextureSourceType."),
+        };
+    }
+
+    internal async Task<Image<Rgba32>> LoadImageSharpImageAsync()
+    {
+        return _type switch
+        {
+            TextureSourceType.File => await Image.LoadAsync<Rgba32>(_filename),
+            TextureSourceType.Stream => await Image.LoadAsync<Rgba32>(_stream),
+            TextureSourceType.ByteArray => Image.Load<Rgba32>(_byteArray),
+            TextureSourceType.Temporary => _image,
+            _ => throw new InvalidOperationException("Invalid TextureSourceType.")
         };
     }
 }

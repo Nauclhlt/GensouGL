@@ -14,12 +14,9 @@ internal sealed class MpegFileAdapter : StreamingSource
         _mpegFile = new MpegFile(stream);
     }
 
-    public override void GetInfo(out int sampleRate, out int bitsPerSample, out int channels, out float duration)
+    public override AudioInfo GetInfo()
     {
-        sampleRate = _mpegFile.SampleRate;
-        bitsPerSample = 16;
-        channels = _mpegFile.Channels;
-        duration = (float)_mpegFile.Duration.TotalSeconds;
+        return new AudioInfo((float)_mpegFile.Duration.TotalSeconds, _mpegFile.SampleRate, 16, _mpegFile.Channels);
     }
 
     public override int Read(byte[] buffer, int length)

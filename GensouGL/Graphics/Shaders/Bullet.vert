@@ -17,8 +17,9 @@ out vec2 vTexCoord;
 
 void main()
 {
-	vec2 rot = vec2(vertPosition.x * cos(rotation) + vertPosition.y * sin(rotation), -vertPosition.x * sin(rotation) + vertPosition.y * cos(rotation));
-	gl_Position = vMatrix * vec4(position + scale * rot, 0, 1);
+	vec2 sv = vertPosition * scale;
+	vec2 rot = vec2(sv.x * cos(rotation) + sv.y * sin(rotation), -sv.x * sin(rotation) + sv.y * cos(rotation));
+	gl_Position = vMatrix * vec4(position + rot, 0, 1);
 
 	vColor = color;
 	vTexCoord = texCoord;

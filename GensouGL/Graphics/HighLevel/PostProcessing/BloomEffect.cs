@@ -31,6 +31,8 @@ public sealed class BloomEffect : PostProcessEffect
         set => _spread = value;
     }
 
+    public static BloomEffect Default { get; } = new();
+
     public BloomEffect() : this(0.5f, 1.0f, 0.5f, 1.0f)
     {
     }

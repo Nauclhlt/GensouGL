@@ -45,7 +45,7 @@ public sealed class StreamingAudio : Audio, IDisposable
                 return;
             }
 
-            if (value < 0 || value > _duration)
+            if (value < 0 || value > Duration)
             {
                 return;
             }
@@ -72,12 +72,12 @@ public sealed class StreamingAudio : Audio, IDisposable
                 return;
             }
 
-            _loopEnd = value > _duration ? float.PositiveInfinity : value;
+            _loopEnd = value > Duration ? float.PositiveInfinity : value;
         }
     }
     
     
-    public float Position => BytesToSeconds((long)_buffersPlayed * BufferSize) + AL.GetSource(_source, ALSourcef.SecOffset);    
+    public float Position => _info.BytesToSeconds((long)_buffersPlayed * BufferSize) + AL.GetSource(_source, ALSourcef.SecOffset);    
     public AudioState State => _state;
     public int[] Buffers => _buffers;
     public Guid UniqueId => _uniqueId;
@@ -91,8 +91,8 @@ public sealed class StreamingAudio : Audio, IDisposable
     {
         _uniqueId = Guid.NewGuid();
         _streamingSource = streamingSource;
-        _streamingSource.GetInfo(out _sampleRate, out _bitsPerSample, out _channels, out _duration);
-        _format = Audio.ToFormat(_channels, _bitsPerSample);
+        _info = _streamingSource.GetInfo();
+        _format = _info.ToFormat();
         _loop = false;
         _state = AudioState.Stopped;
         _buffersPlayed = 0;
@@ -113,7 +113,7 @@ public sealed class StreamingAudio : Audio, IDisposable
         int read = _streamingSource.Read(buf, BufferSize);
         if (read <= 0) return false;
 
-        AL.BufferData(buffer, _format, ref buf[0], read, _sampleRate);
+        AL.BufferData(buffer, _format, ref buf[0], read, SampleRate);
         AL.SourceQueueBuffer(_source, buffer);
 
         return true;
@@ -194,7 +194,7 @@ public sealed class StreamingAudio : Audio, IDisposable
 
     public void Seek(float position)
     {
-        if (position < 0 || position >= _duration)
+        if (position < 0 || position >= Duration)
         {
 #if DEBUG
             DebugLog.Error("StreamingAudio: Specified position is out of range.");
@@ -209,7 +209,7 @@ public sealed class StreamingAudio : Audio, IDisposable
 
         DequeueAllBuffers();
 
-        long offset = SecondsToBytes(position);
+        long offset = _info.SecondsToBytes(position);
         _streamingSource.Seek(offset);
         _buffersPlayed = offset / BufferSize;
 
@@ -230,7 +230,7 @@ public sealed class StreamingAudio : Audio, IDisposable
 
         DequeueAllBuffers();
 
-        long start = SecondsToBytes(LoopStart);
+        long start = _info.SecondsToBytes(LoopStart);
         _streamingSource.Seek(start);
         _buffersPlayed = start / BufferSize;
 
@@ -279,18 +279,6 @@ public sealed class StreamingAudio : Audio, IDisposable
         }
     }
 
-    private float BytesToSeconds(long bytes)
-    {
-        float bytesPerSecond = _sampleRate * _channels * (_bitsPerSample / 8.0f);
-        return bytes / bytesPerSecond;
-    }
-
-    private long SecondsToBytes(float seconds)
-    {
-        float bytesPerSecond = _sampleRate * _channels * (_bitsPerSample / 8.0f);
-        return (long)(seconds * bytesPerSecond);
-    }
-
 
 
 
@@ -312,6 +300,11 @@ public sealed class StreamingAudio : Audio, IDisposable
     public static StreamingAudio FromWave(Stream stream)
     {
         return new StreamingAudio(new WavePcmSource(stream));
+    }
+
+    public static StreamingAudio From(AudioSource source)
+    {
+        return new StreamingAudio(source.CreateStreamingSource());
     }
 
 

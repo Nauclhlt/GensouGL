@@ -22,9 +22,10 @@ class TestScene : Scene
     private Texture _backgroundImage;
     private List<Bullet> _bullets = new();
     private Texture _image;
-    private MemoryAudio _testAudio;
-    private StreamingAudio _testStream;
     private BloomEffect _bloom;
+    private TextInputListener _listener;
+    private AsyncResourceLoader _loader;
+    private StreamingAudio _streamingAudio;
 
     public override void OnInitialize()
     {
@@ -37,24 +38,25 @@ class TestScene : Scene
         _image.ResizeMode = TextureResizeMode.NearestNeighbor;
         RegisterPersistentResource(_image);
 
-        //_testAudio = MemoryAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
-        _testAudio = MemoryAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
-        _testAudio.Loop = true;
-        RegisterPersistentResource(_testAudio);
-
-        //_testStream = StreamingAudio.FromMp3(@"C:\Users\PC_User\Downloads\[MV] SECRET NUMBER(시크릿넘버)  Got That Boom.mp3");
-        _testStream = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
-        _testStream.Loop = true;
-        _testStream.LoopStart = 10f;
-        _testStream.LoopEnd = 20f;
-        RegisterPersistentResource(_testStream);
-
         _backgroundImage = new(@"C:\Users\PC_User\OneDrive\画像\Screenshots\スクリーンショット 2025-03-30 142858.png");
         RegisterPersistentResource(_backgroundImage);
 
         _bloom = new(0.4f, 1.0f, 0.3f, 3.0f);
 
+        _listener = Input.CreateTextInputListener();
+        
         InGameDebug.Enable();
+
+        _loader = new(2);
+        RegisterPersistentResource(_loader);
+
+
+
+
+
+
+        _streamingAudio = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
+        RegisterPersistentResource(_streamingAudio);
     }
 
     public override void OnEnter()
@@ -94,26 +96,28 @@ class TestScene : Scene
                 v = v.Rotate(MathF.PI * 2 / 12);
             }
         }
-
-        if (Input.IsKeyPressed(Key.A))
-        {
-            _testStream.Play();
-        }
-
-        if (Input.IsKeyPressed(Key.B))
-        {
-            _testStream.Stop();
-        }
-
-        if (Input.IsKeyPressed(Key.C))
-        {
-            _testStream.Seek(10f);
-        }
         
         if (Input.IsKeyPressed(Key.Escape))
         {
             ExitGame();
         }
+
+        if (Input.IsKeyPressed(Key.A))
+        {
+            _streamingAudio.Play();
+        }
+
+        if (Input.IsKeyPressed(Key.B))
+        {
+            _streamingAudio.Stop();
+        }
+
+        if (Input.IsKeyPressed(Key.L))
+        {
+            _loader.QueueTexture("testImage", new TextureSource(@"C:\Users\PC_User\Downloads\20231104200836.png"));
+        }
+
+        _loader.ProcessQueue();
 
         if (Input.IsKeyPressed(Key.D))
         {
@@ -121,12 +125,17 @@ class TestScene : Scene
         }
 
         _elapsed += deltaTime;
+
+        if (_listener.Pop(out string content))
+        {
+            DebugLog.User(content);
+        }
     }
 
     public override void Render(float deltaTime)
     {
         _qr.DrawTexture(ScreenBounds, _backgroundImage);
-        
+
         using (_br.BeginPostProc(_bloom))
         {
             _br.Begin(_image);
@@ -136,6 +145,13 @@ class TestScene : Scene
             }
             _br.End();
         }
+
+        Point mp = Input.GetMousePosition();
+
+        //using (_qr.BeginPostProc(new BlindfoldEffect(Color.Black, ScreenBounds)))
+        //{
+        //    _qr.DrawCircle(mp.X, mp.Y, 128, Color.White);
+        //}
     }
 }
 
@@ -164,6 +180,6 @@ public sealed class Bullet
 
     public void Render(BatchBulletRenderer br, Texture texture)
     {
-        br.Draw(_position.X, _position.Y, 12, 12, Color.White, texture);
+        br.Draw(_position.X, _position.Y, 12, 12, 0f, Color.White, texture);
     }
 }

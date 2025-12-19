@@ -46,7 +46,7 @@
                         // fmt chunk が16以上の場合、追加スキップ
                         if (chunkSize > 16)
                             br.ReadBytes(chunkSize - 16);
-
+                        
                         fmtFound = true;
                         break;
 

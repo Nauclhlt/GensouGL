@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Core\CoreDebug\JetBrainsMono-Light.ttf" />
+    <None Remove="Graphics\Shaders\Blindfold.frag" />
     <None Remove="Graphics\Shaders\BloomBlur.frag" />
     <None Remove="Graphics\Shaders\Bullet.frag" />
     <None Remove="Graphics\Shaders\Bullet.vert" />
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Core\CoreDebug\JetBrainsMono-Light.ttf" />
+    <EmbeddedResource Include="Graphics\Shaders\Blindfold.frag" />
     <EmbeddedResource Include="Graphics\Shaders\BloomBlur.frag" />
     <EmbeddedResource Include="Graphics\Shaders\BrightPass.frag" />
     <EmbeddedResource Include="Graphics\Shaders\BrightPass.vert" />

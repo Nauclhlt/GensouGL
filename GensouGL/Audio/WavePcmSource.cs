@@ -89,12 +89,9 @@ internal sealed class WavePcmSource : StreamingSource
         _reader.BaseStream.Seek(_pcmHead, SeekOrigin.Begin);       
     }
 
-    public override void GetInfo(out int sampleRate, out int bitsPerSample, out int channels, out float duration)
+    public override AudioInfo GetInfo()
     {
-        sampleRate = _sampleRate;
-        bitsPerSample = _bitsPerSample;
-        channels = _channels;
-        duration = _duration;
+        return new AudioInfo(_duration, _sampleRate, _bitsPerSample, _channels);
     }
 
     public override int Read(byte[] buffer, int length)

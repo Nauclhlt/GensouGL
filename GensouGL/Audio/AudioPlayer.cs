@@ -3,7 +3,7 @@ using OpenTK.Audio;
 
 namespace GensouGL.Core;
 
-public static class AudioPlayer
+internal static class AudioPlayer
 {
     private static OpenALContext _context;
 

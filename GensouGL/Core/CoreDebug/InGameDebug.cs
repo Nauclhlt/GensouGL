@@ -87,7 +87,8 @@ public static class InGameDebug
                 $"OpenGL version: {_glVersion}",
                 $"OpenGL vendor: {_glVendor}",
                 $"OpenGL renderer: {_glRenderer}",
-                $"OpenAL version: {_alVersion}"
+                $"OpenAL version: {_alVersion}",
+                $"Memory Usage: {Math.Round(Environment.WorkingSet / 1024.0 / 1024.0, 2)} MB"
                 ];
                 float maxWidth = list1.Max(x => _font1.WidthOf(x));
                 drawWindow(10f, 10f, maxWidth + 20f, 200f);

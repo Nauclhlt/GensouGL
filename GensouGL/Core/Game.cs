@@ -31,6 +31,7 @@ public sealed class Game
     internal SceneManager _sceneManager;
     internal OverlayService _overlayService;
     internal InputService _inputService;
+    private List<TextInputListener> _textInputListeners;
 
     internal Game()
     {
@@ -88,11 +89,25 @@ public sealed class Game
 
 
 
+    // internal
+    internal void RegisterTextInputListener(TextInputListener listener)
+    {
+        _textInputListeners.Add(listener);
+    }
+
+    internal void UnregisterTextInputListener(TextInputListener listener)
+    {
+        _textInputListeners.Remove(listener);
+    }
+
+
+
 
 
     private void InitializeEngineCore()
     {
         _overlayService = new(this);
+        _textInputListeners = new();
         _inputService = new(this);
 
         _sceneManager = new(this);
@@ -134,7 +149,7 @@ public sealed class Game
 
 
 
-
+    // events
     private void OnUpdateWindow(FrameEventArgs args)
     {
         float deltaTime = (float)args.Time;
@@ -187,6 +202,14 @@ public sealed class Game
         _window.SwapBuffers();
     }
 
+    private void OnTextInput(TextInputEventArgs args)
+    {
+        for (int i = 0; i < _textInputListeners.Count; i++)
+        {
+            _textInputListeners[i].Send(args.AsString);
+        }
+    }
+
     public void Run()
     {
         if (_windowWidth <= 0 || _windowHeight <= 0)
@@ -228,6 +251,7 @@ public sealed class Game
 
         _window.UpdateFrame += OnUpdateWindow;
         _window.RenderFrame += OnRenderWindow;
+        _window.TextInput += OnTextInput;
 
         _windowWidth = _window.ClientSize.X;
         _windowHeight = _window.ClientSize.Y;
