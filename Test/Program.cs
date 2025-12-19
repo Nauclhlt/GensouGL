@@ -30,7 +30,7 @@ class TestScene : Scene
     public override void OnInitialize()
     {
         DebugLog.User("TestScene initialized.");
-
+        
         _br = CreateBatchBulletRenderer(Screen.Default);
         _qr = CreateQuickRenderer(Screen.Default);
 
