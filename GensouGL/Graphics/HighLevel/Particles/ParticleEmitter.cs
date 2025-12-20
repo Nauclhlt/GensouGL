@@ -3,6 +3,7 @@
 public abstract class ParticleEmitter
 {
     protected ParticleSettings _settings;
+    protected GVector2 _position;
 
-    public abstract void Emit(Point point);
+    public abstract bool Update(ParticleSystem system, float deltaTime);
 }

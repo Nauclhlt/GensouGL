@@ -18,7 +18,7 @@ public sealed class Texture : ITexture, IDisposable
     public static Texture Empty
     {
         get;
-    } = new Texture(32, 32);
+    } = new Texture(32, 32, Color.White);
 
     private Texture()
     {
@@ -36,6 +36,37 @@ public sealed class Texture : ITexture, IDisposable
 
         GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0,
             PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+
+        TextureService.Pop();
+    }
+
+    public Texture(int width, int height, Color fillColor)
+    {
+        if (width < 0 || height < 0)
+            throw new ArgumentOutOfRangeException("Width and Height must be non-negative.");
+
+        _id = GL.GenTexture();
+        _width = width;
+        _height = height;
+        _coords = new Rect(0, 0, 1, 1);
+
+        byte[] pixels = new byte[width * height * 4];
+        for (int i = 0; i < width * height; i++)
+        {
+            pixels[i * 4 + 0] = fillColor.R;
+            pixels[i * 4 + 1] = fillColor.G;
+            pixels[i * 4 + 2] = fillColor.B;
+            pixels[i * 4 + 3] = fillColor.A;
+        }
+
+        TextureService.PushAndBind(_id);
+
+        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0,
+            PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);

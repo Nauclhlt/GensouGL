@@ -12,6 +12,7 @@ public sealed class Particle
     public float AngularVelocity { get; set; }
     public Color StartColor { get; set; }
     public Color EndColor { get; set; }
+    public ITexture Texture { get; set; }
 
     public Color GetCurrentColor()
     {
@@ -23,7 +24,7 @@ public sealed class Particle
         Velocity += Accel * deltaTime;
         Position += Velocity * deltaTime;
 
-        Rotation += AngularVelocity;
+        Rotation += AngularVelocity * deltaTime;
 
         Life -= deltaTime;
     }

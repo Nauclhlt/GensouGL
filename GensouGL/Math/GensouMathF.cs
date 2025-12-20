@@ -9,7 +9,7 @@ public static class GensouMathF
 
     public static Color Lerp(Color from, Color to, float pos)
     {
-        return Color.FromFloat(Lerp(from.R, to.R, pos), Lerp(from.G, from.G, pos), Lerp(from.B, to.B, pos), Lerp(from.A, to.A, pos));
+        return Color.FromFloat(Lerp(from.Rf, to.Rf, pos), Lerp(from.Gf, from.Gf, pos), Lerp(from.Bf, to.Bf, pos), Lerp(from.Af, to.Af, pos));
     }
 
     public static float Rad(float degrees)

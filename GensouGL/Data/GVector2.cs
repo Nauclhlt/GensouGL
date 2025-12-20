@@ -71,4 +71,7 @@ public struct GVector2
     public static GVector2 operator *(GVector2 v, float scalar) => new (v.X * scalar, v.Y * scalar);
     public static GVector2 operator *(float scalar, GVector2 v) => new(v.X * scalar, v.Y * scalar);
     public static GVector2 operator /(GVector2 v, float scalar) => new (v.X / scalar, v.Y / scalar);
+
+    public static implicit operator Point(GVector2 v) => new(v.X, v.Y);
+    public static implicit operator GVector2(Point p) => new(p.X, p.Y);
 }

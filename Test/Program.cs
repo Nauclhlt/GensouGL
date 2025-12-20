@@ -1,6 +1,7 @@
 ﻿using GensouGL.Core;
 using GensouGL.GameDev;
 using GensouGL.Graphics;
+using GensouGL.Graphics.Particles;
 using GensouGL.Helpers;
 using GensouGL.IO;
 
@@ -22,10 +23,11 @@ class TestScene : Scene
     private Texture _backgroundImage;
     private List<Bullet> _bullets = new();
     private Texture _image;
+    private Texture _particleImage;
     private BloomEffect _bloom;
     private TextInputListener _listener;
-    private AsyncResourceLoader _loader;
     private StreamingAudio _streamingAudio;
+    private ParticleSystem _particleSystem;
 
     public override void OnInitialize()
     {
@@ -38,6 +40,9 @@ class TestScene : Scene
         _image.ResizeMode = TextureResizeMode.NearestNeighbor;
         RegisterPersistentResource(_image);
 
+        _particleImage = new(@"C:\Users\PC_User\Downloads\testpart.png");
+        RegisterPersistentResource(_particleImage);
+
         _backgroundImage = new(@"C:\Users\PC_User\OneDrive\画像\Screenshots\スクリーンショット 2025-03-30 142858.png");
         RegisterPersistentResource(_backgroundImage);
 
@@ -47,12 +52,9 @@ class TestScene : Scene
         
         InGameDebug.Enable();
 
-        _loader = new(2);
-        RegisterPersistentResource(_loader);
+        
 
-
-
-
+        _particleSystem = new(_br, _particleImage, BlendMode.Add);
 
 
         _streamingAudio = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
@@ -84,6 +86,8 @@ class TestScene : Scene
             }
         }
 
+        _particleSystem.Update(deltaTime);
+
         if (Input.IsKeyDown(Key.Enter))
         {
             float cx = 960f * Randomizer.NextFloat();
@@ -92,7 +96,7 @@ class TestScene : Scene
             GVector2 v = new GVector2(0, 220f);
             for (int i = 0; i < 12; i++)
             {
-                _bullets.Add(new Bullet(new GVector2(cx, cy) - v.Normalize() * 80f, v));
+                _bullets.Add(new Bullet(new GVector2(cx, cy) + v.Normalize() * 40f, v.Rotate(GensouMathF.Rad(90))));
                 v = v.Rotate(MathF.PI * 2 / 12);
             }
         }
@@ -112,16 +116,27 @@ class TestScene : Scene
             _streamingAudio.Stop();
         }
 
-        if (Input.IsKeyPressed(Key.L))
-        {
-            _loader.QueueTexture("testImage", new TextureSource(@"C:\Users\PC_User\Downloads\20231104200836.png"));
-        }
-
-        _loader.ProcessQueue();
-
         if (Input.IsKeyPressed(Key.D))
         {
             InGameDebug.ShowOrHideOverlay();
+        }
+
+        if (Input.IsKeyPressed(Key.L))
+        {
+            RandomCircularEmitter emitter = new(
+                new ParticleSettings()
+                {
+                    Speed = (300f, 350f),
+                    Accel = (15f, 30f),
+                    Rotation = (0, MathF.PI),
+                    Life = (0.2f, 0.4f),
+                    Size = (16, 20f),
+                    ShootAngle = (0f, MathF.PI * 2),
+                    StartColor = (Color.White, Color.White),
+                    EndColor = (Color.White.WithAlpha(0), Color.White.WithAlpha(0)),
+                    Texture = _particleImage
+                }, ScreenCenter, 1f, 2, 32);
+            _particleSystem.Emit(emitter);
         }
 
         _elapsed += deltaTime;
@@ -148,10 +163,10 @@ class TestScene : Scene
 
         Point mp = Input.GetMousePosition();
 
-        //using (_qr.BeginPostProc(new BlindfoldEffect(Color.Black, ScreenBounds)))
-        //{
-        //    _qr.DrawCircle(mp.X, mp.Y, 128, Color.White);
-        //}
+        _particleSystem.Render();
+        //_br.Begin(_image);
+        //_br.Draw(mp.X, mp.Y, 128, 128, 0f, Color.Yellow, _image);
+        //_br.End();
     }
 }
 

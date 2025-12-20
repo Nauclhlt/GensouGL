@@ -78,6 +78,11 @@ public sealed class AsyncResourceLoader : IDisposable
         QueueCore(name, new AsyncStreamingAudioLoader(source));
     }
 
+    public void QueueMemoryAudio(string name, AudioSource source)
+    {
+        QueueCore(name, new AsyncMemoryAudioLoader(source));
+    }
+
     public void QueueText(string name, string filename)
     {
         QueueCore(name, new AsyncTextLoader(filename));
