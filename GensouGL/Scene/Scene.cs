@@ -37,6 +37,11 @@ public class Scene
         return new BatchBulletRenderer(_game, screen);
     }
 
+    protected BatchShapeRenderer CreateBatchShapeRenderer(Screen screen)
+    {
+        return new BatchShapeRenderer(_game, screen);
+    }
+
     protected void RegisterPersistentResource(IDisposable resource)
     {
         PersistentResourceService.Register(resource);

@@ -23,7 +23,7 @@ public struct Rect
     public readonly float Top => Y;
     public readonly float Right => X + Width;
     public readonly float Bottom => Y + Height;
-    public readonly Point Center => new(X + Width / 2, Y + Height / 2);
+    public readonly Point CenterPoint => new(X + Width / 2, Y + Height / 2);
     public readonly bool HasArea => Width != 0 && Height != 0;
 
     public readonly Rect Offset(float offsetX, float offsetY)
@@ -34,6 +34,11 @@ public struct Rect
     public readonly Rect Resize(float newWidth, float newHeight)
     {
         return new Rect(X, Y, newWidth, newHeight);
+    }
+
+    public readonly Rect Center(float width, float height)
+    {
+        return new Rect(X + (Width - width) / 2f, Y + (Height - height) / 2f, width, height);
     }
 
     public readonly Rect GetPartialRelative(Rect rect)

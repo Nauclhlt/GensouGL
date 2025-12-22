@@ -28,6 +28,7 @@ class TestScene : Scene
     private TextInputListener _listener;
     private StreamingAudio _streamingAudio;
     private ParticleSystem _particleSystem;
+    private BatchShapeRenderer _sr;
 
     public override void OnInitialize()
     {
@@ -35,6 +36,7 @@ class TestScene : Scene
         
         _br = CreateBatchBulletRenderer(Screen.Default);
         _qr = CreateQuickRenderer(Screen.Default);
+        _sr = CreateBatchShapeRenderer(Screen.Default);
 
         _image = new(@"C:\Users\PC_User\Downloads\red.png");
         _image.ResizeMode = TextureResizeMode.NearestNeighbor;
@@ -43,7 +45,7 @@ class TestScene : Scene
         _particleImage = new(@"C:\Users\PC_User\Downloads\testpart.png");
         RegisterPersistentResource(_particleImage);
 
-        _backgroundImage = new(@"C:\Users\PC_User\OneDrive\画像\Screenshots\スクリーンショット 2025-03-30 142858.png");
+        _backgroundImage = new(@"C:\Users\PC_User\Downloads\20231104200836.png");
         RegisterPersistentResource(_backgroundImage);
 
         _bloom = new(0.4f, 1.0f, 0.3f, 3.0f);
@@ -108,12 +110,12 @@ class TestScene : Scene
 
         if (Input.IsKeyPressed(Key.A))
         {
-            _streamingAudio.Play();
+            OverlayService.Show(new TestOverlay(_qr));
         }
 
         if (Input.IsKeyPressed(Key.B))
         {
-            _streamingAudio.Stop();
+            
         }
 
         if (Input.IsKeyPressed(Key.D))
@@ -196,5 +198,30 @@ public sealed class Bullet
     public void Render(BatchBulletRenderer br, Texture texture)
     {
         br.Draw(_position.X, _position.Y, 12, 12, 0f, Color.White, texture);
+    }
+}
+
+public sealed class TestOverlay : Overlay
+{
+    private QuickRenderer _qr;
+
+    public TestOverlay(QuickRenderer qr)
+    {
+        _qr = qr;
+    }
+
+    public override void FocusUpdate(float deltaTime)
+    {
+        if (Input.IsKeyPressed(Key.C))
+        {
+            Close();
+        }
+    }
+
+    public override void Render(float deltaTime)
+    {
+        _qr.DrawRect(ScreenBounds.Center(400, 400), Color.DarkSlateBlue.WithAlpha(140));
+        _qr.DrawWireRect(ScreenBounds.Center(400, 400), Color.White);
+
     }
 }

@@ -3,6 +3,7 @@
 internal static class TempScreenPool
 {
     private static Dictionary<TempScreenParams, Stack<Screen>> _pools = new();
+    private static int _totalPoolSize = 0;
 
     public static Screen Rent(int width, int height)
     {
@@ -23,6 +24,12 @@ internal static class TempScreenPool
 
         Screen s = new(p.Width, p.Height);
         PersistentResourceService.Register(s);
+        _totalPoolSize++;
+#if DEBUG
+        DebugLog.Info($"TempScreenPool: Created new Screen {p.Width}x{p.Height}.");
+        DebugLog.Info($"TempScreenPool: Current total pool size: {_totalPoolSize}");
+#endif
+
         return s;
     }
 

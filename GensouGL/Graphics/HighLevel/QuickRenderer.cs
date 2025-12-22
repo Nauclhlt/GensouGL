@@ -4,6 +4,8 @@ public sealed class QuickRenderer : Renderer
 {
     private static QuickRendererBuffer _buffer;
 
+    internal static QuickRendererBuffer InternalBuffer => _buffer;
+
     internal static void Initialize()
     {
         _buffer = new QuickRendererBuffer();
@@ -436,19 +438,19 @@ internal sealed class QuickRendererBuffer : IDisposable
         GL.BindVertexArray(0);
     }
 
-    public void Draw(PrimitiveType type, float[] va, float[] ca, float[] ta)
+    public void Draw(PrimitiveType type, Span<float> va, Span<float> ca, Span<float> ta)
     {
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Length, va, BufferUsageHint.DynamicDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Length, ref va[0], BufferUsageHint.DynamicDraw);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Length, ca, BufferUsageHint.DynamicDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Length, ref ca[0], BufferUsageHint.DynamicDraw);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _tbuf);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ta.Length, ta, BufferUsageHint.DynamicDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ta.Length, ref ta[0], BufferUsageHint.DynamicDraw);
 
 
         GL.BindVertexArray(_vao);
@@ -472,15 +474,15 @@ internal sealed class QuickRendererBuffer : IDisposable
         GL.BindVertexArray(0);
     }
 
-    public void Draw(PrimitiveType type, float[] va, float[] ca)
+    public void Draw(PrimitiveType type, Span<float> va, Span<float> ca)
     {
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Length, va, BufferUsageHint.DynamicDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Length, ref va[0], BufferUsageHint.DynamicDraw);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Length, ca, BufferUsageHint.DynamicDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Length, ref ca[0], BufferUsageHint.DynamicDraw);
 
         GL.BindVertexArray(_vao);
 
