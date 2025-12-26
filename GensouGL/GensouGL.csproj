@@ -12,8 +12,11 @@
     <None Remove="Graphics\Shaders\BloomBlur.frag" />
     <None Remove="Graphics\Shaders\Bullet.frag" />
     <None Remove="Graphics\Shaders\Bullet.vert" />
+    <None Remove="Graphics\Shaders\OutlinedText.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\SimpleShape.vert" />
+    <None Remove="Graphics\Shaders\SimpleText.frag" />
+    <None Remove="Graphics\Shaders\SimpleText.vert" />
     <None Remove="Graphics\Shaders\SimpleTexture.frag" />
     <None Remove="Graphics\Shaders\SimpleTexture.vert" />
   </ItemGroup>
@@ -26,16 +29,19 @@
     <EmbeddedResource Include="Graphics\Shaders\BrightPass.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Bullet.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Bullet.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\OutlinedText.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\OutlinedText.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleShape.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\SimpleText.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\SimpleText.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.frag" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.vert" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Collision\" />
-    <Folder Include="Graphics\Text\" />
-    <Folder Include="Graphics\Video\" />
+    <Folder Include="Graphics\HighLevel\Video\" />
     <Folder Include="UI\" />
   </ItemGroup>
 

@@ -116,6 +116,8 @@ public sealed class Shader : IDisposable
     private static Shader s_brightPass;
     private static Shader s_bloomBlur;
     private static Shader s_blindfold;
+    private static Shader s_simpleText;
+    private static Shader s_outlinedText;
 
     internal static Shader SimpleShape => s_simpleShape;
     internal static Shader SimpleTexture => s_simpleTexture;
@@ -123,6 +125,8 @@ public sealed class Shader : IDisposable
     internal static Shader BrightPass => s_brightPass;
     internal static Shader BloomBlur => s_bloomBlur;
     internal static Shader Blindfold => s_blindfold;
+    internal static Shader SimpleText => s_simpleText;
+    internal static Shader OutlinedText => s_outlinedText;
 
     internal static void LoadShaders()
     {
@@ -133,6 +137,8 @@ public sealed class Shader : IDisposable
         s_brightPass = Gen(asm, "BrightPass");
         s_bloomBlur = Gen(asm, "BrightPass", "BloomBlur");
         s_blindfold = Gen(asm, "BrightPass", "Blindfold");
+        s_simpleText = Gen(asm, "SimpleText");
+        s_outlinedText = Gen(asm, "OutlinedText");
     }
 
     private static Shader Gen(Assembly asm, string vert, string frag = null)

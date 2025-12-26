@@ -87,9 +87,9 @@ public sealed class BatchShapeRenderer : Renderer
         DrawRect(rect, color, color, color, color);
     }
 
-    public void DrawRect(Rect rect, Color upperLeft, Color lowerLeft, Color lowerRight, Color upperRight)
+    public void DrawRect(Rect rect, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
-        DrawRect(rect.X, rect.Y, rect.Width, rect.Height, upperLeft, lowerLeft, lowerRight, upperRight);
+        DrawRect(rect.X, rect.Y, rect.Width, rect.Height, topLeft, bottomLeft, bottomRight, topRight);
     }
 
     public void DrawRect(float x, float y, float width, float height, Color color)
@@ -97,7 +97,7 @@ public sealed class BatchShapeRenderer : Renderer
         DrawRect(x, y, width, height, color, color, color, color);
     }
 
-    public void DrawRect(float x, float y, float width, float height, Color upperLeft, Color lowerLeft, Color lowerRight, Color upperRight)
+    public void DrawRect(float x, float y, float width, float height, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
         if (EnsureType(ShapeType.Rect))
         {
@@ -117,13 +117,13 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            upperLeft.Rf, upperLeft.Gf, upperLeft.Bf, upperLeft.Af,
-            lowerLeft.Rf, lowerLeft.Gf, lowerLeft.Bf, lowerLeft.Af,
-            upperRight.Rf, upperRight.Gf, upperRight.Bf, upperRight.Af,
+            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af,
+            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
+            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
 
-            upperRight.Rf, upperRight.Gf, upperRight.Bf, upperRight.Af,
-            lowerLeft.Rf, lowerLeft.Gf, lowerLeft.Bf, lowerLeft.Af,
-            lowerRight.Rf, lowerRight.Gf, lowerRight.Bf, lowerRight.Af,
+            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
+            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
+            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
         ]);
     }
 
@@ -137,9 +137,9 @@ public sealed class BatchShapeRenderer : Renderer
         DrawWireRect(rect, lineWidth, color, color, color, color);
     }
 
-    public void DrawWireRect(Rect rect, float lineWidth, Color upperLeft, Color lowerLeft, Color lowerRight, Color upperRight)
+    public void DrawWireRect(Rect rect, float lineWidth, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
-        DrawWireRect(rect.X, rect.Y, rect.Width, rect.Height, lineWidth, upperLeft, lowerLeft, lowerRight, upperRight);
+        DrawWireRect(rect.X, rect.Y, rect.Width, rect.Height, lineWidth, topLeft, bottomLeft, bottomRight, topRight);
     }
 
     public void DrawWireRect(float x, float y, float width, float height, Color color)
@@ -152,7 +152,7 @@ public sealed class BatchShapeRenderer : Renderer
         DrawWireRect(x, y, width, height, lineWidth, color, color, color, color);
     }
 
-    public void DrawWireRect(float x, float y, float width, float height, float lineWidth, Color upperLeft, Color lowerLeft, Color lowerRight, Color upperRight)
+    public void DrawWireRect(float x, float y, float width, float height, float lineWidth, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
         if (EnsureType(ShapeType.WireRect))
         {
@@ -176,17 +176,17 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            upperLeft.Rf, upperLeft.Gf, upperLeft.Bf, upperLeft.Af,
-            lowerLeft.Rf, lowerLeft.Gf, lowerLeft.Bf, lowerLeft.Af,
+            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af,
+            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
 
-            lowerLeft.Rf, lowerLeft.Gf, lowerLeft.Bf, lowerLeft.Af,
-            lowerRight.Rf, lowerRight.Gf, lowerRight.Bf, lowerRight.Af,
+            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
+            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
 
-            lowerRight.Rf, lowerRight.Gf, lowerRight.Bf, lowerRight.Af,
-            upperRight.Rf, upperRight.Gf, upperRight.Bf, upperRight.Af,
+            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
+            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
 
-            upperRight.Rf, upperRight.Gf, upperRight.Bf, upperRight.Af,
-            upperLeft.Rf, upperLeft.Gf, upperLeft.Bf, upperLeft.Af
+            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
+            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af
         ]);
     }
 

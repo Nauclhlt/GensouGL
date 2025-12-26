@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace GensouGL.Graphics;
+﻿namespace GensouGL.Graphics;
 
 public sealed class BatchTextRenderer : Renderer
 {
@@ -46,7 +44,53 @@ public sealed class BatchTextRenderer : Renderer
         for (int i = 0; i <  _buffers.Count; i++)
         {
             _buffers[i].Clear();
+            _used[i] = false;
         }
+    }
+
+    public void End()
+    {
+        if (_currentFont is null)
+        {
+#if DEBUG
+            DebugLog.Error("BatchTextRenderer: End() called before Begin().");
+#endif
+            return;
+        }
+
+        LoadState();
+
+        if (_currentFont.IsOutlined)
+        {
+            Shader.OutlinedText.Bind();
+        }
+        else
+        {
+            Shader.SimpleText.Bind();
+        }
+            
+        Shader.SendMatrix0(GetDefaultVMatrix());
+
+        for (int p = 0; p < _buffers.Count; p++)
+        {
+            if (!_used[p]) continue;
+
+            TextureService.PushAndBind(_currentFont.GetPageTexture(p).TextureId);
+
+            if (_currentFont.IsOutlined)
+            {
+                _buffer.Draw(PrimitiveType.Triangles, _buffers[p].Vertices, _buffers[p].Colors, _buffers[p].TexCoords, _buffers[p].OutlineColors);
+            }
+            else
+            {
+                _buffer.Draw(PrimitiveType.Triangles, _buffers[p].Vertices, _buffers[p].Colors, _buffers[p].TexCoords);
+            }
+
+            TextureService.Pop();
+        }
+
+        _currentFont = null;
+        RestoreState();
     }
 
     public void DrawCentered(Rect rect, string text, Color color)
@@ -56,18 +100,23 @@ public sealed class BatchTextRenderer : Renderer
 
     public void DrawCentered(float x, float y, float width, float height, string text, Color color)
     {
-        if (_currentFont is null)
-        {
-#if DEBUG
-            DebugLog.Error("BatchTextRenderer: Draw() called before Begin().");
-#endif
-            return;
-        }
-
         float tw = _currentFont.WidthOf(text);
         float th = _currentFont.HeightOf(text);
 
         Draw(x + (width - tw) / 2, y + (height - th) / 2, text, color);
+    }
+
+    public void DrawGradientCentered(Rect rect, string text, RectGradient gradient)
+    {
+        DrawGradientCentered(rect.X, rect.Y, rect.Width, rect.Height, text, gradient);
+    }
+
+    public void DrawGradientCentered(float x, float y, float width, float height, string text, RectGradient gradient)
+    {
+        float tw = _currentFont.WidthOf(text);
+        float th = _currentFont.HeightOf(text);
+
+        DrawGradient(x + (width - tw) / 2, y + (height - th) / 2, text, gradient);
     }
 
     public void Draw(Point point, string text, Color color)
@@ -77,10 +126,20 @@ public sealed class BatchTextRenderer : Renderer
 
     public void Draw(float x, float y, string text, Color color)
     {
+        DrawGradient(x, y, text, new RectGradient(color));
+    }
+
+    public void DrawGradient(Point point, string text, RectGradient gradient)
+    {
+        DrawGradient(point.X, point.Y, text, gradient);
+    }
+
+    public void DrawGradient(float x, float y, string text, RectGradient gradient)
+    {
         if (_currentFont is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer: Draw() called before Begin().");
+            DebugLog.Error("BatchTextRenderer: Drawing function called before Begin().");
 #endif
             return;
         }
@@ -122,7 +181,10 @@ public sealed class BatchTextRenderer : Renderer
                 _used.Add(false);
             }
 
-            _buffers[info.Page].Add(cursorX, cursorY, info.Width, info.Height, info.Coords, color);
+            if (_currentFont.IsOutlined)
+                _buffers[info.Page].AddWithBorder(cursorX, cursorY, info.Width, info.Height, info.Coords, gradient, Color.Black);
+            else
+                _buffers[info.Page].Add(cursorX, cursorY, info.Width, info.Height, info.Coords, gradient);
             _used[info.Page] = true;
 
             cursorX += info.Width;
@@ -130,34 +192,109 @@ public sealed class BatchTextRenderer : Renderer
         }
     }
 
-    public void End()
+
+
+
+
+
+    public void DrawOutlined(Point point, string text, Color color, Color outlineColor)
+    {
+        DrawOutlined(point.X, point.Y, text, color, outlineColor);
+    }
+
+    public void DrawOutlined(float x, float y, string text, Color color, Color outlineColor)
+    {
+        DrawGradientOutlined(x, y, text, new RectGradient(color), outlineColor);
+    }
+
+    public void DrawOutlinedCentered(Rect rect, string text, Color color, Color outlineColor)
+    {
+        DrawOutlinedCentered(rect.X, rect.Y, rect.Width, rect.Height, text, color, outlineColor);
+    }
+
+    public void DrawOutlinedCentered(float x, float y, float width, float height, string text, Color color, Color outlineColor)
+    {
+        DrawGradientOutlinedCentered(x, y, width, height, text, new RectGradient(color), outlineColor);
+    }
+
+    public void DrawGradientOutlinedCentered(Rect rect, string text, RectGradient gradient, Color outlineColor)
+    {
+        DrawGradientOutlinedCentered(rect.X, rect.Y, rect.Width, rect.Height, text, gradient, outlineColor);
+    }
+
+    public void DrawGradientOutlinedCentered(float x, float y, float width, float height, string text, RectGradient gradient, Color outlineColor)
+    {
+        float tw = _currentFont.WidthOf(text);
+        float th = _currentFont.HeightOf(text);
+        DrawGradientOutlined(x + (width - tw) / 2, y + (height - th) / 2, text, gradient, outlineColor);
+    }
+
+    public void DrawGradientOutlined(Point point, string text, RectGradient gradient, Color outlineColor)
+    {
+        DrawGradientOutlined(point.X, point.Y, text, gradient, outlineColor);
+    }
+
+    public void DrawGradientOutlined(float x, float y, string text, RectGradient gradient, Color outlineColor)
     {
         if (_currentFont is null)
         {
 #if DEBUG
-            DebugLog.Error("BatchTextRenderer: End() called before Begin().");
+            DebugLog.Error("BatchTextRenderer: Drawing function called before Begin().");
 #endif
             return;
         }
 
-        LoadState();
-
-        Shader.SimpleTexture.Bind();
-        Shader.SendMatrix0(GetDefaultVMatrix());
-
-        for (int p = 0; p < _buffers.Count; p++)
+        if (!_currentFont.IsOutlined)
         {
-            if (!_used[p]) continue;
-
-            TextureService.PushAndBind(_currentFont.GetPageTexture(p).TextureId);
-
-            _buffer.Draw(PrimitiveType.Triangles, _buffers[p].Vertices, _buffers[p].Colors, _buffers[p].TexCoords);
-
-            TextureService.Pop();
+#if DEBUG
+            DebugLog.Error("BatchTextRenderer: DrawGradientOutlined() called while outline is disabled.");
+#endif
+            return;
         }
 
-        _currentFont = null;
-        RestoreState();
+        float cursorX = x;
+        float cursorY = y;
+        int lineHeight = 0;
+
+        ReadOnlySpan<char> span = text.AsSpan();
+
+        for (int i = 0; i < span.Length; i++)
+        {
+            if (span[i] == '\r') continue;
+            if (span[i] == '\n')
+            {
+                cursorX = x;
+                cursorY += lineHeight;
+                lineHeight = 0;
+                continue;
+            }
+            if (span[i] == ' ')
+            {
+                cursorX += _currentFont.WidthOf('w');
+                lineHeight = int.Max(lineHeight, _currentFont.HeightOf('w'));
+                continue;
+            }
+            if (span[i] == '\t')
+            {
+                cursorX += _currentFont.WidthOf('w') * 4;
+                lineHeight = int.Max(lineHeight, _currentFont.HeightOf('w'));
+                continue;
+            }
+
+            GlyphInfo info = _currentFont.GetGlyph(span[i]);
+
+            while (info.Page >= _buffers.Count)
+            {
+                _buffers.Add(new());
+                _used.Add(false);
+            }
+
+            _buffers[info.Page].AddWithBorder(cursorX, cursorY, info.Width, info.Height, info.Coords, gradient, outlineColor);
+            _used[info.Page] = true;
+
+            cursorX += info.Width;
+            lineHeight = int.Max(lineHeight, _currentFont.HeightOf(span[i]));
+        }
     }
 }
 
@@ -167,6 +304,7 @@ internal sealed class BatchTextRendererBuffer: IDisposable
     private int _vbuf;
     private int _cbuf;
     private int _tbuf;
+    private int _ocbuf;
 
     private bool _disposed = false;
 
@@ -176,33 +314,62 @@ internal sealed class BatchTextRendererBuffer: IDisposable
         _vbuf = GL.GenBuffer();
         _cbuf = GL.GenBuffer();
         _tbuf = GL.GenBuffer();
+        _ocbuf = GL.GenBuffer();
 
         GL.BindVertexArray(_vao);
         GL.EnableVertexAttribArray(0);
         GL.EnableVertexAttribArray(1);
         GL.EnableVertexAttribArray(2);
+        GL.EnableVertexAttribArray(3);
+        GL.BindVertexArray(0);
+    }
+
+    private void Buffer(int buffer, List<float> a)
+    {
+        Span<float> span = CollectionsMarshal.AsSpan(a);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * span.Length, ref span[0], BufferUsageHint.DynamicDraw);
+    }
+
+    public void Draw(PrimitiveType type, List<float> va, List<float> ca, List<float> ta, List<float> oca)
+    {
+        Buffer(_vbuf, va);
+        Buffer(_cbuf, ca);
+        Buffer(_tbuf, ta);
+        Buffer(_ocbuf, oca);
+
+        GL.BindVertexArray(_vao);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
+
+        GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
+
+        GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _tbuf);
+
+        GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _ocbuf);
+
+        GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+        GL.DrawArrays(type, 0, va.Count / 2);
+
         GL.BindVertexArray(0);
     }
 
     public void Draw(PrimitiveType type, List<float> va, List<float> ca, List<float> ta)
     {
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
-
-        Span<float> vspan = CollectionsMarshal.AsSpan(va);
-        Span<float> cspan = CollectionsMarshal.AsSpan(ca);
-        Span<float> tspan = CollectionsMarshal.AsSpan(ta);
-
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Count, ref vspan[0], BufferUsageHint.DynamicDraw);
-
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
-
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Count, ref cspan[0], BufferUsageHint.DynamicDraw);
-
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _tbuf);
-
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ta.Count, ref tspan[0], BufferUsageHint.DynamicDraw);
-
-
+        Buffer(_vbuf, va);
+        Buffer(_cbuf, ca);
+        Buffer(_tbuf, ta);
+        
         GL.BindVertexArray(_vao);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
@@ -232,6 +399,7 @@ internal sealed class BatchTextRendererBuffer: IDisposable
             GL.DeleteBuffer(_vbuf);
             GL.DeleteBuffer(_cbuf);
             GL.DeleteBuffer(_tbuf);
+            GL.DeleteBuffer(_ocbuf);
 
             _disposed = true;
         }
@@ -243,19 +411,57 @@ internal sealed class PageBuffer
     private List<float> _vertices;
     private List<float> _colors;
     private List<float> _texCoords;
+    private List<float> _outlineColors;
 
     public List<float> Vertices => _vertices;
     public List<float> Colors => _colors;
     public List<float> TexCoords => _texCoords;
+    public List<float> OutlineColors => _outlineColors;
 
     public PageBuffer()
     {
         _vertices = new List<float>();
         _colors = new List<float>();
         _texCoords = new List<float>();
+        _outlineColors = new List<float>();
     }
 
-    public void Add(float x, float y, float w, float h, Rect uv, Color color)
+    public void AddWithBorder(float x, float y, float w, float h, Rect uv, RectGradient gradient, Color outlineColor)
+    {
+        Add(x, y, w, h, uv, gradient);
+
+        _outlineColors.Add(outlineColor.Rf);
+        _outlineColors.Add(outlineColor.Gf);
+        _outlineColors.Add(outlineColor.Bf);
+        _outlineColors.Add(outlineColor.Af);
+
+        _outlineColors.Add(outlineColor.Rf);
+        _outlineColors.Add(outlineColor.Gf);
+        _outlineColors.Add(outlineColor.Bf);
+        _outlineColors.Add(outlineColor.Af);
+
+        _outlineColors.Add(outlineColor.Rf);
+        _outlineColors.Add(outlineColor.Gf);
+        _outlineColors.Add(outlineColor.Bf);
+        _outlineColors.Add(outlineColor.Af);
+
+        _outlineColors.Add(outlineColor.Rf);
+        _outlineColors.Add(outlineColor.Gf);
+        _outlineColors.Add(outlineColor.Bf);
+        _outlineColors.Add(outlineColor.Af);
+
+        _outlineColors.Add(outlineColor.Rf);
+        _outlineColors.Add(outlineColor.Gf);
+        _outlineColors.Add(outlineColor.Bf);
+        _outlineColors.Add(outlineColor.Af);
+
+        _outlineColors.Add(outlineColor.Rf);
+        _outlineColors.Add(outlineColor.Gf);
+        _outlineColors.Add(outlineColor.Bf);
+        _outlineColors.Add(outlineColor.Af);
+    }
+
+    public void Add(float x, float y, float w, float h, Rect uv, RectGradient gradient)
     {
         _vertices.Add(x);
         _vertices.Add(y);
@@ -275,35 +481,35 @@ internal sealed class PageBuffer
         _vertices.Add(x + w);
         _vertices.Add(y + h);
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(gradient.TopLeft.Rf);
+        _colors.Add(gradient.TopLeft.Gf);
+        _colors.Add(gradient.TopLeft.Bf);
+        _colors.Add(gradient.TopLeft.Af);
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(gradient.BottomLeft.Rf);
+        _colors.Add(gradient.BottomLeft.Gf);
+        _colors.Add(gradient.BottomLeft.Bf);
+        _colors.Add(gradient.BottomLeft.Af);
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(gradient.TopRight.Rf);
+        _colors.Add(gradient.TopRight.Gf);
+        _colors.Add(gradient.TopRight.Bf);
+        _colors.Add(gradient.TopRight.Af);
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(gradient.TopRight.Rf);
+        _colors.Add(gradient.TopRight.Gf);
+        _colors.Add(gradient.TopRight.Bf);
+        _colors.Add(gradient.TopRight.Af);
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(gradient.BottomLeft.Rf);
+        _colors.Add(gradient.BottomLeft.Gf);
+        _colors.Add(gradient.BottomLeft.Bf);
+        _colors.Add(gradient.BottomLeft.Af);
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(gradient.BottomRight.Rf);
+        _colors.Add(gradient.BottomRight.Gf);
+        _colors.Add(gradient.BottomRight.Bf);
+        _colors.Add(gradient.BottomRight.Af);
 
         _texCoords.Add(uv.X);
         _texCoords.Add(uv.Y);
@@ -329,5 +535,6 @@ internal sealed class PageBuffer
         _vertices.Clear();
         _colors.Clear();
         _texCoords.Clear();
+        _outlineColors.Clear();
     }
 }

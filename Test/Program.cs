@@ -20,15 +20,12 @@ class TestScene : Scene
 
     private BatchBulletRenderer _br;
     private QuickRenderer _qr;
+    private BatchTextRenderer _tr;
     private Texture _backgroundImage;
     private List<Bullet> _bullets = new();
     private Texture _image;
-    private Texture _particleImage;
     private BloomEffect _bloom;
-    private TextInputListener _listener;
-    private StreamingAudio _streamingAudio;
-    private ParticleSystem _particleSystem;
-    private BatchShapeRenderer _sr;
+    private TextFont _font;
 
     public override void OnInitialize()
     {
@@ -36,36 +33,28 @@ class TestScene : Scene
         
         _br = CreateBatchBulletRenderer(Screen.Default);
         _qr = CreateQuickRenderer(Screen.Default);
-        _sr = CreateBatchShapeRenderer(Screen.Default);
-
+        
         _image = new(@"C:\Users\PC_User\Downloads\red.png");
         _image.ResizeMode = TextureResizeMode.NearestNeighbor;
         RegisterPersistentResource(_image);
-
-        _particleImage = new(@"C:\Users\PC_User\Downloads\testpart.png");
-        RegisterPersistentResource(_particleImage);
-
+        
         _backgroundImage = new(@"C:\Users\PC_User\Downloads\20231104200836.png");
         RegisterPersistentResource(_backgroundImage);
 
         _bloom = new(0.4f, 1.0f, 0.3f, 3.0f);
 
-        _listener = Input.CreateTextInputListener();
-        
+        //FontSource src = new FontSource(@"C:\Users\PC_User\Downloads\makinas4\makinas4\Makinas-4-Flat.otf");
+        //_font = new(@"C:\Users\PC_User\Downloads\makinas4\makinas4\Makinas-4-Flat.otf", 70, FontSettings.Regular.Outlined(2f));
+        _font = new(@"C:\Users\PC_User\Downloads\MS-Gothic\MSGOTHIC.TTF", 46, FontSettings.Regular.Outlined(2f));
+        _tr = CreateBatchTextRenderer(Screen.Default);
+
         InGameDebug.Enable();
-
-        
-
-        _particleSystem = new(_br, _particleImage, BlendMode.Add);
-
-
-        _streamingAudio = StreamingAudio.FromWave(@"C:\Users\PC_User\Downloads\nc434502_レーザー発射音.wav");
-        RegisterPersistentResource(_streamingAudio);
     }
 
     public override void OnEnter()
     {
         DebugLog.User("Entered TestScene.");
+        BackgroundColor = Color.SkyBlue;
     }
 
     public override void OnLeave()
@@ -88,8 +77,6 @@ class TestScene : Scene
             }
         }
 
-        _particleSystem.Update(deltaTime);
-
         if (Input.IsKeyDown(Key.Enter))
         {
             float cx = 960f * Randomizer.NextFloat();
@@ -108,67 +95,26 @@ class TestScene : Scene
             ExitGame();
         }
 
-        if (Input.IsKeyPressed(Key.A))
-        {
-            OverlayService.Show(new TestOverlay(_qr));
-        }
-
-        if (Input.IsKeyPressed(Key.B))
-        {
-            
-        }
+        
 
         if (Input.IsKeyPressed(Key.D))
         {
             InGameDebug.ShowOrHideOverlay();
         }
 
-        if (Input.IsKeyPressed(Key.L))
-        {
-            RandomCircularEmitter emitter = new(
-                new ParticleSettings()
-                {
-                    Speed = (300f, 350f),
-                    Accel = (15f, 30f),
-                    Rotation = (0, MathF.PI),
-                    Life = (0.2f, 0.4f),
-                    Size = (16, 20f),
-                    ShootAngle = (0f, MathF.PI * 2),
-                    StartColor = (Color.White, Color.White),
-                    EndColor = (Color.White.WithAlpha(0), Color.White.WithAlpha(0)),
-                    Texture = _particleImage
-                }, ScreenCenter, 1f, 2, 32);
-            _particleSystem.Emit(emitter);
-        }
-
         _elapsed += deltaTime;
-
-        if (_listener.Pop(out string content))
-        {
-            DebugLog.User(content);
-        }
     }
 
     public override void Render(float deltaTime)
     {
-        _qr.DrawTexture(ScreenBounds, _backgroundImage);
-
-        using (_br.BeginPostProc(_bloom))
+        //_qr.DrawTexture(ScreenBounds, _backgroundImage);
+        
+        _br.Begin(_image);
+        for (int i = 0; i < _bullets.Count; i++)
         {
-            _br.Begin(_image);
-            for (int i = 0; i < _bullets.Count; i++)
-            {
-                _bullets[i].Render(_br, _image);
-            }
-            _br.End();
+            _bullets[i].Render(_br, _image);
         }
-
-        Point mp = Input.GetMousePosition();
-
-        _particleSystem.Render();
-        //_br.Begin(_image);
-        //_br.Draw(mp.X, mp.Y, 128, 128, 0f, Color.Yellow, _image);
-        //_br.End();
+        _br.End();
     }
 }
 
