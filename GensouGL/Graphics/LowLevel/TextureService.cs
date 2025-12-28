@@ -2,37 +2,57 @@
 
 internal static class TextureService
 {
-    private static readonly Stack<int> _stack = new();
-    private static int _boundTexture = 0;
+    private const int TextureSlotCount = 5;
 
-    public static int BoundTexture => _boundTexture;
+    private static readonly Stack<int>[] _stack;
+    private static int[] _boundTexture;
 
-    public static void Bind(int id)
+
+    
+    static TextureService()
     {
-        _boundTexture = id;
+        _stack = new Stack<int>[TextureSlotCount];
+        for (int i = 0; i < _stack.Length; i++)
+        {
+            _stack[i] = new();
+        }
+        _boundTexture = new int[TextureSlotCount];
+    }
+
+    public static void Bind(int id, int slot = 0)
+    {
+        _boundTexture[slot] = id;
+        GL.ActiveTexture(TextureUnit.Texture0 + slot);
         GL.BindTexture(TextureTarget.Texture2D, id);
     }
 
-    public static void Unbind()
+    public static void Unbind(int slot = 0)
     {
-        _boundTexture = 0;
+        _boundTexture[slot] = 0;
+        GL.ActiveTexture(TextureUnit.Texture0 + slot);
         GL.BindTexture(TextureTarget.Texture2D, 0);
     }
 
-    public static void Push()
+    public static void Push(int slot = 0)
     {
-        _stack.Push(_boundTexture);
+        _stack[slot].Push(_boundTexture[slot]);
     }
 
-    public static void PushAndBind(int id)
+    public static void PushAndBind(int id, int slot = 0)
     {
-        Push();
-        Bind(id);
+        Push(slot);
+        Bind(id, slot);
     }
 
-    public static void Pop()
+    public static void Pop(int slot = 0)
     {
-        _boundTexture = _stack.Pop();
-        GL.BindTexture(TextureTarget.Texture2D, _boundTexture);
+        _boundTexture[slot] = _stack[slot].Pop();
+        GL.ActiveTexture(TextureUnit.Texture0 + slot);
+        GL.BindTexture(TextureTarget.Texture2D, _boundTexture[slot]);
+    }
+
+    public static int GetBound(int slot)
+    {
+        return _boundTexture[slot];
     }
 }

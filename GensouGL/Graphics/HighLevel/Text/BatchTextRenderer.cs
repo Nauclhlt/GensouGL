@@ -430,35 +430,35 @@ internal sealed class PageBuffer
     {
         Add(x, y, w, h, uv, gradient);
 
-        _outlineColors.Add(outlineColor.Rf);
-        _outlineColors.Add(outlineColor.Gf);
-        _outlineColors.Add(outlineColor.Bf);
-        _outlineColors.Add(outlineColor.Af);
+        _outlineColors.Add(outlineColor.R);
+        _outlineColors.Add(outlineColor.G);
+        _outlineColors.Add(outlineColor.B);
+        _outlineColors.Add(outlineColor.A);
 
-        _outlineColors.Add(outlineColor.Rf);
-        _outlineColors.Add(outlineColor.Gf);
-        _outlineColors.Add(outlineColor.Bf);
-        _outlineColors.Add(outlineColor.Af);
+        _outlineColors.Add(outlineColor.R);
+        _outlineColors.Add(outlineColor.G);
+        _outlineColors.Add(outlineColor.B);
+        _outlineColors.Add(outlineColor.A);
 
-        _outlineColors.Add(outlineColor.Rf);
-        _outlineColors.Add(outlineColor.Gf);
-        _outlineColors.Add(outlineColor.Bf);
-        _outlineColors.Add(outlineColor.Af);
+        _outlineColors.Add(outlineColor.R);
+        _outlineColors.Add(outlineColor.G);
+        _outlineColors.Add(outlineColor.B);
+        _outlineColors.Add(outlineColor.A);
 
-        _outlineColors.Add(outlineColor.Rf);
-        _outlineColors.Add(outlineColor.Gf);
-        _outlineColors.Add(outlineColor.Bf);
-        _outlineColors.Add(outlineColor.Af);
+        _outlineColors.Add(outlineColor.R);
+        _outlineColors.Add(outlineColor.G);
+        _outlineColors.Add(outlineColor.B);
+        _outlineColors.Add(outlineColor.A);
 
-        _outlineColors.Add(outlineColor.Rf);
-        _outlineColors.Add(outlineColor.Gf);
-        _outlineColors.Add(outlineColor.Bf);
-        _outlineColors.Add(outlineColor.Af);
+        _outlineColors.Add(outlineColor.R);
+        _outlineColors.Add(outlineColor.G);
+        _outlineColors.Add(outlineColor.B);
+        _outlineColors.Add(outlineColor.A);
 
-        _outlineColors.Add(outlineColor.Rf);
-        _outlineColors.Add(outlineColor.Gf);
-        _outlineColors.Add(outlineColor.Bf);
-        _outlineColors.Add(outlineColor.Af);
+        _outlineColors.Add(outlineColor.R);
+        _outlineColors.Add(outlineColor.G);
+        _outlineColors.Add(outlineColor.B);
+        _outlineColors.Add(outlineColor.A);
     }
 
     public void Add(float x, float y, float w, float h, Rect uv, RectGradient gradient)
@@ -481,35 +481,35 @@ internal sealed class PageBuffer
         _vertices.Add(x + w);
         _vertices.Add(y + h);
 
-        _colors.Add(gradient.TopLeft.Rf);
-        _colors.Add(gradient.TopLeft.Gf);
-        _colors.Add(gradient.TopLeft.Bf);
-        _colors.Add(gradient.TopLeft.Af);
+        _colors.Add(gradient.TopLeft.R);
+        _colors.Add(gradient.TopLeft.G);
+        _colors.Add(gradient.TopLeft.B);
+        _colors.Add(gradient.TopLeft.A);
 
-        _colors.Add(gradient.BottomLeft.Rf);
-        _colors.Add(gradient.BottomLeft.Gf);
-        _colors.Add(gradient.BottomLeft.Bf);
-        _colors.Add(gradient.BottomLeft.Af);
+        _colors.Add(gradient.BottomLeft.R);
+        _colors.Add(gradient.BottomLeft.G);
+        _colors.Add(gradient.BottomLeft.B);
+        _colors.Add(gradient.BottomLeft.A);
 
-        _colors.Add(gradient.TopRight.Rf);
-        _colors.Add(gradient.TopRight.Gf);
-        _colors.Add(gradient.TopRight.Bf);
-        _colors.Add(gradient.TopRight.Af);
+        _colors.Add(gradient.TopRight.R);
+        _colors.Add(gradient.TopRight.G);
+        _colors.Add(gradient.TopRight.B);
+        _colors.Add(gradient.TopRight.A);
 
-        _colors.Add(gradient.TopRight.Rf);
-        _colors.Add(gradient.TopRight.Gf);
-        _colors.Add(gradient.TopRight.Bf);
-        _colors.Add(gradient.TopRight.Af);
+        _colors.Add(gradient.TopRight.R);
+        _colors.Add(gradient.TopRight.G);
+        _colors.Add(gradient.TopRight.B);
+        _colors.Add(gradient.TopRight.A);
 
-        _colors.Add(gradient.BottomLeft.Rf);
-        _colors.Add(gradient.BottomLeft.Gf);
-        _colors.Add(gradient.BottomLeft.Bf);
-        _colors.Add(gradient.BottomLeft.Af);
+        _colors.Add(gradient.BottomLeft.R);
+        _colors.Add(gradient.BottomLeft.G);
+        _colors.Add(gradient.BottomLeft.B);
+        _colors.Add(gradient.BottomLeft.A);
 
-        _colors.Add(gradient.BottomRight.Rf);
-        _colors.Add(gradient.BottomRight.Gf);
-        _colors.Add(gradient.BottomRight.Bf);
-        _colors.Add(gradient.BottomRight.Af);
+        _colors.Add(gradient.BottomRight.R);
+        _colors.Add(gradient.BottomRight.G);
+        _colors.Add(gradient.BottomRight.B);
+        _colors.Add(gradient.BottomRight.A);
 
         _texCoords.Add(uv.X);
         _texCoords.Add(uv.Y);

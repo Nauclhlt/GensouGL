@@ -16,7 +16,8 @@ Gensou.Create()
 
 class TestScene : Scene
 {
-    private float _elapsed = 0.0f;
+    private bool _flag = false;
+    private float _elapsed = 0f;
 
     private BatchBulletRenderer _br;
     private QuickRenderer _qr;
@@ -26,6 +27,7 @@ class TestScene : Scene
     private Texture _image;
     private BloomEffect _bloom;
     private TextFont _font;
+    private Screen _screen;
 
     public override void OnInitialize()
     {
@@ -41,12 +43,15 @@ class TestScene : Scene
         _backgroundImage = new(@"C:\Users\PC_User\Downloads\20231104200836.png");
         RegisterPersistentResource(_backgroundImage);
 
-        _bloom = new(0.4f, 1.0f, 0.3f, 3.0f);
+        _bloom = new(0.1f, 0.8f, 0.3f, 2.5f);
 
         //FontSource src = new FontSource(@"C:\Users\PC_User\Downloads\makinas4\makinas4\Makinas-4-Flat.otf");
         //_font = new(@"C:\Users\PC_User\Downloads\makinas4\makinas4\Makinas-4-Flat.otf", 70, FontSettings.Regular.Outlined(2f));
         _font = new(@"C:\Users\PC_User\Downloads\MS-Gothic\MSGOTHIC.TTF", 46, FontSettings.Regular.Outlined(2f));
         _tr = CreateBatchTextRenderer(Screen.Default);
+
+        _screen = new(960, 540);
+        RegisterPersistentResource(_screen);
 
         InGameDebug.Enable();
     }
@@ -54,7 +59,7 @@ class TestScene : Scene
     public override void OnEnter()
     {
         DebugLog.User("Entered TestScene.");
-        BackgroundColor = Color.SkyBlue;
+        BackgroundColor = Color.Black;
     }
 
     public override void OnLeave()
@@ -95,26 +100,33 @@ class TestScene : Scene
             ExitGame();
         }
 
-        
-
         if (Input.IsKeyPressed(Key.D))
         {
             InGameDebug.ShowOrHideOverlay();
         }
 
+        if (Input.IsKeyPressed(Key.E))
+        {
+            _flag = !_flag;
+        }
+
         _elapsed += deltaTime;
+        //_cgEffect.Settings.HueShiftRadians = MathF.PI * MathF.Sin(_elapsed);
     }
 
     public override void Render(float deltaTime)
     {
-        //_qr.DrawTexture(ScreenBounds, _backgroundImage);
-        
-        _br.Begin(_image);
-        for (int i = 0; i < _bullets.Count; i++)
+        _qr.DrawTexture(ScreenBounds, _backgroundImage);
+
+        using (_br.BeginPostProc(_bloom))
         {
-            _bullets[i].Render(_br, _image);
+            _br.Begin(_image);
+            for (int i = 0; i < _bullets.Count; i++)
+            {
+                _bullets[i].Render(_br, _image);
+            }
+            _br.End();
         }
-        _br.End();
     }
 }
 
@@ -143,7 +155,7 @@ public sealed class Bullet
 
     public void Render(BatchBulletRenderer br, Texture texture)
     {
-        br.Draw(_position.X, _position.Y, 12, 12, 0f, Color.White, texture);
+        br.Draw(_position.X, _position.Y, 12, 12, 0f, Color.Red, texture);
     }
 }
 
@@ -168,6 +180,5 @@ public sealed class TestOverlay : Overlay
     {
         _qr.DrawRect(ScreenBounds.Center(400, 400), Color.DarkSlateBlue.WithAlpha(140));
         _qr.DrawWireRect(ScreenBounds.Center(400, 400), Color.White);
-
     }
 }

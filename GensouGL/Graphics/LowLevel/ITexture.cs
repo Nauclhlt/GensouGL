@@ -12,8 +12,18 @@ public interface ITexture
 
 public static class ITextureExtensions
 {
-    public static Subtexture GetSubtexture(this ITexture self, Rect rect)
+    public static ITexture GetSubtexture(this ITexture self, Rect rect)
     {
         return new Subtexture(self, new Rect(rect.X / self.Width, rect.Y / self.Height, rect.Width / self.Width, rect.Height / self.Height));
+    }
+
+    public static ITexture VFlipped(this ITexture self)
+    {
+        return new Subtexture(self, new Rect(self.Coords.X, self.Coords.Bottom, self.Coords.Width, -self.Coords.Height));
+    }
+
+    public static ITexture HFlipped(this ITexture self)
+    {
+        return new Subtexture(self, new Rect(self.Coords.Right, self.Coords.Y, -self.Coords.Width, self.Coords.Height));
     }
 }

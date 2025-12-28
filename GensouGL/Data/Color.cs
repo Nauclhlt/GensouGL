@@ -1,21 +1,28 @@
 ﻿namespace GensouGL.Core;
 
-[StructLayout(LayoutKind.Sequential)]
 public struct Color
 {
-    public byte R;
-    public byte G;
-    public byte B;
-    public byte A;
+    public float R;
+    public float G;
+    public float B;
+    public float A;
 
-    public readonly float Rf => R / 255f;
-    public readonly float Gf => G / 255f;
-    public readonly float Bf => B / 255f;
-    public readonly float Af => A / 255f;
+    public readonly byte Rb => (byte)(R * 255);
+    public readonly byte Gb => (byte)(G * 255);
+    public readonly byte Bb => (byte)(B * 255);
+    public readonly byte Ab => (byte)(A * 255);
 
     public Color(byte r, byte g, byte b) : this(r, g, b, 255) { }
 
     public Color(byte r, byte g, byte b, byte a)
+    {
+        R = r / 255f;
+        G = g / 255f;
+        B = b / 255f;
+        A = a / 255f;
+    }
+
+    public Color(float r, float g, float b, float a)
     {
         R = r;
         G = g;
@@ -23,24 +30,29 @@ public struct Color
         A = a;
     }
 
-    public readonly Color WithAlpha(byte a)
+    public readonly Color WithAlpha(float a)
     {
         return new Color(R, G, B, a);
     }
 
-    public readonly Color WithAlpha(float a)
-    {
-        return new Color(R, G, B, (byte)(a * 255));
-    }
-
-    public readonly Color Inverse()
-    {
-        return new Color((byte)(255 - R), (byte)(255 - G), (byte)(255 - B), A);
-    }
-
     public readonly Color Dot(Color color)
     {
-        return Color.FromFloat(Rf * color.Rf, Gf * color.Gf, Bf * color.Bf, Af * color.Af);
+        return new(R * color.R, G * color.G, B * color.B, A * color.A);
+    }
+
+    public readonly Color Scale(float scale)
+    {
+        return new(R * scale, G * scale, B * scale, A);
+    }
+
+    public readonly Color ScaleWithAlpha(float scale, float alphaScale)
+    {
+        return new(R * scale, G * scale, B * scale, A * alphaScale);
+    }
+
+    public readonly float Size()
+    {
+        return MathF.Sqrt(R * R + G * G + B * B);
     }
 
     public static Color FromHex(uint hex)
@@ -53,12 +65,12 @@ public struct Color
 
     public static Color FromFloat(float r, float g, float b, float a = 1.0f)
     {
-        return new Color((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), (byte)(a * 255));
+        return new Color(r, g, b, a);
     }
 
     internal readonly OpenTK.Mathematics.Color4 ToOpenTKColor4()
     {
-        return new OpenTK.Mathematics.Color4(Rf, Gf, Bf, Af);
+        return new OpenTK.Mathematics.Color4(R, G, B, A);
     }
 
     #region Default Colors

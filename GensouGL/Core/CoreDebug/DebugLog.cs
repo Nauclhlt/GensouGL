@@ -2,6 +2,8 @@
 
 public static class DebugLog
 {
+    private const int Capacity = 1024 * 1024;
+
     private static readonly StringBuilder _buffer;
     private static readonly StringWriter _writer;
     private static readonly List<string> _list;
@@ -16,6 +18,15 @@ public static class DebugLog
         _buffer = new();
         _writer = new(_buffer);
         _list = new();
+    }
+
+    private static void CheckState()
+    {
+        if(_buffer.Length > Capacity)
+        {
+            _buffer.Clear();
+            _list.Clear();
+        }
     }
 
     internal static void Info(string message)

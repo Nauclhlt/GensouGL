@@ -71,6 +71,13 @@ public sealed class Shader : IDisposable
         GL.Uniform1(loc, value);
     }
 
+    public void SetUniformInt(string name, int value)
+    {
+        GL.UseProgram(_program);
+        int loc = GL.GetUniformLocation(_program, name);
+        GL.Uniform1(loc, value);
+    }
+
     public void SetUniformVector2(string name, float x, float y)
     {
         GL.UseProgram(_program);
@@ -118,6 +125,9 @@ public sealed class Shader : IDisposable
     private static Shader s_blindfold;
     private static Shader s_simpleText;
     private static Shader s_outlinedText;
+    private static Shader s_colorGrading;
+    private static Shader s_colorInversion;
+    private static Shader s_textureMask;
 
     internal static Shader SimpleShape => s_simpleShape;
     internal static Shader SimpleTexture => s_simpleTexture;
@@ -127,6 +137,9 @@ public sealed class Shader : IDisposable
     internal static Shader Blindfold => s_blindfold;
     internal static Shader SimpleText => s_simpleText;
     internal static Shader OutlinedText => s_outlinedText;
+    internal static Shader ColorGrading => s_colorGrading;
+    internal static Shader ColorInversion => s_colorInversion;
+    internal static Shader TextureMask => s_textureMask;
 
     internal static void LoadShaders()
     {
@@ -138,7 +151,9 @@ public sealed class Shader : IDisposable
         s_bloomBlur = Gen(asm, "BrightPass", "BloomBlur");
         s_blindfold = Gen(asm, "BrightPass", "Blindfold");
         s_simpleText = Gen(asm, "SimpleText");
-        s_outlinedText = Gen(asm, "OutlinedText");
+        s_colorGrading = Gen(asm, "BrightPass", "ColorGrading");
+        s_colorInversion = Gen(asm, "BrightPass", "ColorInversion");
+        s_textureMask = Gen(asm, "BrightPass", "TextureMask");
     }
 
     private static Shader Gen(Assembly asm, string vert, string frag = null)

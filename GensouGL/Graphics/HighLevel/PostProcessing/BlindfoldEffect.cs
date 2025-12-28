@@ -30,7 +30,7 @@ public sealed class BlindfoldEffect : PostProcessEffect
     internal override void Apply(Game game, Renderer renderer, Screen source, Screen dest)
     {
         Shader.Blindfold.Bind();
-        Shader.Blindfold.SetUniformVector4("pColor", _color.Rf, _color.Gf, _color.Bf, _color.Af);
+        Shader.Blindfold.SetUniformVector4("pColor", _color.R, _color.G, _color.B, _color.A);
         
         FullscreenQuadRenderer.Draw(dest, source.Texture);
     }

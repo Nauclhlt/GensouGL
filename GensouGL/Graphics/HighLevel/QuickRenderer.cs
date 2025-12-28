@@ -59,10 +59,10 @@ public sealed class QuickRenderer : Renderer
 
         float[] ca =
         [
-            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af,
-            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
-            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
-            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
+            topLeft.R, topLeft.G, topLeft.B, topLeft.A,
+            bottomLeft.R, bottomLeft.G, bottomLeft.B, bottomLeft.A,
+            topRight.R, topRight.G, topRight.B, topRight.A,
+            bottomRight.R, bottomRight.G, bottomRight.B, bottomRight.A,
         ];
 
         LoadState();
@@ -113,11 +113,11 @@ public sealed class QuickRenderer : Renderer
 
         float[] ca =
         [
-            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af,
-            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
-            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
-            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
-            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af
+            topLeft.R, topLeft.G, topLeft.B, topLeft.A,
+            bottomLeft.R, bottomLeft.G, bottomLeft.B, bottomLeft.A,
+            bottomRight.R, bottomRight.G, bottomRight.B, bottomRight.A,
+            topRight.R, topRight.G, topRight.B, topRight.A,
+            topLeft.R, topLeft.G, topLeft.B, topLeft.A
         ];
 
         LoadState();
@@ -173,8 +173,8 @@ public sealed class QuickRenderer : Renderer
 
         float[] ca =
         {
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af
+            aColor.R, aColor.G, aColor.B, aColor.A,
+            bColor.R, bColor.G, bColor.B, bColor.A
         };
 
         LoadState();
@@ -217,9 +217,9 @@ public sealed class QuickRenderer : Renderer
 
         float[] ca =
         {
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af,
-            cColor.Rf, cColor.Gf, cColor.Bf, cColor.Af,
+            aColor.R, aColor.G, aColor.B, aColor.A,
+            bColor.R, bColor.G, bColor.B, bColor.A,
+            cColor.R, cColor.G, cColor.B, cColor.A,
         };
 
         LoadState();
@@ -271,10 +271,10 @@ public sealed class QuickRenderer : Renderer
 
         float[] ca =
         {
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af,
-            cColor.Rf, cColor.Gf, cColor.Bf, cColor.Af,
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
+            aColor.R, aColor.G, aColor.B, aColor.A,
+            bColor.R, bColor.G, bColor.B, bColor.A,
+            cColor.R, cColor.G, cColor.B, cColor.A,
+            aColor.R, aColor.G, aColor.B, aColor.A,
         };
 
         LoadState();
@@ -325,10 +325,10 @@ public sealed class QuickRenderer : Renderer
         float[] ca = new float[v * 4];
         for (int i = 0; i < v; i++)
         {
-            ca[(i << 2)] = color.Rf;
-            ca[(i << 2) + 1] = color.Gf;
-            ca[(i << 2) + 2] = color.Bf;
-            ca[(i << 2) + 3] = color.Af;
+            ca[(i << 2)] = color.R;
+            ca[(i << 2) + 1] = color.G;
+            ca[(i << 2) + 2] = color.B;
+            ca[(i << 2) + 3] = color.A;
         }
         va[0] = centerX;
         va[1] = centerY;
@@ -384,10 +384,10 @@ public sealed class QuickRenderer : Renderer
 
         float[] ca =
         {
-            color.Rf, color.Gf, color.Bf, color.Af,
-            color.Rf, color.Gf, color.Bf, color.Af,
-            color.Rf, color.Gf, color.Bf, color.Af,
-            color.Rf, color.Gf, color.Bf, color.Af
+            color.R, color.G, color.B, color.A,
+            color.R, color.G, color.B, color.A,
+            color.R, color.G, color.B, color.A,
+            color.R, color.G, color.B, color.A
         };
 
         float[] ta =

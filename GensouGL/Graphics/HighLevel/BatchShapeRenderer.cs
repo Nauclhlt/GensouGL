@@ -117,13 +117,13 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af,
-            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
-            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
+            topLeft.R, topLeft.G, topLeft.B, topLeft.A,
+            bottomLeft.R, bottomLeft.G, bottomLeft.B, bottomLeft.A,
+            topRight.R, topRight.G, topRight.B, topRight.A,
 
-            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
-            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
-            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
+            topRight.R, topRight.G, topRight.B, topRight.A,
+            bottomLeft.R, bottomLeft.G, bottomLeft.B, bottomLeft.A,
+            bottomRight.R, bottomRight.G, bottomRight.B, bottomRight.A,
         ]);
     }
 
@@ -176,17 +176,17 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af,
-            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
+            topLeft.R, topLeft.G, topLeft.B, topLeft.A,
+            bottomLeft.R, bottomLeft.G, bottomLeft.B, bottomLeft.A,
 
-            bottomLeft.Rf, bottomLeft.Gf, bottomLeft.Bf, bottomLeft.Af,
-            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
+            bottomLeft.R, bottomLeft.G, bottomLeft.B, bottomLeft.A,
+            bottomRight.R, bottomRight.G, bottomRight.B, bottomRight.A,
 
-            bottomRight.Rf, bottomRight.Gf, bottomRight.Bf, bottomRight.Af,
-            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
+            bottomRight.R, bottomRight.G, bottomRight.B, bottomRight.A,
+            topRight.R, topRight.G, topRight.B, topRight.A,
 
-            topRight.Rf, topRight.Gf, topRight.Bf, topRight.Af,
-            topLeft.Rf, topLeft.Gf, topLeft.Bf, topLeft.Af
+            topRight.R, topRight.G, topRight.B, topRight.A,
+            topLeft.R, topLeft.G, topLeft.B, topLeft.A
         ]);
     }
 
@@ -236,8 +236,8 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af
+            aColor.R, aColor.G, aColor.B, aColor.A,
+            bColor.R, bColor.G, bColor.B, bColor.A
         ]);
     }
 
@@ -276,9 +276,9 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af,
-            cColor.Rf, cColor.Gf, cColor.Bf, cColor.Af,
+            aColor.R, aColor.G, aColor.B, aColor.A,
+            bColor.R, bColor.G, bColor.B, bColor.A,
+            cColor.R, cColor.G, cColor.B, cColor.A,
         ]);
     }
 
@@ -330,14 +330,14 @@ public sealed class BatchShapeRenderer : Renderer
 
         _colors.AddRange(
         [
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af,
+            aColor.R, aColor.G, aColor.B, aColor.A,
+            bColor.R, bColor.G, bColor.B, bColor.A,
 
-            bColor.Rf, bColor.Gf, bColor.Bf, bColor.Af,
-            cColor.Rf, cColor.Gf, cColor.Bf, cColor.Af,
+            bColor.R, bColor.G, bColor.B, bColor.A,
+            cColor.R, cColor.G, cColor.B, cColor.A,
 
-            cColor.Rf, cColor.Gf, cColor.Bf, cColor.Af,
-            aColor.Rf, aColor.Gf, aColor.Bf, aColor.Af,
+            cColor.R, cColor.G, cColor.B, cColor.A,
+            aColor.R, aColor.G, aColor.B, aColor.A,
         ]);
     }
 
@@ -394,9 +394,9 @@ public sealed class BatchShapeRenderer : Renderer
             _vertices.Add(centerY + radY * MathF.Sin((i + 1) * divAngle));
 
             _colors.AddRange([
-                color.Rf, color.Gf, color.Bf, color.Af,
-                color.Rf, color.Gf, color.Bf, color.Af,
-                color.Rf, color.Gf, color.Bf, color.Af,
+                color.R, color.G, color.B, color.A,
+                color.R, color.G, color.B, color.A,
+                color.R, color.G, color.B, color.A,
             ]);
 
             cur++;

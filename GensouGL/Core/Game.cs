@@ -25,7 +25,6 @@ public sealed class Game
     public string Title => _title;
 
 
-
     // these fields are not visible to the user
     internal GameWindow _window;
     internal SceneManager _sceneManager;
@@ -119,6 +118,8 @@ public sealed class Game
         FullscreenQuadRenderer.Initialize();
         AudioPlayer.Initialize();
         InGameDebug.Initialize(this);
+
+        Screen.Default = new(0, _screenWidth, _screenHeight);
     }
 
     private void InitializeOpenGL()
@@ -129,6 +130,7 @@ public sealed class Game
         GL.Disable(EnableCap.DepthTest);
         GL.Disable(EnableCap.StencilTest);
         GL.Enable(EnableCap.Blend);
+        GL.Disable(EnableCap.FramebufferSrgb);
     }
 
     private void FinalizeEngineCore()
@@ -177,9 +179,13 @@ public sealed class Game
 
     private void OnRenderWindow(FrameEventArgs args)
     {
+        FramebufferService.PushAndBind(Screen.Default.ScreenId);
+
         Color bg = _sceneManager.CurrentScene.BackgroundColor;
-        GL.ClearColor(bg.Rf, bg.Gf, bg.Bf, 1.0f);
+        GL.ClearColor(bg.R, bg.G, bg.B, 1.0f);
         GL.Clear(ClearBufferMask.ColorBufferBit);
+
+        FramebufferService.Pop();
 
         float deltaTime = (float)args.Time;
 
@@ -260,8 +266,6 @@ public sealed class Game
 
         InitializeOpenGL();
         InitializeEngineCore();
-
-        Screen.Default = new(0, _screenWidth, _screenHeight);
 
         
         _sceneManager.Navigate(_initialScene);

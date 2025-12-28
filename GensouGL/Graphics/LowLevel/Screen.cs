@@ -4,11 +4,8 @@ public sealed class Screen : IScreen, IDisposable
 {
     public static Screen Default { get; internal set; } = new Screen(0, 0, 0);
 
-
     private int _framebuffer;
     private Texture _texture;
-    private int _renderingWidth;
-    private int _renderingHeight;
     private int _width;
     private int _height;
 
@@ -50,11 +47,19 @@ public sealed class Screen : IScreen, IDisposable
         FramebufferService.Pop();
     }
 
+    public void MakeHDR()
+    {
+        if (_texture == null)
+            throw new InvalidOperationException("Cannot make default screen HDR.");
+
+        GL.TextureStorage2D(_texture.TextureId, 1, SizedInternalFormat.Rgba16f, _width, _height);
+    }
+
     public void Clear(Color color)
     {
         FramebufferService.PushAndBind(_framebuffer);
 
-        GL.ClearColor(color.Rf, color.Gf, color.Bf, color.Af);
+        GL.ClearColor(color.R, color.G, color.B, color.A);
         GL.Clear(ClearBufferMask.ColorBufferBit);
 
         FramebufferService.Pop();

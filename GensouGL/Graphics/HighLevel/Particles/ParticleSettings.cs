@@ -98,10 +98,10 @@ public sealed class ParticleSettings
 
     public Color GenerateColor(RangeParameter<Color> source)
     {
-        return Color.FromFloat(source.Min.Rf + (source.Max.Rf - source.Min.Rf) * Randomizer.NextFloat(),
-                              source.Min.Gf + (source.Max.Gf - source.Min.Gf) * Randomizer.NextFloat(),
-                              source.Min.Bf + (source.Max.Bf - source.Min.Bf) * Randomizer.NextFloat(),
-                              source.Min.Af + (source.Max.Af - source.Min.Af) * Randomizer.NextFloat());
+        return Color.FromFloat(source.Min.R + (source.Max.R - source.Min.R) * Randomizer.NextFloat(),
+                              source.Min.G + (source.Max.G - source.Min.G) * Randomizer.NextFloat(),
+                              source.Min.B + (source.Max.B - source.Min.B) * Randomizer.NextFloat(),
+                              source.Min.A + (source.Max.A - source.Min.A) * Randomizer.NextFloat());
     }
 
     public Particle CreateParticle()

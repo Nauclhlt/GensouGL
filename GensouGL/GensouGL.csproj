@@ -12,6 +12,7 @@
     <None Remove="Graphics\Shaders\BloomBlur.frag" />
     <None Remove="Graphics\Shaders\Bullet.frag" />
     <None Remove="Graphics\Shaders\Bullet.vert" />
+    <None Remove="Graphics\Shaders\ColorInversion.frag" />
     <None Remove="Graphics\Shaders\OutlinedText.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\SimpleShape.vert" />
@@ -19,6 +20,11 @@
     <None Remove="Graphics\Shaders\SimpleText.vert" />
     <None Remove="Graphics\Shaders\SimpleTexture.frag" />
     <None Remove="Graphics\Shaders\SimpleTexture.vert" />
+    <None Remove="Graphics\Shaders\TextureMask.frag" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Shaders\ColorGrading.frag" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +35,7 @@
     <EmbeddedResource Include="Graphics\Shaders\BrightPass.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Bullet.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Bullet.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\ColorInversion.frag" />
     <EmbeddedResource Include="Graphics\Shaders\OutlinedText.frag" />
     <EmbeddedResource Include="Graphics\Shaders\OutlinedText.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleShape.frag" />
@@ -37,6 +44,7 @@
     <EmbeddedResource Include="Graphics\Shaders\SimpleText.vert" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.frag" />
     <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\TextureMask.frag" />
   </ItemGroup>
 
   <ItemGroup>

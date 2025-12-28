@@ -91,10 +91,10 @@ public sealed class BatchBulletRenderer : Renderer
             return;
         }
 
-        _colors.Add(color.Rf);
-        _colors.Add(color.Gf);
-        _colors.Add(color.Bf);
-        _colors.Add(color.Af);
+        _colors.Add(color.R);
+        _colors.Add(color.G);
+        _colors.Add(color.B);
+        _colors.Add(color.A);
 
         _texCoords.Add(texture.Coords.X);
         _texCoords.Add(texture.Coords.Y);

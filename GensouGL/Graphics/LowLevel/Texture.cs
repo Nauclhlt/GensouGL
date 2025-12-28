@@ -40,7 +40,7 @@ public sealed class Texture : ITexture, IDisposable
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-
+        
         TextureService.Pop();
     }
 
@@ -57,10 +57,10 @@ public sealed class Texture : ITexture, IDisposable
         byte[] pixels = new byte[width * height * 4];
         for (int i = 0; i < width * height; i++)
         {
-            pixels[i * 4 + 0] = fillColor.R;
-            pixels[i * 4 + 1] = fillColor.G;
-            pixels[i * 4 + 2] = fillColor.B;
-            pixels[i * 4 + 3] = fillColor.A;
+            pixels[i * 4 + 0] = fillColor.Rb;
+            pixels[i * 4 + 1] = fillColor.Gb;
+            pixels[i * 4 + 2] = fillColor.Bb;
+            pixels[i * 4 + 3] = fillColor.Ab;
         }
 
         TextureService.PushAndBind(_id);
