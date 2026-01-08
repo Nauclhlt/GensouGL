@@ -1,6 +1,7 @@
 ﻿namespace GensouGL.Core;
 
-public sealed class SceneManager
+// No need to make this class public, users can only see ISceneNavigator.
+internal sealed class SceneManager : ISceneNavigator
 {
     private Scene _currentScene;
     private Game _game;
@@ -19,10 +20,7 @@ public sealed class SceneManager
         _currentScene = scene;
         if (!_currentScene.Initialized)
         {
-            _currentScene._sceneManager = this;
-            _currentScene._overlayService = _game._overlayService;
-            _currentScene._input = _game._inputService;
-            _currentScene._game = _game;
+            _currentScene._context = new GameSceneContext(_game);
             _currentScene.OnInitialize();
             _currentScene.Initialized = true;
         }

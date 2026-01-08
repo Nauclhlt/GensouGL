@@ -1,15 +1,45 @@
 ﻿namespace GensouGL.Core;
 
+/// <summary>
+/// Represents blending modes.
+/// </summary>
 public enum BlendMode
 {
+    /// <summary>
+    /// Normal(Alpha) blend.
+    /// </summary>
     Normal = 0,
+    /// <summary>
+    /// Add blend.
+    /// </summary>
     Add = 1,
+    /// <summary>
+    /// Add blend with no alpha.
+    /// </summary>
     AddNoAlpha = 2,
+    /// <summary>
+    /// Glow blend.
+    /// </summary>
     Glow = 3,
+    /// <summary>
+    /// Subtract blend.
+    /// </summary>
     Subtract = 4,
+    /// <summary>
+    /// Multiplty blend.
+    /// </summary>
     Multiply = 5,
+    /// <summary>
+    /// Max blend.
+    /// </summary>
     Max = 6,
+    /// <summary>
+    /// Min blend.
+    /// </summary>
     Min = 7,
+    /// <summary>
+    /// Screen blend.
+    /// </summary>
     Screen = 8
 }
 

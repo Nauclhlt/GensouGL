@@ -2,15 +2,30 @@
 
 namespace GensouGL.Graphics;
 
+/// <summary>
+/// Represents a shader program.
+/// </summary>
 public sealed class Shader : IDisposable
 {
     private string _vertexShaderSource;
     private string _fragmentShaderSource;
     private int _program;
 
+    /// <summary>
+    /// Gets the source code of the vertex shader.
+    /// </summary>
     public string VertexShaderSource => _vertexShaderSource;
+    /// <summary>
+    /// Gets the source code of the fragment shader.
+    /// </summary>
     public string FragmentShaderSource => _fragmentShaderSource;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="Shader"/> with the vertex and fragment shader sources.
+    /// </summary>
+    /// <param name="vertexShaderSource">Vertex shader source code.</param>
+    /// <param name="fragmentShaderSource">Fragment shader source code.</param>
+    /// <exception cref="Exception">Thrown when an compile error occurred.</exception>
     public Shader(string vertexShaderSource, string fragmentShaderSource)
     {
         _vertexShaderSource = vertexShaderSource;
@@ -54,16 +69,27 @@ public sealed class Shader : IDisposable
         GL.DeleteShader(fshader);
     }
 
+    /// <summary>
+    /// Binds the shader program.
+    /// </summary>
     public void Bind()
     {
         GL.UseProgram(_program);
     }
 
+    /// <summary>
+    /// Unbind the shader program.
+    /// </summary>
     public void Unbind()
     {
         GL.UseProgram(0);
     }
 
+    /// <summary>
+    /// Sets the specified uniform value.
+    /// </summary>
+    /// <param name="name">Name of the uniform.</param>
+    /// <param name="value">Value.</param>
     public void SetUniformFloat(string name, float value)
     {
         GL.UseProgram(_program);
@@ -71,6 +97,11 @@ public sealed class Shader : IDisposable
         GL.Uniform1(loc, value);
     }
 
+    /// <summary>
+    /// Sets the specified uniform value.
+    /// </summary>
+    /// <param name="name">Name of the uniform.</param>
+    /// <param name="value">Value.</param>
     public void SetUniformInt(string name, int value)
     {
         GL.UseProgram(_program);
@@ -78,6 +109,12 @@ public sealed class Shader : IDisposable
         GL.Uniform1(loc, value);
     }
 
+    /// <summary>
+    /// Sets the specified uniform value.
+    /// </summary>
+    /// <param name="name">Name of the uniform.</param>
+    /// <param name="x">X component.</param>
+    /// <param name="y">Y component.</param>
     public void SetUniformVector2(string name, float x, float y)
     {
         GL.UseProgram(_program);
@@ -85,6 +122,14 @@ public sealed class Shader : IDisposable
         GL.Uniform2(loc, x, y);
     }
 
+    /// <summary>
+    /// Sets the specified uniform value.
+    /// </summary>
+    /// <param name="name">Name of the uniform.</param>
+    /// <param name="x">X component.</param>
+    /// <param name="y">Y component.</param>
+    /// <param name="z">Z component.</param>
+    /// <param name="w">W component.</param>
     public void SetUniformVector4(string name, float x, float y, float z, float w)
     {
         GL.UseProgram(_program);
@@ -102,12 +147,18 @@ public sealed class Shader : IDisposable
         GL.DeleteProgram(_program);
     }
 
+    /// <summary>
+    /// Releases all resources used by <see cref="Shader"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="Shader"/> destructor.
+    /// </summary>
     ~Shader()
     {
         Dispose(false);
@@ -151,6 +202,7 @@ public sealed class Shader : IDisposable
         s_bloomBlur = Gen(asm, "BrightPass", "BloomBlur");
         s_blindfold = Gen(asm, "BrightPass", "Blindfold");
         s_simpleText = Gen(asm, "SimpleText");
+        s_outlinedText = Gen(asm, "OutlinedText");
         s_colorGrading = Gen(asm, "BrightPass", "ColorGrading");
         s_colorInversion = Gen(asm, "BrightPass", "ColorInversion");
         s_textureMask = Gen(asm, "BrightPass", "TextureMask");

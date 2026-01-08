@@ -1,83 +1,141 @@
 ﻿namespace GensouGL.Core;
 
+/// <summary>
+/// Represents a scene.
+/// </summary>
+/// <remarks>To create a scene, inherit <see cref="Scene"/> and override needed methods. 
+/// Use <see cref="Scene.SceneNavigator"/> to navigate to your scene.</remarks>
 public class Scene
 {
+    /// <summary>
+    /// Gets the empty scene.
+    /// </summary>
     public static Scene Empty { get; } = new Scene();
 
     
-    internal bool Initialized { get; set; }
+    internal bool Initialized { get; set; }    
+    internal ISceneContext _context;
+
+
+    /// <summary>
+    /// Returns the bounding rectangle of the screen.
+    /// </summary>
+    protected Rect ScreenBounds => new Rect(0, 0, ScreenWidth, ScreenHeight);
+    /// <summary>
+    /// Returns the bounding rectangle of the client area of the window.
+    /// </summary>
+    protected Rect WindowBounds => new Rect(0, 0, WindowWidth, WindowHeight);
+    /// <summary>
+    /// Gets the width of the screen.
+    /// </summary>
+    protected int ScreenWidth => _context.ScreenWidth;
+    /// <summary>
+    /// Gets the height of the screen.
+    /// </summary>
+    protected int ScreenHeight => _context.ScreenHeight;
+    /// <summary>
+    /// Gets the width of the window.
+    /// </summary>
+    protected int WindowWidth => _context.WindowWidth;
+    /// <summary>
+    /// Gets the height of the window.
+    /// </summary>
+    protected int WindowHeight => _context.WindowHeight;
+    /// <summary>
+    /// Returns the center point of the screen.
+    /// </summary>
+    protected Point ScreenCenter => new Point(ScreenWidth / 2f, ScreenHeight / 2f);
+    /// <summary>
+    /// Returns the center point of the client area of the window.
+    /// </summary>
+    protected Point WindowCenter => new Point(WindowWidth / 2f, WindowHeight / 2f);
+    /// <summary>
+    /// Gets the scene navigator instance.
+    /// </summary>
+    protected ISceneNavigator SceneNavigator => _context.SceneNavigator;
+    /// <summary>
+    /// Gets the overlay service.
+    /// </summary>
+    protected OverlayService OverlayService => _context.OverlayService;
+    /// <summary>
+    /// Gets the input service.
+    /// </summary>
+    protected InputService Input => _context.InputService;
+
+    /// <summary>
+    /// Gets or sets the background color of the scene.
+    /// </summary>
     public Color BackgroundColor { get; set; } = new Color(0, 0, 0, 255);
 
-
-    internal SceneManager _sceneManager;
-    internal OverlayService _overlayService;
-    internal InputService _input;
-    internal Game _game;
-
-    protected Rect ScreenBounds => new Rect(0, 0, _game.ScreenWidth, _game.ScreenHeight);
-    protected Rect WindowBounds => new Rect(0, 0, _game.WindowWidth, _game.WindowHeight);
-    protected float ScreenWidth => _game.ScreenWidth;
-    protected float ScreenHeight => _game.ScreenHeight;
-    protected Point ScreenCenter => new Point(_game.ScreenWidth / 2f, _game.ScreenHeight / 2f);
-    protected SceneManager SceneManager => _sceneManager;
-    protected OverlayService OverlayService => _overlayService;
-    protected InputService Input => _input;
-
-
-    protected QuickRenderer CreateQuickRenderer(Screen screen)
-    {
-        return new QuickRenderer(_game, screen);
-    }
-
-    protected BatchTextRenderer CreateBatchTextRenderer(Screen screen)
-    {
-        return new BatchTextRenderer(_game, screen);
-    }
-
-    protected BatchBulletRenderer CreateBatchBulletRenderer(Screen screen)
-    {
-        return new BatchBulletRenderer(_game, screen);
-    }
-
-    protected BatchShapeRenderer CreateBatchShapeRenderer(Screen screen)
-    {
-        return new BatchShapeRenderer(_game, screen);
-    }
-
+    /// <summary>
+    /// Registers the specified resource as a persistent resource. Objects registered as persistent resources will be released together when the game ends.
+    /// </summary>
+    /// <param name="resource">Resource to register.</param>
     protected void RegisterPersistentResource(IDisposable resource)
     {
         PersistentResourceService.Register(resource);
     }
 
-    protected void ExitGame()
-    {
-        _game.ExitGame();
-    }
+    /// <summary>
+    /// Ends the game.
+    /// </summary>
+    protected void ExitGame() => _context.ExitGame();
 
+    /// <summary>
+    /// Sets the visibility of the mouse cursor.
+    /// </summary>
+    /// <param name="visible">New visibility.</param>
+    protected void SetCursorVisibility(bool visible) => _context.SetCursorVisibility(visible);
+
+    /// <summary>
+    /// When overridden, runs the scene update logic.
+    /// </summary>
+    /// <param name="deltaTime">Delta time.</param>
     public virtual void Update(float deltaTime)
     {
     }
 
+    /// <summary>
+    /// When overridden, runs the scene update logic(with focus).
+    /// </summary>
+    /// <param name="deltaTime">Delta time.</param>
     public virtual void FocusUpdate(float deltaTime)
     {
     }
 
+    /// <summary>
+    /// When overridden, runs the scene rendering logic.
+    /// </summary>
+    /// <param name="deltaTime">Delta time.</param>
     public virtual void Render(float deltaTime)
     {
     }
 
+    /// <summary>
+    /// When overridden, runs the scene rendering logic(with focus).
+    /// </summary>
+    /// <param name="deltaTime">Delta time.</param>
     public virtual void FocusRender(float deltaTime)
     {
     }
 
+    /// <summary>
+    /// When overridden, initializes the scene.
+    /// </summary>
     public virtual void OnInitialize()
     {
     }
 
+    /// <summary>
+    /// When overridden, runs the entering process.
+    /// </summary>
     public virtual void OnEnter()
     {
     }
 
+    /// <summary>
+    /// When overridden, runs the leaving process.
+    /// </summary>
     public virtual void OnLeave()
     {
     }

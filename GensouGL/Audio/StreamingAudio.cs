@@ -1,15 +1,21 @@
 ﻿using OpenTK.Audio.OpenAL;
 using OpenTK.Audio;
 
-namespace GensouGL.Core;
+namespace GensouGL.Audio;
 
-// For longer audio.
+/// <summary>
+/// Represents an audio clip that supports streaming playback, providing playback control and seeking capabilities.
+/// </summary>
+/// <remarks><see cref="StreamingAudio"/> enables streaming playback, which provides the memory-efficient way to play longer audio.
+/// Use the static From* methods to create instances from supported audio sources such as MP3 or WAV
+/// files or streams. This class implements <see cref="IDisposable"/>; callers should dispose of instances when no longer needed to
+/// release unmanaged resources. <see cref="StreamingAudio"/> is not thread-safe; synchronize access if used from multiple
+/// threads.</remarks>
 public sealed class StreamingAudio : Audio, IDisposable
 {
     private const int BufferCount = 3;
     private const int BufferSize = 4096 * 4;
 
-    // Used to prevent duplicate playback...
     private Guid _uniqueId;
     private int[] _buffers;
     private StreamingSource _streamingSource;
@@ -26,12 +32,18 @@ public sealed class StreamingAudio : Audio, IDisposable
     private bool _disposed = false;
 
 
+    /// <summary>
+    /// Gets or sets whether the audio loops.
+    /// </summary>
     public bool Loop
     {
         get => _loop;
         set => _loop = value;
     }
 
+    /// <summary>
+    /// Gets or sets the start position of one loop in seconds. Value must be within the valid range.
+    /// </summary>
     public float LoopStart
     {
         get => _loopStart;
@@ -39,9 +51,7 @@ public sealed class StreamingAudio : Audio, IDisposable
         {
             if (_state != AudioState.Stopped)
             {
-#if DEBUG
-                DebugLog.Warn("StreamingAudio: Do not set LoopStart or LoopEnd while playing or being paused. Setter skipped.");
-#endif
+                DebugLog.Warn($"{nameof(StreamingAudio)}: Do not set LoopStart or LoopEnd while playing or being paused. Setter skipped.");
                 return;
             }
 
@@ -54,6 +64,9 @@ public sealed class StreamingAudio : Audio, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the end position of one loop in seconds. Value must be within the valid range.
+    /// </summary>
     public float LoopEnd
     {
         get => _loopEnd;
@@ -61,9 +74,7 @@ public sealed class StreamingAudio : Audio, IDisposable
         {
             if (_state != AudioState.Stopped)
             {
-#if DEBUG
-                DebugLog.Warn("StreamingAudio: Do not set LoopStart or LoopEnd while playing or being paused. Setter skipped.");
-#endif
+                DebugLog.Warn($"{nameof(StreamingAudio)}: Do not set LoopStart or LoopEnd while playing or being paused. Setter skipped.");
                 return;
             }
 
@@ -77,9 +88,17 @@ public sealed class StreamingAudio : Audio, IDisposable
     }
     
     
+    /// <summary>
+    /// Gets the current playback position in seconds.
+    /// </summary>
     public float Position => _info.BytesToSeconds((long)_buffersPlayed * BufferSize) + AL.GetSource(_source, ALSourcef.SecOffset);    
+    /// <summary>
+    /// Gets the current state of the audio.
+    /// </summary>
     public AudioState State => _state;
-    public int[] Buffers => _buffers;
+    /// <summary>
+    /// Gets the unique ID associated with the audio.
+    /// </summary>
     public Guid UniqueId => _uniqueId;
 
 
@@ -129,14 +148,18 @@ public sealed class StreamingAudio : Audio, IDisposable
     }
 
 
-
+    /// <summary>
+    /// Plays the audio.
+    /// </summary>
+    /// <remarks>
+    /// When the current state is Playing: has no effect. When the current state is Paused: resumes the playback from the last position. 
+    /// When the current state is Stopped: plays the audio from the beginning.
+    /// </remarks>
     public void Play()
     {
         if (LoopStart > LoopEnd)
         {
-#if DEBUG
-            DebugLog.Error("StreamingAudio: LoopStart > LoopEnd.");
-#endif
+            DebugLog.Error($"{nameof(StreamingAudio)}: LoopStart > LoopEnd.");
             return;
         }
 
@@ -160,25 +183,34 @@ public sealed class StreamingAudio : Audio, IDisposable
         }
         else
         {
-#if DEBUG
-            DebugLog.Warn("StreamingAudio: Play() called during playback.");
-#endif
+            DebugLog.Warn($"{nameof(StreamingAudio)}: Play() called during playback.");
         }
     }
 
+    /// <summary>
+    /// Pauses the audio.
+    /// </summary>
+    /// <remarks>
+    /// Paused audio can be resumed by the play method.
+    /// </remarks>
     public void Pause()
     {
+        if (_state == AudioState.Stopped)
+        {
+            DebugLog.Warn($"{nameof(StreamingAudio)}: Pause() called, but the audio was not playing.");
+        }
         _state = AudioState.Paused;
         AL.SourcePause(_source);
     }
 
+    /// <summary>
+    /// Stops the audio.
+    /// </summary>
     public void Stop()
     {
         if (_state == AudioState.Stopped)
         {
-#if DEBUG
-            DebugLog.Warn("StreamingAudio: Stop() called before playback.");
-#endif
+            DebugLog.Warn($"{nameof(StreamingAudio)}: Stop() called before playback.");
             return;
         }
 
@@ -192,13 +224,15 @@ public sealed class StreamingAudio : Audio, IDisposable
         AL.Source(_source, ALSourcef.SecOffset, 0f);
     }
 
+    /// <summary>
+    /// Seeks the playback position to the specified position in seconds.
+    /// </summary>
+    /// <param name="position">Position to which the playback position should be sought</param>
     public void Seek(float position)
     {
         if (position < 0 || position >= Duration)
         {
-#if DEBUG
-            DebugLog.Error("StreamingAudio: Specified position is out of range.");
-#endif
+            DebugLog.Error($"{nameof(StreamingAudio)}: Specified position is out of range.");
             return;
         }
 
@@ -282,29 +316,64 @@ public sealed class StreamingAudio : Audio, IDisposable
 
 
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified MP3 file name.
+    /// </summary>
+    /// <param name="filename">File name to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
     public static StreamingAudio FromMp3(string filename)
     {
         return new StreamingAudio(new MpegFileAdapter(filename));
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="StreamingAudio "/> using the specified MP3 stream.
+    /// </summary>
+    /// <param name="stream">MP3 stream to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
     public static StreamingAudio FromMp3(Stream stream)
     {
         return new StreamingAudio(new MpegFileAdapter(stream));
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified Wave file name.
+    /// </summary>
+    /// <param name="filename">File name to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
     public static StreamingAudio FromWave(string filename)
     {
         return new StreamingAudio(new WavePcmSource(filename));
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified Wave stream.
+    /// </summary>
+    /// <param name="stream">Wave stream to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
     public static StreamingAudio FromWave(Stream stream)
     {
         return new StreamingAudio(new WavePcmSource(stream));
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified <see cref="AudioSource"/>.
+    /// </summary>
+    /// <param name="source"><see cref="AudioSource"/> instance to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
     public static StreamingAudio From(AudioSource source)
     {
         return new StreamingAudio(source.CreateStreamingSource());
+    }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified <see cref="StreamingSource"/>.
+    /// </summary>
+    /// <param name="streamingSource"><see cref="StreamingSource"/> instance to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
+    public static StreamingAudio FromStreamingSource(StreamingSource streamingSource)
+    {
+        return new StreamingAudio(streamingSource);
     }
 
 
@@ -327,12 +396,18 @@ public sealed class StreamingAudio : Audio, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources contained by <see cref="StreamingAudio"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="StreamingAudio"/> destructor.
+    /// </summary>
     ~StreamingAudio()
     {
         Dispose(false);

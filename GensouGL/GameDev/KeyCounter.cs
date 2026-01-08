@@ -1,15 +1,26 @@
 ﻿namespace GensouGL.GameDev;
 
+/// <summary>
+/// Manages integer counts associated with string keys.
+/// </summary>
 public sealed class KeyCounter
 {
     private Dictionary<string, int> _map;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="KeyCounter" />.
+    /// </summary>
     public KeyCounter()
     {
         _map = new Dictionary<string, int>();
     }
 
-    public int Add(string key)
+    /// <summary>
+    /// Increases the count associated with the specified key by 1.
+    /// </summary>
+    /// <param name="key">Target key.</param>
+    /// <returns>Count after increment.</returns>
+    public int Increase(string key)
     {
         if (_map.ContainsKey(key))
         {
@@ -22,7 +33,13 @@ public sealed class KeyCounter
         return _map[key];
     }
 
-    public int Add(string key, int count)
+    /// <summary>
+    /// Increases the count associated with the specified key by the specified amount.
+    /// </summary>
+    /// <param name="key">Target key.</param>
+    /// <param name="count">Count.</param>
+    /// <returns>Count after increment.</returns>
+    public int Increase(string key, int count)
     {
         if (_map.ContainsKey(key))
         {
@@ -35,12 +52,22 @@ public sealed class KeyCounter
         return _map[key];
     }
 
+    /// <summary>
+    /// Gets the count associated with the specified key.
+    /// </summary>
+    /// <param name="key">Target key.</param>
+    /// <returns>Count associated with the specified key.</returns>
     public int CountOf(string key)
     {
         return _map.TryGetValue(key, out int count) ? count : 0;
     }
 
-    public int Remove(string key)
+    /// <summary>
+    /// Decreases the count associated with the specified key by 1.
+    /// </summary>
+    /// <param name="key">Target key.</param>
+    /// <returns>Count after decrement.</returns>
+    public int Decrease(string key)
     {
         if (_map.ContainsKey(key))
         {
@@ -58,6 +85,12 @@ public sealed class KeyCounter
         return 0;
     }
 
+    /// <summary>
+    /// Decreases the count associated with the specified key by the specified amount.
+    /// </summary>
+    /// <param name="key">Target key.</param>
+    /// <param name="count">Count.</param>
+    /// <returns>Count after decrement.</returns>
     public int Remove(string key, int count)
     {
         if (_map.ContainsKey(key))
@@ -76,11 +109,19 @@ public sealed class KeyCounter
         return 0;
     }
 
+    /// <summary>
+    /// Returns if the specified key is contained in the key counter.
+    /// </summary>
+    /// <param name="key">Target key.</param>
+    /// <returns>Flag representing whether the specified key is contained in the key counter.</returns>
     public bool Contains(string key)
     {
         return _map.ContainsKey(key);
     }
 
+    /// <summary>
+    /// Clears all keys.
+    /// </summary>
     public void Clear()
     {
         _map.Clear();

@@ -1,11 +1,20 @@
 ﻿namespace GensouGL.Core;
 
+/// <summary>
+/// Manages Overlays.
+/// </summary>
 public sealed class OverlayService
 {
     private readonly List<Overlay> _overlays = new();
     private Game _game;
     
+    /// <summary>
+    /// Gets whether one or more overlays are currently shown.
+    /// </summary>
     public bool Any => _overlays.Count > 0;
+    /// <summary>
+    /// Gets the number of overlays shown.
+    /// </summary>
     public int Count => _overlays.Count;
 
     internal OverlayService(Game game)
@@ -13,15 +22,16 @@ public sealed class OverlayService
         _game = game;
     }
 
+    /// <summary>
+    /// Shows the specified overlay.
+    /// </summary>
+    /// <param name="overlay">Overlay to show.</param>
     public void Show(Overlay overlay)
     {
         ArgumentNullException.ThrowIfNull(overlay);
         if (!overlay.Initialized)
         {
-            overlay._sceneManager = null;
-            overlay._overlayService = _game._overlayService;
-            overlay._input = _game._inputService;
-            overlay._game = _game;
+            overlay._context = new GameSceneContext(_game);
             overlay.OnInitialize();
             overlay.Initialized = true;
         }
@@ -29,6 +39,9 @@ public sealed class OverlayService
         _overlays.Add(overlay);
     }
 
+    /// <summary>
+    /// Closes the top-level overlay.
+    /// </summary>
     public void CloseTop()
     {
         if (_overlays.Count > 0)
@@ -37,11 +50,19 @@ public sealed class OverlayService
         }
     }
 
+    /// <summary>
+    /// Closes all overlays.
+    /// </summary>
     public void CloseAll()
     {
         _overlays.Clear();
     }
 
+    /// <summary>
+    /// Closes the overlay at the specified level.
+    /// </summary>
+    /// <param name="level">Level.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the level is invalid.</exception>
     public void CloseLevel(int level)
     {
         if (level < 0 || level >= _overlays.Count)
@@ -51,6 +72,10 @@ public sealed class OverlayService
         _overlays.RemoveAt(_overlays.Count - level - 1);
     }
 
+    /// <summary>
+    /// Gets the top-level overlay.
+    /// </summary>
+    /// <returns>Top-level overlay.</returns>
     public Overlay GetTop() => _overlays.Count > 0 ? _overlays[^1] : Overlay.Empty;
 
     internal void CheckState()

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Concurrent;
 namespace GensouGL.Core;
 
+/// <summary>
+/// Provides asynchronous resource loading.
+/// </summary>
 public sealed class AsyncResourceLoader : IDisposable
 {
     private int _loadedCount = 0;
@@ -13,13 +16,35 @@ public sealed class AsyncResourceLoader : IDisposable
     private bool _started = false;
     private Dictionary<string, object> _map = new();
 
+    /// <summary>
+    /// Gets the total number of resources loaded.
+    /// </summary>
     public int LoadedCount => _loadedCount;
+    /// <summary>
+    /// Gets the total number of resources requested.
+    /// </summary>
     public int TotalCount => _totalCount;
+    /// <summary>
+    /// Gets the number of workers.
+    /// </summary>
     public int WorkerCount => _workerCount;
+    /// <summary>
+    /// Gets whether all resources has been loaded.
+    /// </summary>
     public bool IsReady => _totalCount == _loadedCount;
+    /// <summary>
+    /// Gets whethter the instance is disposed.
+    /// </summary>
     public bool Disposed => _disposed;
+    /// <summary>
+    /// Gets whether the loading process has been started.
+    /// </summary>
     public bool Started => _started;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="AsyncResourceLoader"/>.
+    /// </summary>
+    /// <param name="workerCount">Default value is 1. Value representing the number of workers to be used to load resources.</param>
     public AsyncResourceLoader(int workerCount = 1)
     {
         _workerCount = int.Clamp(workerCount, 1, int.Max(1, Environment.ProcessorCount - 1));
@@ -52,11 +77,17 @@ public sealed class AsyncResourceLoader : IDisposable
         }
     }
 
+    /// <summary>
+    /// Stops the resource loading process.
+    /// </summary>
     public void Stop()
     {
         _started = false;
     }
 
+    /// <summary>
+    /// Dequeues and complete one loading process from the queue, if any.
+    /// </summary>
     public void ProcessQueue()
     {
         if (_completeQueue.TryDequeue(out var proc))
@@ -64,25 +95,45 @@ public sealed class AsyncResourceLoader : IDisposable
             proc.Item2.Complete();
             _loadedCount++;
             _map[proc.Item1] = proc.Item2.Resource;
-            DebugLog.Info($"AsyncResourceLoader: Loaded '{proc.Item1}'");
+            DebugLog.Info($"{nameof(AsyncResourceLoader)}: Loaded '{proc.Item1}'");
         }
     }
 
+    /// <summary>
+    /// Queues a new loading process of the texture.
+    /// </summary>
+    /// <param name="name">Name of the resource.</param>
+    /// <param name="source"><see cref="TextureSource"/> from which the texture should be loaded.</param>
     public void QueueTexture(string name, TextureSource source)
     {
         QueueCore(name, new AsyncTextureLoader(source));
     }
 
+    /// <summary>
+    /// Queues a new loading process of the streaming audio.
+    /// </summary>
+    /// <param name="name">Name of the resource.</param>
+    /// <param name="source"><see cref="AudioSource"/> from which the texture should be loaded.</param>
     public void QueueStreamingAudio(string name, AudioSource source)
     {
         QueueCore(name, new AsyncStreamingAudioLoader(source));
     }
 
+    /// <summary>
+    /// Queues a new loading process of the memory audio.
+    /// </summary>
+    /// <param name="name">Name of the resource.</param>
+    /// <param name="source"><see cref="AudioSource"/> from which the texture should be loaded.</param>
     public void QueueMemoryAudio(string name, AudioSource source)
     {
         QueueCore(name, new AsyncMemoryAudioLoader(source));
     }
 
+    /// <summary>
+    /// Queues a new loading process of the text file.
+    /// </summary>
+    /// <param name="name">Name of the resource.</param>
+    /// <param name="filename">Source file name.</param>
     public void QueueText(string name, string filename)
     {
         QueueCore(name, new AsyncTextLoader(filename));
@@ -92,9 +143,7 @@ public sealed class AsyncResourceLoader : IDisposable
     {
         if (_map.ContainsKey(name))
         {
-#if DEBUG
-            DebugLog.Error($"AsyncResourceLoader: '{name}' has been already loaded or is in the queue.");
-#endif
+            DebugLog.Error($"{nameof(AsyncResourceLoader)}: '{name}' has been already loaded or is in the queue.");
             return;
         }
         _map[name] = null; 
@@ -104,7 +153,12 @@ public sealed class AsyncResourceLoader : IDisposable
         _semaphore.Release();
     }
 
-
+    /// <summary>
+    /// Returns the resource with the specified name as T.
+    /// </summary>
+    /// <typeparam name="T">Type of the target resource.</typeparam>
+    /// <param name="name">Target resource name.</param>
+    /// <returns>Target resource as T</returns>
     public T Get<T>(string name)
     {
         if (_map.TryGetValue(name, out var result))
@@ -137,12 +191,18 @@ public sealed class AsyncResourceLoader : IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources contained by <see cref="AsyncResourceLoader"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="AsyncResourceLoader"/> destructor.
+    /// </summary>
     ~AsyncResourceLoader()
     {
         Dispose(false);

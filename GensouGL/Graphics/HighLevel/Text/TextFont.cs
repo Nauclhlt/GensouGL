@@ -8,8 +8,9 @@ using IMS = SixLabors.ImageSharp;
 using IMSF = SixLabors.Fonts;
 using IMSP = SixLabors.ImageSharp.PixelFormats;
 
-// FontAtlasArrayを内部に持ち, グリフ情報を要求されたら, なければ作成, すでにあれば返す.
-// グリフを生成する
+/// <summary>
+/// Represents a text font.
+/// </summary>
 public sealed class TextFont : IDisposable
 {
     private FontAtlasArray _atlasArray;
@@ -19,11 +20,26 @@ public sealed class TextFont : IDisposable
 
     private bool _disposed = false;
 
+    /// <summary>
+    /// Gets if the font is outlined.
+    /// </summary>
     public bool IsOutlined => _settings.OutlineWidth > 0f;
+    /// <summary>
+    /// Gets the font size.
+    /// </summary>
     public float Size => _font.Size;
+    /// <summary>
+    /// Gets the font style.
+    /// </summary>
     public FontStyleMode Style => _settings.Style;
 
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="TextFont"/> using the specified parameters.
+    /// </summary>
+    /// <param name="source">Font source.</param>
+    /// <param name="size">Font size.</param>
+    /// <param name="settings">Font settings.</param>
     public TextFont(FontSource source, float size, FontSettings settings)
     {
         _font = new(source.GetFontFamily(), size, (IMSF.FontStyle)settings.Style);
@@ -32,12 +48,44 @@ public sealed class TextFont : IDisposable
         _settings = settings;
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="TextFont"/> using the specified parameters.
+    /// </summary>
+    /// <param name="source">Font source.</param>
+    /// <param name="size">Font size.</param>
     public TextFont(FontSource source, float size) : this(source, size, FontSettings.Regular) { }
+    /// <summary>
+    /// Initializes a new instance of <see cref="TextFont"/> using the specified parameters.
+    /// </summary>
+    /// <param name="filename">Font file name.</param>
+    /// <param name="size">Font size.</param>
+    /// <param name="settings">Font settings.</param>
     public TextFont(string filename, float size, FontSettings settings) : this(new FontSource(filename), size, settings) { }
+    /// <summary>
+    /// Initializes a new instance of <see cref="TextFont"/> using the specified parameters.
+    /// </summary>
+    /// <param name="filename">Font file name.</param>
+    /// <param name="size">Font size.</param>
     public TextFont(string filename, float size) : this(filename, size, FontSettings.Regular) { }
+    /// <summary>
+    /// Initializes a new instance of <see cref="TextFont"/> using the specified parameters.
+    /// </summary>
+    /// <param name="stream">Source font stream.</param>
+    /// <param name="size">Font size.</param>
+    /// <param name="settings">Font settings.</param>
     public TextFont(Stream stream, float size, FontSettings settings) : this(new FontSource(stream), size, settings) { }
+    /// <summary>
+    /// Initializes a new instance of <see cref="TextFont"/> using the specified parameters.
+    /// </summary>
+    /// <param name="stream">Source font stream.</param>
+    /// <param name="size">Font size.</param>
     public TextFont(Stream stream, float size) : this(stream, size, FontSettings.Regular) { }
-
+    
+    /// <summary>
+    /// Gets the glyph information of the specified character.
+    /// </summary>
+    /// <param name="c">Target character.</param>
+    /// <returns>Glyph information.</returns>
     public GlyphInfo GetGlyph(char c)
     {
         if (char.IsWhiteSpace(c)) return GetGlyph('a');
@@ -86,11 +134,21 @@ public sealed class TextFont : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the height of the specified character.
+    /// </summary>
+    /// <param name="c">Target character.</param>
+    /// <returns>Height of the specified charactter.</returns>
     public int HeightOf(char c)
     {
         return GetGlyph(c).Height;
     }
 
+    /// <summary>
+    /// Gets the height of the specified string.
+    /// </summary>
+    /// <param name="s">Target string.</param>
+    /// <returns>Height of the specified string.</returns>
     public int HeightOf(ReadOnlySpan<char> s)
     {
         int max = 0;
@@ -102,11 +160,21 @@ public sealed class TextFont : IDisposable
         return max;
     }
 
+    /// <summary>
+    /// Gets the width of the specified character.
+    /// </summary>
+    /// <param name="c">Target character.</param>
+    /// <returns>Width of the specified charactter.</returns>
     public int WidthOf(char c)
     {
         return GetGlyph(c).Width;
     }
 
+    /// <summary>
+    /// Gets the width of the specified string.
+    /// </summary>
+    /// <param name="s">Target string.</param>
+    /// <returns>Width of the specified string.</returns>
     public int WidthOf(ReadOnlySpan<char> s)
     {
         int width = 0;
@@ -118,6 +186,11 @@ public sealed class TextFont : IDisposable
         return width;
     }
 
+    /// <summary>
+    /// Gets the atlas texture of the specified page.
+    /// </summary>
+    /// <param name="page">Page index.</param>
+    /// <returns>Atlas texture of the specified page.</returns>
     public ITexture GetPageTexture(int page)
     {
         return _atlasArray.GetPageTexture(page);
@@ -136,12 +209,18 @@ public sealed class TextFont : IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources used by <see cref="TextFont"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="TextFont"/> destructor.
+    /// </summary>
     ~TextFont()
     {
         Dispose(false);

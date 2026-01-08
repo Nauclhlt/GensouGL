@@ -1,5 +1,8 @@
 ﻿namespace GensouGL.Graphics;
 
+/// <summary>
+/// Handles animation.
+/// </summary>
 public sealed class Animator
 {
     private Dictionary<string, AnimationClip> _animationList;
@@ -12,17 +15,38 @@ public sealed class Animator
     private float _elapsed;
     private float _elapsedInFrame;
 
+    /// <summary>
+    /// Gets the name of the animation being played.
+    /// </summary>
     public string Current => _current;
+    /// <summary>
+    /// Gets the animation clip being played.
+    /// </summary>
     public AnimationClip CurrentClip => _currentClip;
+    /// <summary>
+    /// Gets the current frame number.
+    /// </summary>
     public int CurrentFrame => _currentFrame;
+    /// <summary>
+    /// Gets the elapsed time in seconds.
+    /// </summary>
     public float Elapsed => _elapsed;
+    /// <summary>
+    /// Gets or sets the speed of animation playback.
+    /// </summary>
     public float Speed
     {
         get => _speed;
         set => _speed = value;
     }
+    /// <summary>
+    /// Gets whether the animation is currently playing.
+    /// </summary>
     public bool Playing => _playing;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="Animator"/>.
+    /// </summary>
     public Animator()
     {
         _animationList = [];
@@ -33,15 +57,18 @@ public sealed class Animator
         _playing = false;
     }
 
+    /// <summary>
+    /// Adds the specified animation clip with the specified name.
+    /// </summary>
+    /// <param name="name">Animation name.</param>
+    /// <param name="clip">Animation clip.</param>
     public void Add(string name, AnimationClip clip)
     {
         if (_animationList.ContainsKey(name)) return;
 
         if (!ValidateClip(clip))
         {
-#if DEBUG
-            DebugLog.Error("Animator: Invalid AnimationClip.");
-#endif
+            DebugLog.Error($"{nameof(Animator)}: Invalid AnimationClip.");
             return;
         }
 
@@ -53,18 +80,24 @@ public sealed class Animator
         return clip is not null && clip.Frames is not null && clip.Texture is not null;
     }
 
+    /// <summary>
+    /// Removes the animation with the specified name.
+    /// </summary>
+    /// <param name="name">Target animation name.</param>
     public void Remove(string name)
     {
         _animationList.Remove(name);
     }
 
+    /// <summary>
+    /// Plays the animation with the specified name.
+    /// </summary>
+    /// <param name="name">Target animation name.</param>
     public void Play(string name)
     {
         if (!_animationList.ContainsKey(name))
         {
-#if DEBUG
-            DebugLog.Error($"Animator: Animation '{name}' is not present.");
-#endif
+            DebugLog.Error($"{nameof(Animator)}: Animation '{name}' is not present.");
             return;
         }
 
@@ -76,6 +109,13 @@ public sealed class Animator
         _playing = true;
     }
 
+    /// <summary>
+    /// Updates the animation playback state.
+    /// </summary>
+    /// <remarks>
+    /// Call Update() every frame to play the animation currectly.
+    /// </remarks>
+    /// <param name="deltaTime">Delta time.</param>
     public void Update(float deltaTime)
     {
         if (!_playing || _current == string.Empty) return;
@@ -107,6 +147,10 @@ public sealed class Animator
         }
     }
 
+    /// <summary>
+    /// Gets the texture of the current frame.
+    /// </summary>
+    /// <returns>Texture of the current frame.</returns>
     public ITexture GetCurrentFrameTexture()
     {
         if (!_playing) return Texture.Empty;

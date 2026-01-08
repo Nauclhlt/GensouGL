@@ -2,7 +2,7 @@
 
 // For compatibility, streaming audios cannot support asynchronous loading.
 // So in this implementation, Complete() runs everything synchronously.
-public sealed class AsyncStreamingAudioLoader : IAsyncResourceLoadingProcess
+internal sealed class AsyncStreamingAudioLoader : IAsyncResourceLoadingProcess
 {
     private AudioSource _source;
     private StreamingAudio _audio;

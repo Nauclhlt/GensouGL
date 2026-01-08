@@ -1,13 +1,40 @@
 ﻿namespace GensouGL.Core;
 
+/// <summary>
+/// Specifies the type of shape.
+/// </summary>
 public enum ShapeType
 {
+    /// <summary>
+    /// Invalid shape type.
+    /// </summary>
+    /// <remarks>
+    /// Do not use this item. 
+    /// </remarks>
     Invalid,
+    /// <summary>
+    /// Rectangle shape type.
+    /// </summary>
     Rect,
+    /// <summary>
+    /// Wire rectangle shape type.
+    /// </summary>
     WireRect,
+    /// <summary>
+    /// Line shape type.
+    /// </summary>
     Line,
+    /// <summary>
+    /// Triangle shape type.
+    /// </summary>
     Triangle,
+    /// <summary>
+    /// Wire triangle shape type.
+    /// </summary>
     WireTriangle,
+    /// <summary>
+    /// Ellipse shape type.
+    /// </summary>
     Ellipse
 }
 

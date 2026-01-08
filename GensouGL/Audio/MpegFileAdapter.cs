@@ -1,4 +1,4 @@
-﻿namespace GensouGL.Core;
+﻿namespace GensouGL.Audio;
 
 internal sealed class MpegFileAdapter : StreamingSource
 {

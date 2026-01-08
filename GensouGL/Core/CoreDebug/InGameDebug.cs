@@ -2,18 +2,24 @@
 
 namespace GensouGL.Core;
 
+/// <summary>
+/// Handles the in-game overlay debug.
+/// </summary>
 public static class InGameDebug
 {
     private static bool _enabled = false;
     private static bool _overlayShown = false;
 
+    /// <summary>
+    /// Gets or sets whether the in-game debug is enabled.
+    /// </summary>
     public static bool Enabled => _enabled;
 
     private static Game _game;
     private static TextFont _font1;
     private static TextFont _font2;
-    private static QuickRenderer _quickRenderer;
-    private static BatchTextRenderer _batchTextRenderer;
+    private static QuickRenderer2D _quickRenderer;
+    private static BatchTextRenderer2D _batchTextRenderer;
 
     // INFO
     private static string _glVersion;
@@ -26,6 +32,9 @@ public static class InGameDebug
     private static readonly Color Foreground = Color.LightGray;
     private static readonly Color ForegroundAccent = Color.HotPink;
 
+    /// <summary>
+    /// Enables and sets up the in-game debug.
+    /// </summary>
     public static void Enable()
     {
         _enabled = true;
@@ -37,8 +46,8 @@ public static class InGameDebug
         _font1 = new TextFont(ffStream, 20f);
         _font2 = new TextFont(ffStream, 26f);
 
-        _quickRenderer = new QuickRenderer(_game, Screen.Default);
-        _batchTextRenderer = new BatchTextRenderer(_game, Screen.Default);
+        _quickRenderer = new QuickRenderer2D(Screen.Default);
+        _batchTextRenderer = new BatchTextRenderer2D(Screen.Default);
 
 
         // info
@@ -137,13 +146,14 @@ public static class InGameDebug
         }
     }
 
-    public static void ShowOrHideOverlay()
+    /// <summary>
+    /// Toggles the visibility of the debug overlay.
+    /// </summary>
+    public static void ToggleOverlayVisibility()
     {
         if (!_enabled)
         {
-#if DEBUG
             DebugLog.Error("InGameDebug: In-Game debug is not enabled.");
-#endif
             return;
         }
 

@@ -1,5 +1,9 @@
 ﻿namespace GensouGL.Graphics.Particles;
 
+/// <summary>
+/// An emitter that releases particles in random directions within a circular range.
+/// Unlike <see cref="DivCircularEmitter"/>, this class randomizes the angle for each particle.
+/// </summary>
 public sealed class RandomCircularEmitter : ParticleEmitter
 {
     private float _interval;
@@ -7,7 +11,15 @@ public sealed class RandomCircularEmitter : ParticleEmitter
     private int _emitCount;
     private int _particleCount;
 
-    public RandomCircularEmitter(ParticleSettings settings, GVector2 position, float interval, int emitCount, int particleCount)
+    /// <summary>
+    /// Initializes a new instance of <see cref="RandomCircularEmitter"/>.
+    /// </summary>
+    /// <param name="settings">Settings for the particles, including angle randomization logic.</param>
+    /// <param name="position">Central position of the emission.</param>
+    /// <param name="interval">Time interval between emissions (in seconds).</param>
+    /// <param name="emitCount">Total number of emission cycles.</param>
+    /// <param name="particleCount">The number of particles to release per cycle.</param>
+    public RandomCircularEmitter(ParticleSettings settings, Vec2 position, float interval, int emitCount, int particleCount)
     {
         _settings = settings;
         _position = position;
@@ -17,6 +29,12 @@ public sealed class RandomCircularEmitter : ParticleEmitter
         _particleCount = particleCount;
     }
 
+    /// <summary>
+    /// Updates the emitter state and releases particles with randomized directions if the interval has elapsed.
+    /// </summary>
+    /// <param name="system">Particle system to add particles to.</param>
+    /// <param name="deltaTime">Elapsed time since the last update.</param>
+    /// <returns>True if all emission cycles are complete; otherwise, false.</returns>
     public override bool Update(ParticleSystem system, float deltaTime)
     {
         _wait -= deltaTime;
@@ -24,7 +42,7 @@ public sealed class RandomCircularEmitter : ParticleEmitter
         {
             for (int i = 0; i < _particleCount; i++)
             {
-                GVector2 dir = GVector2.UnitX.Rotate(_settings.GenerateShootAngle());
+                Vec2 dir = Vec2.UnitX.Rotate(_settings.GenerateShootAngle());
                 Particle p = _settings.CreateParticle();
                 p.Position = _position;
                 p.Velocity = dir * _settings.GenerateSpeed();

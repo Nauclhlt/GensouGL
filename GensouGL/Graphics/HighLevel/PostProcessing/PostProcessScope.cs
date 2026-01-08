@@ -3,13 +3,11 @@
 internal sealed class PostProcessScope : IDisposable
 {
     private Renderer _renderer;
-    private Game _game;
     private PostProcessEffect _effect;
 
-    public PostProcessScope(Renderer renderer, Game game, PostProcessEffect effect)
+    public PostProcessScope(Renderer renderer, PostProcessEffect effect)
     {
         _renderer = renderer;
-        _game = game;
         _effect = effect;
     }
 
@@ -17,7 +15,7 @@ internal sealed class PostProcessScope : IDisposable
     {
         Screen source = _renderer.ScreenStack.Pop();
 
-        _effect.Apply(_game, _renderer, source, _renderer.ScreenStack.Peek());
+        _effect.Apply(_renderer, source, _renderer.ScreenStack.Peek());
 
         TempScreenPool.Return(source);
     }

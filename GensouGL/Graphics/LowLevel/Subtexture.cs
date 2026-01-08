@@ -1,6 +1,6 @@
 ﻿namespace GensouGL.Graphics;
 
-public readonly struct Subtexture : ITexture
+internal readonly struct Subtexture : ITexture
 {
     private readonly int _id;
     private readonly int _baseWidth;

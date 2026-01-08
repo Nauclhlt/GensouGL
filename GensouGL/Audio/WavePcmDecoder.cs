@@ -1,4 +1,6 @@
-﻿public sealed class WavPcmDecoder
+﻿namespace GensouGL.Audio;
+
+public sealed class WavPcmDecoder
 {
     public int Channels { get; private set; }
     public int SampleRate { get; private set; }

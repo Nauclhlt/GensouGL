@@ -3,7 +3,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-public sealed class AsyncTextureLoader : IAsyncResourceLoadingProcess
+internal sealed class AsyncTextureLoader : IAsyncResourceLoadingProcess
 {
     private TextureSource _source;
     private Texture _texture;

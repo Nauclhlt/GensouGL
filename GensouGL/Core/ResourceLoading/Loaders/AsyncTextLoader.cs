@@ -1,6 +1,6 @@
 ﻿namespace GensouGL.Core.AsyncLoaders;
 
-public sealed class AsyncTextLoader : IAsyncResourceLoadingProcess
+internal sealed class AsyncTextLoader : IAsyncResourceLoadingProcess
 {
     private string _filename;
     private string _text;

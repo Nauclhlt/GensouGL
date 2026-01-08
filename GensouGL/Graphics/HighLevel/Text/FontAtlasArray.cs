@@ -3,28 +3,43 @@
 using IMS = SixLabors.ImageSharp;
 using IMSP = SixLabors.ImageSharp.PixelFormats;
 
-
-// フォントアトラスのページを管理する.
-// 画像を新規登録してグリフ情報を返す.
-// グリフ情報からテクスチャを返す.
+/// <summary>
+/// Manages a array of font atlas pages.
+/// </summary>
 public sealed class FontAtlasArray : IDisposable
 {
     private List<FontAtlasPage> _pages;
     
     private bool _disposed = false;
 
-    public List<FontAtlasPage> Pages => _pages;
+    /// <summary>
+    /// Gets the list of the pages.
+    /// </summary>
+    public ImmutableList<FontAtlasPage> Pages => _pages.ToImmutableList();
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="FontAtlasArray"/>.
+    /// </summary>
     public FontAtlasArray()
     {
         _pages = [new()];
     }
 
+    /// <summary>
+    /// Gets the atlas texture of the specified page.
+    /// </summary>
+    /// <param name="page">Page index.</param>
+    /// <returns>Atlas texture of the specified page.</returns>
     public ITexture GetPageTexture(int page)
     {
         return _pages[page].Texture;
     }
 
+    /// <summary>
+    /// Gets the texture of the specified glyph.
+    /// </summary>
+    /// <param name="info">Source glyph info.</param>
+    /// <returns>Texture of the specified glyph.</returns>
     public ITexture GetGlyphTexture(GlyphInfo info)
     {
         return _pages[info.Page].Texture.GetPartial(info.Coords);
@@ -58,12 +73,18 @@ public sealed class FontAtlasArray : IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources used by <see cref="FontAtlasArray"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="FontAtlasArray"/> destructor.
+    /// </summary>
     ~FontAtlasArray()
     {
         Dispose(false);

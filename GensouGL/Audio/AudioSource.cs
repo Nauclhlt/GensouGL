@@ -1,21 +1,42 @@
 ﻿using System.IO;
 
-namespace GensouGL.Core;
+namespace GensouGL.Audio;
 
+/// <summary>
+/// Represents a source of audio data, such as an MP3 or WAV file or stream.
+/// </summary>
+/// <remarks>Use the static factory methods to create an instance of this class from a file path or a stream
+/// containing MP3 or WAV audio data. The type of audio source is determined by the factory method used. Once created,
+/// the properties provide access to the underlying file name or stream, as well as the audio source type. This class is
+/// immutable and thread-safe after construction.</remarks>
 public sealed class AudioSource
 {
     private AudioSourceType _type;
     private string _filename;
     private Stream _stream;
 
+    /// <summary>
+    /// Gets the type of the audio source.
+    /// </summary>
     public AudioSourceType Type => _type;
+    /// <summary>
+    /// Gets the file name associated with this instance. Returns <see langword="null"/>, if the instance was not created from a file name.
+    /// </summary>
     public string Filename => _filename;
+    /// <summary>
+    /// Gets the stream associated with this instance. Returns <see langword="null"/>, if the instance was not created from a stream.
+    /// </summary>
     public Stream Stream => _stream;
 
     private AudioSource()
     {
     }
 
+    /// <summary>
+    /// Creates a new AudioSource instance that contains the specified MP3 file.
+    /// </summary>
+    /// <param name="filename">The path to the MP3 file to use as the audio source. Cannot be null or empty.</param>
+    /// <returns>An AudioSource configured to contain the specified MP3 file.</returns>
     public static AudioSource FromMp3(string filename)
     {
         return new()
@@ -25,6 +46,14 @@ public sealed class AudioSource
         };
     }
 
+    /// <summary>
+    /// Creates a new <see cref="AudioSource"/> instance that reads audio data from the specified MP3 stream.
+    /// </summary>
+    /// <remarks>The caller is responsible for managing the lifetime of the provided stream. The stream must
+    /// remain open and readable for the duration of the <see cref="AudioSource"/>'s use.</remarks>
+    /// <param name="stream">The stream containing MP3 audio data. The stream must be readable and positioned at the beginning of the MP3
+    /// content.</param>
+    /// <returns>An <see cref="AudioSource"/> that provides audio data from the specified MP3 stream.</returns>
     public static AudioSource FromMp3(Stream stream)
     {
         return new()
@@ -34,6 +63,11 @@ public sealed class AudioSource
         };
     }
 
+    /// <summary>
+    /// Creates a new <see cref="AudioSource"/> instance that contains audio from the specified Wave file.
+    /// </summary>
+    /// <param name="filename">The path to the Wave (.wav) file to use as the audio source. Cannot be null or empty.</param>
+    /// <returns>An <see cref="AudioSource"/> configured to contain the specified Wave file.</returns>
     public static AudioSource FromWave(string filename)
     {
         return new()
@@ -42,6 +76,15 @@ public sealed class AudioSource
             _type = AudioSourceType.WaveFile
         };
     }
+
+    /// <summary>
+    /// Creates a new <see cref="AudioSource"/> instance that reads audio data from the specified Wave stream.
+    /// </summary>
+    /// <remarks>The caller is responsible for managing the lifetime of the provided stream. The stream must
+    /// remain open and readable for the duration of the <see cref="AudioSource"/>'s use.</remarks>
+    /// <param name="stream">The stream containing Wave audio data. The stream must be readable and positioned at the beginning of the Wave
+    /// content.</param>
+    /// <returns>An <see cref="AudioSource"/> that provides audio data from the specified Wave stream.</returns>
 
     public static AudioSource FromWave(Stream stream)
     {

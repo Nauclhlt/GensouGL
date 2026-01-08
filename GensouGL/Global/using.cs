@@ -18,6 +18,7 @@ global using NLayer;
 global using GensouGL.GameDev;
 global using GensouGL.Helpers;
 global using GensouGL.IO;
+global using GensouGL.Audio;
 global using GensouGL.Core;
 global using GensouGL.Graphics;
 global using GensouGL.Core.AsyncLoaders;

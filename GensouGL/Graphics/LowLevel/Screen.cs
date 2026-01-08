@@ -1,7 +1,14 @@
 ﻿namespace GensouGL.Graphics;
 
+/// <summary>
+/// Represents a screen(render target).
+/// </summary>
 public sealed class Screen : IScreen, IDisposable
 {
+    /// <summary>
+    /// Gets the default screen.
+    /// </summary>
+    /// <remarks>When you use the default screen, that means you are drawing directly on the game window buffer.</remarks>
     public static Screen Default { get; internal set; } = new Screen(0, 0, 0);
 
     private int _framebuffer;
@@ -11,9 +18,21 @@ public sealed class Screen : IScreen, IDisposable
 
     private bool _disposed = false;
 
+    /// <summary>
+    /// Gets the screen id.
+    /// </summary>
     public int ScreenId => _framebuffer;
+    /// <summary>
+    /// Gets the texture associated with the screen.
+    /// </summary>
     public Texture Texture => _texture;
+    /// <summary>
+    /// Gets the width of the screen.
+    /// </summary>
     public int Width => _width;
+    /// <summary>
+    /// Gets the height of the screen.
+    /// </summary>
     public int Height => _height;
 
     internal Screen(int framebuffer, int width, int height)
@@ -24,6 +43,12 @@ public sealed class Screen : IScreen, IDisposable
         _texture = null;
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="Screen"/> with the size.
+    /// </summary>
+    /// <param name="width">Width of the screen.</param>
+    /// <param name="height">Height of the screen.</param>
+    /// <exception cref="ArgumentException">Thrown when the size is invalid.</exception>
     public Screen(int width, int height)
     {
         if (width <= 0 || height <= 0)
@@ -47,14 +72,10 @@ public sealed class Screen : IScreen, IDisposable
         FramebufferService.Pop();
     }
 
-    public void MakeHDR()
-    {
-        if (_texture == null)
-            throw new InvalidOperationException("Cannot make default screen HDR.");
-
-        GL.TextureStorage2D(_texture.TextureId, 1, SizedInternalFormat.Rgba16f, _width, _height);
-    }
-
+    /// <summary>
+    /// Clears the screen with the specified color.
+    /// </summary>
+    /// <param name="color">Clear color.</param>
     public void Clear(Color color)
     {
         FramebufferService.PushAndBind(_framebuffer);
@@ -81,12 +102,18 @@ public sealed class Screen : IScreen, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources used by <see cref="Screen"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="Screen"/> destructor.
+    /// </summary>
     ~Screen()
     {
         Dispose(false);

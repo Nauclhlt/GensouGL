@@ -1,6 +1,9 @@
 ﻿namespace GensouGL.Graphics;
 
-public sealed class QuickRenderer : Renderer
+/// <summary>
+/// Provides quick rendering features, which generates one draw call per object.
+/// </summary>
+public sealed class QuickRenderer2D : Renderer2D
 {
     private static QuickRendererBuffer _buffer;
 
@@ -16,37 +19,68 @@ public sealed class QuickRenderer : Renderer
         _buffer.Dispose();
     }
 
-
-
-
-
-
-    private QuickRenderer()
+    private QuickRenderer2D()
     {
     }
 
-    internal QuickRenderer(Game game, Screen screen)
+    /// <summary>
+    /// Initializes a new instance of <see cref="QuickRenderer2D"/> with the specified screen.
+    /// </summary>
+    /// <param name="screen">Screen(render target).</param>
+    public QuickRenderer2D(Screen screen)
     {
-        Setup(game, screen);
+        Setup(screen);
     }
 
     #region Rectangle
 
+    /// <summary>
+    /// Draws the a rectangle.
+    /// </summary>
+    /// <param name="rect">Rectangle.</param>
+    /// <param name="color">Color of the rectangle.</param>
     public void DrawRect(Rect rect, Color color)
     {
         DrawRect(rect, color, color, color, color);
     }
 
+    /// <summary>
+    /// Draws the a rectangle with the colors of the four corners.
+    /// </summary>
+    /// <param name="rect">Rectangle.</param>
+    /// <param name="topLeft">Top-left color of the rectangle.</param>
+    /// <param name="bottomLeft">Bottom-left color of the rectangle.</param>
+    /// <param name="bottomRight">Bottom-right color of the rectangle.</param>
+    /// <param name="topRight">Top-right color of the rectangle.</param>
     public void DrawRect(Rect rect, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
         DrawRect(rect.X, rect.Y, rect.Width, rect.Height, topLeft, bottomLeft, bottomRight, topRight);
     }
 
+    /// <summary>
+    /// Draws the a rectangle.
+    /// </summary>
+    /// <param name="x">X coordinate of the rectangle.</param>
+    /// <param name="y">Y coordinate of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="color">Color of the rectangle.</param>
     public void DrawRect(float x, float y, float width, float height, Color color)
     {
         DrawRect(x, y, width, height, color, color, color, color);
     }
 
+    /// <summary>
+    /// Draws the a rectangle with the colors of the four corners.
+    /// </summary>
+    /// <param name="x">X coordinate of the rectangle.</param>
+    /// <param name="y">Y coordinate of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="topLeft">Top-left color of the rectangle.</param>
+    /// <param name="bottomLeft">Bottom-left color of the rectangle.</param>
+    /// <param name="bottomRight">Bottom-right color of the rectangle.</param>
+    /// <param name="topRight">Top-right color of the rectangle.</param>
     public void DrawRect(float x, float y, float width, float height, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
         float[] va =
@@ -75,31 +109,80 @@ public sealed class QuickRenderer : Renderer
         RestoreState();
     }
 
+    /// <summary>
+    /// Draws the a wire rectangle.
+    /// </summary>
+    /// <param name="rect">Rectangle.</param>
+    /// <param name="color">Color of the rectangle.</param>
     public void DrawWireRect(Rect rect, Color color)
     {
         DrawWireRect(rect, 1.0f, color, color, color, color);
     }
 
+    /// <summary>
+    /// Draws the a wire rectangle.
+    /// </summary>
+    /// <param name="rect">Rectangle.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="color">Color of the rectangle.</param>
     public void DrawWireRect(Rect rect, float lineWidth, Color color)
     {
         DrawWireRect(rect, lineWidth, color, color, color, color);
     }
 
+    /// <summary>
+    /// Draws the a wire rectangle with the colors of the four corners.
+    /// </summary>
+    /// <param name="rect">Rectangle.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="topLeft">Top-left color of the rectangle.</param>
+    /// <param name="bottomLeft">Bottom-left color of the rectangle.</param>
+    /// <param name="bottomRight">Bottom-right color of the rectangle.</param>
+    /// <param name="topRight">Top-right color of the rectangle.</param>
     public void DrawWireRect(Rect rect, float lineWidth, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
         DrawWireRect(rect.X, rect.Y, rect.Width, rect.Height, lineWidth, topLeft, bottomLeft, bottomRight, topRight);
     }
 
+    /// <summary>
+    /// Draws the a wire rectangle.
+    /// </summary>
+    /// <param name="x">X coordinate of the rectangle.</param>
+    /// <param name="y">Y coordinate of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="color">Color of the rectangle.</param>
     public void DrawWireRect(float x, float y, float width, float height, Color color)
     {
         DrawWireRect(x, y, width, height, 1.0f, color, color, color, color);
     }
 
+    /// <summary>
+    /// Draws the a wire rectangle.
+    /// </summary>
+    /// <param name="x">X coordinate of the rectangle.</param>
+    /// <param name="y">Y coordinate of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="color">Color of the rectangle.</param>
     public void DrawWireRect(float x, float y, float width, float height, float lineWidth, Color color)
     {
         DrawWireRect(x, y, width, height, lineWidth, color, color, color, color);
     }
 
+    /// <summary>
+    /// Draws the a wire rectangle.
+    /// </summary>
+    /// <param name="x">X coordinate of the rectangle.</param>
+    /// <param name="y">Y coordinate of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="topLeft">Top-left color of the rectangle.</param>
+    /// <param name="bottomLeft">Bottom-left color of the rectangle.</param>
+    /// <param name="bottomRight">Bottom-right color of the rectangle.</param>
+    /// <param name="topRight">Top-right color of the rectangle.</param>
     public void DrawWireRect(float x, float y, float width, float height, float lineWidth, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
     {
         float[] va =
@@ -136,31 +219,79 @@ public sealed class QuickRenderer : Renderer
 
     #region Line
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="color">Color of the line.</param>
     public void DrawLine(Point a, Point b, Color color)
     {
         DrawLine(a, b, 1.0f, color, color);
     }
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="color">Color of the line.</param>
     public void DrawLine(Point a, Point b, float lineWidth, Color color)
     {
         DrawLine(a, b, lineWidth, color, color);
     }
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="aColor">Color of the Point A.</param>
+    /// <param name="bColor">Color of the Point B.</param>
     public void DrawLine(Point a, Point b, float lineWidth, Color aColor, Color bColor)
     {
         DrawLine(a.X, a.Y, b.X, b.Y, lineWidth, aColor, bColor);
     }
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="color">Color of the line.</param>
     public void DrawLine(float ax, float ay, float bx, float by, Color color)
     {
         DrawLine(ax, ay, bx, by, 1.0f, color, color);
     }
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="color">Color of the line.</param>
     public void DrawLine(float ax, float ay, float bx, float by, float lineWidth, Color color)
     {
         DrawLine(ax, ay, bx, by, lineWidth, color, color);
     }
 
+    /// <summary>
+    /// Draws a line.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="aColor">Color of the Point A.</param>
+    /// <param name="bColor">Color of the Point B.</param>
     public void DrawLine(float ax, float ay, float bx, float by, float lineWidth, Color aColor, Color bColor)
     {
         GL.LineWidth(lineWidth);
@@ -191,21 +322,59 @@ public sealed class QuickRenderer : Renderer
 
     #region Triangle
 
+    /// <summary>
+    /// Draws a triangle.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="c">Point C.</param>
+    /// <param name="color">Color of the triangle.</param>
     public void DrawTriangle(Point a, Point b, Point c, Color color)
     {
         DrawTriangle(a, b, c, color, color, color);
     }
 
+    /// <summary>
+    /// Draws a triangle.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="c">Point C.</param>
+    /// <param name="aColor">Color of the Point A.</param>
+    /// <param name="bColor">Color of the Point B.</param>
+    /// <param name="cColor">Color of the Point C.</param>
     public void DrawTriangle(Point a, Point b, Point c, Color aColor, Color bColor, Color cColor)
     {
         DrawTriangle(a.X, a.Y, b.X, b.Y, c.X, c.Y, aColor, bColor, cColor);
     }
 
+    /// <summary>
+    /// Draws a triangle.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="cx">X coordinate of the Point C.</param>
+    /// <param name="cy">Y coordinate of the Point C.</param>
+    /// <param name="color">Color of the triangle.</param>
     public void DrawTriangle(float ax, float ay, float bx, float by, float cx, float cy, Color color)
     {
         DrawTriangle(ax, ay, bx, by, cx, cy, color, color, color);
     }
 
+    /// <summary>
+    /// Draws a triangle.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="cx">X coordinate of the Point C.</param>
+    /// <param name="cy">Y coordinate of the Point C.</param>
+    /// <param name="aColor">Color of the Point A.</param>
+    /// <param name="bColor">Color of the Point B.</param>
+    /// <param name="cColor">Color of the Point C.</param>
     public void DrawTriangle(float ax, float ay, float bx, float by, float cx, float cy, Color aColor, Color bColor, Color cColor)
     {
         float[] va =
@@ -232,31 +401,90 @@ public sealed class QuickRenderer : Renderer
         RestoreState();
     }
 
+    /// <summary>
+    /// Draws a wire triangle.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="c">Point C.</param>
+    /// <param name="color">Color of the triangle.</param>
     public void DrawWireTriangle(Point a, Point b, Point c, Color color)
     {
         DrawWireTriangle(a, b, c, 1.0f, color, color, color);
     }
 
+    /// <summary>
+    /// Draws a wire triangle.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="c">Point C.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="color">Color of the triangle.</param>
     public void DrawWireTriangle(Point a, Point b, Point c, float lineWidth, Color color)
     {
         DrawWireTriangle(a, b, c, lineWidth, color, color, color);
     }
 
+    /// <summary>
+    /// Draws a wire triangle.
+    /// </summary>
+    /// <param name="a">Point A.</param>
+    /// <param name="b">Point B.</param>
+    /// <param name="c">Point C.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="aColor">Color of the Point A.</param>
+    /// <param name="bColor">Color of the Point B.</param>
+    /// <param name="cColor">Color of the Point C.</param>
     public void DrawWireTriangle(Point a, Point b, Point c, float lineWidth, Color aColor, Color bColor, Color cColor)
     {
         DrawWireTriangle(a.X, a.Y, b.X, b.Y, c.X, c.Y, lineWidth, aColor, bColor, cColor);
     }
 
+    /// <summary>
+    /// Draws a wire triangle.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="cx">X coordinate of the Point C.</param>
+    /// <param name="cy">Y coordinate of the Point C.</param>
+    /// <param name="color">Color of the triangle.</param>
     public void DrawWireTriangle(float ax, float ay, float bx, float by, float cx, float cy, Color color)
     {
         DrawWireTriangle(ax, ay, bx, by, cx, cy, 1.0f, color, color, color);
     }
 
+    /// <summary>
+    /// Draws a wire triangle.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="cx">X coordinate of the Point C.</param>
+    /// <param name="cy">Y coordinate of the Point C.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="color">Color of the triangle.</param>
     public void DrawWireTriangle(float ax, float ay, float bx, float by, float cx, float cy, float lineWidth, Color color)
     {
         DrawWireTriangle(ax, ay, bx, by, cx, cy, lineWidth, color, color, color);
     }
 
+    /// <summary>
+    /// Draws a wire triangle.
+    /// </summary>
+    /// <param name="ax">X coordinate of the Point A.</param>
+    /// <param name="ay">Y coordinate of the Point A.</param>
+    /// <param name="bx">X coordinate of the Point B.</param>
+    /// <param name="by">Y coordinate of the Point B.</param>
+    /// <param name="cx">X coordinate of the Point C.</param>
+    /// <param name="cy">Y coordinate of the Point C.</param>
+    /// <param name="lineWidth">Line width.</param>
+    /// <param name="aColor">Color of the Point A.</param>
+    /// <param name="bColor">Color of the Point B.</param>
+    /// <param name="cColor">Color of the Point C.</param>
     public void DrawWireTriangle(float ax, float ay, float bx, float by, float cx, float cy, float lineWidth, Color aColor, Color bColor, Color cColor)
     {
         GL.LineWidth(lineWidth);
@@ -291,26 +519,62 @@ public sealed class QuickRenderer : Renderer
 
     #region Ellipse
 
+    /// <summary>
+    /// Draws a circle.
+    /// </summary>
+    /// <param name="circle">Circle.</param>
+    /// <param name="color">Color of the circle.</param>
+    /// <param name="div">Division count.</param>
     public void DrawCircle(Circle circle, Color color, int div = 32)
     {
         DrawCircle(circle.X, circle.Y, circle.Radius, color, div);
     }
 
+    /// <summary>
+    /// Draws a circle.
+    /// </summary>
+    /// <param name="center">Center point of the circle.</param>
+    /// <param name="radius">Radius of the circle.</param>
+    /// <param name="color">Color of the circle.</param>
+    /// <param name="div">Division count.</param>
     public void DrawCircle(Point center, float radius, Color color, int div = 32)
     {
         DrawCircle(center.X, center.Y, radius, color, div);
     }
 
+    /// <summary>
+    /// Draws a circle.
+    /// </summary>
+    /// <param name="centerX">X coordinate of the center point of the circle.</param>
+    /// <param name="centerY">Y coordinate of the center point of the circle.</param>
+    /// <param name="radius">Radius of the circle.</param>
+    /// <param name="color">Color of the circle.</param>
+    /// <param name="div">Division count.</param>
     public void DrawCircle(float centerX, float centerY, float radius, Color color, int div = 32)
     {
         DrawEllipse(centerX - radius, centerY - radius, 2 * radius, 2 * radius, color, div);
     }
 
+    /// <summary>
+    /// Draws an ellipse.
+    /// </summary>
+    /// <param name="rect">Bounding rectangle.</param>
+    /// <param name="color">Color of the ellipse.</param>
+    /// <param name="div">Division count.</param>
     public void DrawEllipse(Rect rect, Color color, int div = 32)
     {
         DrawEllipse(rect.X, rect.Y, rect.Width, rect.Height, color, div);
     }
 
+    /// <summary>
+    /// Draws an ellipse.
+    /// </summary>
+    /// <param name="x">X coordinate of the bounding rectangle.</param>
+    /// <param name="y">Y coordinate of the bounding rectangle.</param>
+    /// <param name="width">Width of the bounding rectangle.</param>
+    /// <param name="height">Height of the bounding rectangle.</param>
+    /// <param name="color">Color of the ellipse.</param>
+    /// <param name="div">Division count.</param>
     public void DrawEllipse(float x, float y, float width, float height, Color color, int div = 32)
     {
         float centerX = x + width / 2;
@@ -356,21 +620,49 @@ public sealed class QuickRenderer : Renderer
 
     #region Texture
 
+    /// <summary>
+    /// Draws a texture.
+    /// </summary>
+    /// <param name="rect">Bounding rectangle.</param>
+    /// <param name="texture">Texture to draw.</param>
     public void DrawTexture(Rect rect, ITexture texture)
     {
         DrawTexture(rect, texture, Color.White);
     }
 
+    /// <summary>
+    /// Draws a texture with a specified color tint.
+    /// </summary>
+    /// <param name="rect">Bounding rectangle.</param>
+    /// <param name="texture">Texture to draw.</param>
+    /// <param name="color">Color tint.</param>
     public void DrawTexture(Rect rect, ITexture texture, Color color)
     {
         DrawTexture(rect.X, rect.Y, rect.Width, rect.Height, texture, color);
     }
 
+    /// <summary>
+    /// Draws a texture.
+    /// </summary>
+    /// <param name="x">X coordinate of the bounding rectangle.</param>
+    /// <param name="y">Y coordinate of the bounding rectangle.</param>
+    /// <param name="width">Width of the bounding rectangle.</param>
+    /// <param name="height">Height of the bounding rectangle.</param>
+    /// <param name="texture">Texture to draw.</param>
     public void DrawTexture(float x, float y, float width, float height, ITexture texture)
     {
         DrawTexture(x, y, width, height, texture, Color.White);
     }
 
+    /// <summary>
+    /// Draws a texture with a specified color tint.
+    /// </summary>
+    /// <param name="x">X coordinate of the bounding rectangle.</param>
+    /// <param name="y">Y coordinate of the bounding rectangle.</param>
+    /// <param name="width">Width of the bounding rectangle.</param>
+    /// <param name="height">Height of the bounding rectangle.</param>
+    /// <param name="texture">Texture to draw.</param>
+    /// <param name="color">Color tint.</param>
     public void DrawTexture(float x, float y, float width, float height, ITexture texture, Color color)
     {
         texture ??= Texture.Empty;

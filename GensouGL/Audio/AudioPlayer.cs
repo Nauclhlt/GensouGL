@@ -1,7 +1,7 @@
 ﻿using OpenTK.Audio.OpenAL;
 using OpenTK.Audio;
 
-namespace GensouGL.Core;
+namespace GensouGL.Audio;
 
 internal static class AudioPlayer
 {
@@ -25,9 +25,7 @@ internal static class AudioPlayer
     {
         if (_streamingAudioSet.ContainsKey(audio.UniqueId))
         {
-#if DEBUG
-            DebugLog.Error("AudioPlayer: Streaming audio has been already registered.");
-#endif
+            DebugLog.Error($"{nameof(AudioPlayer)}: Streaming audio has been already registered.");
             return;
         }
 

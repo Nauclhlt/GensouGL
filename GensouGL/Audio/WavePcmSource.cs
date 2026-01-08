@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using OpenTK.Audio.OpenAL;
 
-namespace GensouGL.Core;
+namespace GensouGL.Audio;
 
 internal sealed class WavePcmSource : StreamingSource
 {

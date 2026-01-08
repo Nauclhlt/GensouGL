@@ -4,8 +4,9 @@ using SixLabors.ImageSharp.Processing;
 using IMS = SixLabors.ImageSharp;
 using IMSP = SixLabors.ImageSharp.PixelFormats;
 
-// フォントアトラスの1ページ.
-// 新しい画像を詰めてUV座標を返す.
+/// <summary>
+/// Represents a page of font atlas array.
+/// </summary>
 public sealed class FontAtlasPage : IDisposable
 {
     private static readonly int AtlasSize = 512;
@@ -19,8 +20,14 @@ public sealed class FontAtlasPage : IDisposable
 
     private bool _disposed = false;
 
+    /// <summary>
+    /// Gets the underlying texture.
+    /// </summary>
     public Texture Texture => _texture;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="FontAtlasPage"/>.
+    /// </summary>
     public FontAtlasPage()
     {
         _texture = new Texture(AtlasSize, AtlasSize);
@@ -84,12 +91,18 @@ public sealed class FontAtlasPage : IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources used by <see cref="FontAtlasPage"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="FontAtlasPage"/> destructor.
+    /// </summary>
     ~FontAtlasPage()
     {
         Dispose(false);

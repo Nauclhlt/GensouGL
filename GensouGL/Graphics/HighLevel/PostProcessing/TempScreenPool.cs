@@ -25,10 +25,8 @@ internal static class TempScreenPool
         Screen s = new(p.Width, p.Height);
         PersistentResourceService.Register(s);
         _totalPoolSize++;
-#if DEBUG
-        DebugLog.Info($"TempScreenPool: Created new Screen {p.Width}x{p.Height}.");
-        DebugLog.Info($"TempScreenPool: Current total pool size: {_totalPoolSize}");
-#endif
+        DebugLog.Info($"{nameof(TempScreenPool)}: Created new Screen {p.Width}x{p.Height}.");
+        DebugLog.Info($"{nameof(TempScreenPool)}: Current total pool size: {_totalPoolSize}");
 
         return s;
     }

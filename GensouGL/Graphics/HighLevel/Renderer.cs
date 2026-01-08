@@ -1,83 +1,96 @@
 ﻿namespace GensouGL.Graphics;
 
+/// <summary>
+/// Represents an abstract base class for all renderers.
+/// This class basic features of screen stack, and state management.
+/// </summary>
 public abstract class Renderer
 {
-    protected Game _game;
+    /// <summary>
+    /// Screen stack.
+    /// </summary>
     protected ScreenStack _screenStack;
-    protected Camera _camera;
+
+    /// <summary>
+    /// Rendering state.
+    /// </summary>
     protected RenderState _state;
 
     internal ScreenStack ScreenStack => _screenStack;
 
-    public Camera Camera
-    {
-        get => _camera;
-        set
-        {
-            _camera = value is not null ? value : Camera.Default;
-        }
-    }
-
+    /// <summary>
+    /// Gets or sets the rendering state.
+    /// </summary>
     public RenderState State
     {
         get => _state;
         set => _state = value;
     }
 
-    protected OpenTK.Mathematics.Matrix4 GetDefaultVMatrix()
+    /// <summary>
+    /// Initializes <see cref="Renderer"/> functions.
+    /// </summary>
+    /// <param name="screen">Target screen.</param>
+    protected void Setup(Screen screen)
     {
-        OpenTK.Mathematics.Matrix4 projMatrix = OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0, _screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight, 0, -1, 1);
-        return projMatrix * _camera.GetModelMatrix();
-    }
-
-    // called from constructors of renderers.
-    protected void Setup(Game game, Screen screen)
-    {
-        _game = game;
         _screenStack = new(screen);
-        _camera = Camera.Default;
         _state = RenderState.Default;
+
+        OnSetup(screen);
     }
 
+    /// <summary>
+    /// Begins post-processing.
+    /// </summary>
+    /// <param name="effect">Post-processing effect to apply.</param>
+    /// <returns><see cref="IDisposable"/> instance to indicate the applying range of the effect.</returns>
+    /// <remarks>This function only begins post-processing(prepares a new render target and push it on the screen stack), dispose of the returned object to process the contents rendered on the temporary render target and apply the effect.</remarks>
     public IDisposable BeginPostProc(PostProcessEffect effect)
     {
         Screen tempScreen = TempScreenPool.Rent((int)(_screenStack.BaseScreenWidth * effect.ActualSizeScale), (int)(_screenStack.BaseScreenHeight * effect.ActualSizeScale));
         _screenStack.Push(tempScreen);
         tempScreen.Clear(Color.Transparent);
 
-        return new PostProcessScope(this, _game, effect);
+        return new PostProcessScope(this, effect);
     }
 
+    /// <summary>
+    /// Directly sets the blend mode in the rendering state.
+    /// </summary>
+    /// <param name="blendMode">New blend mode.</param>
     public void SetBlendMode(BlendMode blendMode)
     {
         _state.BlendMode = blendMode;
     }
 
+    /// <summary>
+    /// Set the target screen.
+    /// </summary>
+    /// <param name="screen">New target screen.</param>
     public void SetScreen(Screen screen)
     {
         if (_screenStack.Count >= 2)
         {
-#if DEBUG
-            DebugLog.Error("Renderer: Do not change the target screen while postprocessing.");
-#endif
+            DebugLog.Error($"{nameof(Renderer2D)}: Do not change the target screen while postprocessing.");
             return;
         }
 
         _screenStack.UpdateBaseScreen(screen);
     }
 
-    protected void LoadState()
-    {
-        Screen screen = _screenStack.Peek();
-        _state.LoadBlendMode();
-        FramebufferService.PushAndBind(screen.ScreenId);
-        int viewportWidth = screen.ScreenId == 0 ? _game.WindowWidth : screen.Width;
-        int viewportHeight = screen.ScreenId == 0 ? _game.WindowHeight : screen.Height;
-        GL.Viewport(0, 0, viewportWidth, viewportHeight);
-    }
+    /// <summary>
+    /// When overridden, sets up the renderer.
+    /// </summary>
+    /// <param name="screen">Target screen.</param>
+    protected abstract void OnSetup(Screen screen);
 
-    protected void RestoreState()
-    {
-        FramebufferService.Pop();
-    }
+    /// <summary>
+    /// When overridden, Loads the state.
+    /// </summary>
+    protected abstract void LoadState();
+
+    /// <summary>
+    /// When overridden, Restores the state.
+    /// </summary>
+    protected abstract void RestoreState();
 }

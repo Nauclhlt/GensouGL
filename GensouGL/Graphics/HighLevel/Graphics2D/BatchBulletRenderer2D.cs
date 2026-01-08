@@ -1,6 +1,10 @@
 ﻿namespace GensouGL.Graphics;
 
-public sealed class BatchBulletRenderer : Renderer
+/// <summary>
+/// Represents a high-performance bullet renderer that batches draw calls to minimize GPU state changes.
+/// Bullet is: mass-generated objects defined by (center) position, size, texture, color, and rotation angle.
+/// </summary>
+public sealed class BatchBulletRenderer2D : Renderer2D
 {
     private static BatchBulletRendererBuffer _buffer;
 
@@ -30,29 +34,35 @@ public sealed class BatchBulletRenderer : Renderer
 
 
     private ITexture _globalTexture = null;
-    private List<float> _colors = [];
-    private List<float> _texCoords = [];
-    private List<float> _positions = [];
-    private List<float> _rotations = [];
-    private List<float> _scales = [];
+    private List<float> _colors = new(256);
+    private List<float> _texCoords = new(256);
+    private List<float> _positions = new(256);
+    private List<float> _rotations = new(256);
+    private List<float> _scales = new(256);
 
 
-    private BatchBulletRenderer()
+    private BatchBulletRenderer2D()
     {
     }
 
-    internal BatchBulletRenderer(Game game, Screen screen)
+    /// <summary>
+    /// Initializes a new instance of <see cref="BatchBulletRenderer2D"/> with the specified screen.
+    /// </summary>
+    /// <param name="screen">Screen(render target).</param>
+    public BatchBulletRenderer2D(Screen screen)
     {
-        Setup(game, screen);
+        Setup(screen);
     }
 
+    /// <summary>
+    /// Begins a drawing process using the specified global texture.
+    /// </summary>
+    /// <param name="globalTexture">Global texture.</param>
     public void Begin(ITexture globalTexture)
     {
         if (_globalTexture is not null)
         {
-#if DEBUG
-            DebugLog.Warn("BatchBulletRenderer: Begin() called before End().");
-#endif
+            DebugLog.Warn($"{nameof(BatchBulletRenderer2D)}: Begin() called before End().");
         }
 
         _globalTexture = globalTexture;
@@ -63,31 +73,54 @@ public sealed class BatchBulletRenderer : Renderer
         _scales.Clear();
     }
 
+    /// <summary>
+    /// Draws one bullet using the specified parameters.
+    /// </summary>
+    /// <param name="x">X coordinate of the bullet.</param>
+    /// <param name="y">Y coordinate of the bullet.</param>
+    /// <param name="width">Width of the bullet.</param>
+    /// <param name="height">Height of the bullet.</param>
+    /// <param name="color">Color of the bullet.</param>
+    /// <param name="texture">Texture of the bullet.</param>
     public void Draw(float x, float y, float width, float height, Color color, ITexture texture)
     {
         Draw(x, y, width, height, 0f, color, texture);
     }
 
+    /// <summary>
+    /// Draws one bullet using the specified parameters.
+    /// </summary>
+    /// <param name="center">Position of the bullet.</param>
+    /// <param name="width">Width of the bullet.</param>
+    /// <param name="height">Height of the bullet.</param>
+    /// <param name="color">Color of the bullet.</param>
+    /// <param name="texture">Texture of the bullet.</param>
     public void Draw(Point center, float width, float height, float rotation, Color color, ITexture texture)
     {
         Draw(center.X, center.Y, width, height, rotation, color, texture);
     }
 
+    /// <summary>
+    /// Draws one bullet using the specified parameters.
+    /// </summary>
+    /// <param name="cx">X coordinate of the bullet.</param>
+    /// <param name="cy">Y coordinate of the bullet.</param>
+    /// <param name="width">Width of the bullet.</param>
+    /// <param name="height">Height of the bullet.</param>
+    /// <param name="rotation">Rotation angle of the bullet.</param>
+    /// <param name="color">Color of the bullet.</param>
+    /// <param name="texture">Texture of the bullet.</param>
     public void Draw(float cx, float cy, float width, float height, float rotation, Color color, ITexture texture)
     {
         if (_globalTexture is null)
         {
-#if DEBUG
-            DebugLog.Error("BatchBulletRenderer: Draw() called before Begin().");
-#endif
+            DebugLog.Error($"{nameof(BatchBulletRenderer2D)}: Draw() called before Begin().");
             return;
         }
 
         if (_globalTexture.TextureId != texture.TextureId)
         {
-#if DEBUG
-            DebugLog.Error("BatchBulletRenderer: Inconsistent texture IDs between the global texture and the given texture.");
-#endif
+            DebugLog.Error($"{nameof(BatchBulletRenderer2D)}: Inconsistent texture IDs between the global texture and the given texture.");
             return;
         }
 
@@ -117,13 +150,14 @@ public sealed class BatchBulletRenderer : Renderer
         _scales.Add(height);
     }
 
+    /// <summary>
+    /// Finalizes the batch and submits all accumulated data to the GPU.
+    /// </summary>
     public void End()
     {
         if (_globalTexture is null)
         {
-#if DEBUG
-            DebugLog.Error("BatchBulletRenderer: End() called before Begin().");
-#endif
+            DebugLog.Error($"{nameof(BatchBulletRenderer2D)}: End() called before Begin().");
             return;
         }
 

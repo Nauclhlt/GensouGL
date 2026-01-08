@@ -2,7 +2,7 @@
 
 // For compatibility, memory audios cannot support asynchronous loading.
 // So in this implementation, Complete() runs everything synchronously.
-public sealed class AsyncMemoryAudioLoader : IAsyncResourceLoadingProcess
+internal sealed class AsyncMemoryAudioLoader : IAsyncResourceLoadingProcess
 {
     private AudioSource _source;
     private MemoryAudio _audio;

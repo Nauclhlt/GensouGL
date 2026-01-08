@@ -5,6 +5,9 @@ namespace GensouGL.Graphics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using IMS = SixLabors.ImageSharp;
 
+/// <summary>
+/// Represents a texture.
+/// </summary>
 public sealed class Texture : ITexture, IDisposable
 {
     private int _id;
@@ -15,6 +18,10 @@ public sealed class Texture : ITexture, IDisposable
 
     private bool _disposed = false;
 
+    /// <summary>
+    /// Gets the empty texture.
+    /// </summary>
+    /// <remarks>Returns a 32x32 white texture.</remarks>
     public static Texture Empty
     {
         get;
@@ -44,6 +51,13 @@ public sealed class Texture : ITexture, IDisposable
         TextureService.Pop();
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="Texture"/> with the size and color.
+    /// </summary>
+    /// <param name="width">Width of the texture.</param>
+    /// <param name="height">Heigbt of the texture.</param>
+    /// <param name="fillColor">Fill color.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the texture size is invalid.</exception>
     public Texture(int width, int height, Color fillColor)
     {
         if (width < 0 || height < 0)
@@ -75,6 +89,10 @@ public sealed class Texture : ITexture, IDisposable
         TextureService.Pop();
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="Texture"/> using the specified texture source.
+    /// </summary>
+    /// <param name="source">Texture source.</param>
     public Texture(TextureSource source)
     {
         using SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> img = source.LoadImageSharpImage();
@@ -98,16 +116,49 @@ public sealed class Texture : ITexture, IDisposable
         TextureService.Pop();
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="Texture"/> with the source file name.
+    /// </summary>
+    /// <param name="filename">Source file name.</param>
     public Texture(string filename) : this(new TextureSource(filename)) { }
+    /// <summary>
+    /// Initializes a new instance of <see cref="Texture"/> with the source stream.
+    /// </summary>
+    /// <param name="stream">Source stream.</param>
     public Texture(Stream stream) : this(new TextureSource(stream)) { }
+    /// <summary>
+    /// Initializes a new instance of <see cref="Texture"/> with the source byte array.
+    /// </summary>
+    /// <param name="byteArray">Source byte array.</param>
     public Texture(byte[] byteArray) : this(new TextureSource(byteArray)) { }
 
+    /// <summary>
+    /// Gets the texture id.
+    /// </summary>
     public int TextureId => _id;
+    /// <summary>
+    /// Gets the width of the base texture(this).
+    /// </summary>
     public int BaseWidth => _width;
+    /// <summary>
+    /// Gets the height of the base texture(this).
+    /// </summary>
     public int BaseHeight => _height;
+    /// <summary>
+    /// Gets the width of the texture. Same value as <see cref="BaseWidth"/>.
+    /// </summary>
     public float Width => _width;
+    /// <summary>
+    /// Gets the height of the texture. Same value as <see cref="BaseHeight"/>.
+    /// </summary>
     public float Height => _height;
+    /// <summary>
+    /// Gets the UV coords.
+    /// </summary>
     public Rect Coords => _coords;
+    /// <summary>
+    /// Gets or sets the resize mode.
+    /// </summary>
     public TextureResizeMode ResizeMode
     {
         get => _resizeMode;
@@ -137,6 +188,10 @@ public sealed class Texture : ITexture, IDisposable
         return pixels;
     }
 
+    /// <summary>
+    /// Saves the texture image as a png file.
+    /// </summary>
+    /// <param name="filename">File name.</param>
     public void SaveAsPngFile(string filename)
     {
         byte[] pixels = GetPixelData();
@@ -149,6 +204,10 @@ public sealed class Texture : ITexture, IDisposable
         IMS.ImageExtensions.SaveAsPng(image, filename);
     }
 
+    /// <summary>
+    /// Saves the texture image as a png stream.
+    /// </summary>
+    /// <param name="target">Target stream.</param>
     public void SaveAsPngFileToStream(Stream target)
     {
         byte[] pixels = GetPixelData();
@@ -161,12 +220,25 @@ public sealed class Texture : ITexture, IDisposable
         IMS.ImageExtensions.SaveAsPng(image, target);
     }
 
-    public Subtexture GetPartial(Rect bounds)
+    /// <summary>
+    /// Gets the partial texture representing the specified rectangle area.
+    /// </summary>
+    /// <param name="bounds">Rectangle bounds.</param>
+    /// <returns>Partial texture.</returns>
+    public ITexture GetPartial(Rect bounds)
     {
         return GetPartial(bounds.X, bounds.Y, bounds.Width, bounds.Height);
     }
 
-    public Subtexture GetPartial(float x, float y, float width, float height)
+    /// <summary>
+    /// Gets the partial texture representing the specified rectangle area.
+    /// </summary>
+    /// <param name="x">X coordinate of the rectangle bounds.</param>
+    /// <param name="y">Y coordinate of the rectangle bounds.</param>
+    /// <param name="width">Width of the rectangle bounds.</param>
+    /// <param name="height">Height of the rectangle bounds.</param>
+    /// <returns>Partial texture.</returns>
+    public ITexture GetPartial(float x, float y, float width, float height)
     {
         x /= _width;
         y /= _height;
@@ -174,13 +246,6 @@ public sealed class Texture : ITexture, IDisposable
         height /= _height;
 
         return new Subtexture(this, new Rect(x, y, width, height));
-    }
-
-    public static Texture CreateMonoColor(int width, int height, Color color)
-    {
-        var image = new IMS.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>(width, height, new IMS.PixelFormats.Rgba32(color.R, color.G, color.B, color.A));
-
-        return new Texture(new TextureSource(image));
     }
 
 
@@ -199,12 +264,18 @@ public sealed class Texture : ITexture, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources used by <see cref="Texture"/>.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// <see cref="Texture"/> destructor.
+    /// </summary>
     ~Texture()
     {
         Dispose(false);
