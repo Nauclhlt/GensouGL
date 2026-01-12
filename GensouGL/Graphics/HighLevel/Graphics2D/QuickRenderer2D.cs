@@ -5,13 +5,13 @@
 /// </summary>
 public sealed class QuickRenderer2D : Renderer2D
 {
-    private static QuickRendererBuffer _buffer;
+    private static QuickRendererBuffer2D _buffer;
 
-    internal static QuickRendererBuffer InternalBuffer => _buffer;
+    internal static QuickRendererBuffer2D InternalBuffer => _buffer;
 
     internal static void Initialize()
     {
-        _buffer = new QuickRendererBuffer();
+        _buffer = new QuickRendererBuffer2D();
     }
 
     internal static void Release()
@@ -707,7 +707,7 @@ public sealed class QuickRenderer2D : Renderer2D
     #endregion
 }
 
-internal sealed class QuickRendererBuffer : IDisposable
+internal sealed class QuickRendererBuffer2D : IDisposable
 {
     private int _vao;
     private int _vbuf;
@@ -716,7 +716,7 @@ internal sealed class QuickRendererBuffer : IDisposable
 
     private bool _disposed = false;
 
-    public QuickRendererBuffer()
+    public QuickRendererBuffer2D()
     {
         _vao = GL.GenVertexArray();
         _vbuf = GL.GenBuffer();

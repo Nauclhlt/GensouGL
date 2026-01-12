@@ -163,6 +163,13 @@ public struct Vec2
     public static Vec2 operator /(Vec2 v, float scalar) => new (v.X / scalar, v.Y / scalar);
 
     /// <summary>
+    /// Gets the vector (-X, -Y).
+    /// </summary>
+    /// <param name="v">Vector.</param>
+    /// <returns>Resulting vector.</returns>
+    public static Vec2 operator -(Vec2 v) => new(-v.X, -v.Y);
+
+    /// <summary>
     /// Converts the vector into Point.
     /// </summary>
     /// <param name="v">Source vector.</param>

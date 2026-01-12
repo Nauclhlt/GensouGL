@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -15,6 +16,10 @@
     <None Remove="Graphics\Shaders\Bullet.vert" />
     <None Remove="Graphics\Shaders\ColorInversion.frag" />
     <None Remove="Graphics\Shaders\OutlinedText.vert" />
+    <None Remove="Graphics\Shaders\Shader3D\Lighting_SimpleShape.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\Lighting_SimpleShape.vert" />
+    <None Remove="Graphics\Shaders\Shader3D\SimpleShape.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\SimpleShape.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\SimpleShape.vert" />
     <None Remove="Graphics\Shaders\SimpleText.frag" />
@@ -25,27 +30,31 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Shaders\ColorGrading.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\ColorGrading.frag" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Core\CoreDebug\JetBrainsMono-Light.ttf" />
-    <EmbeddedResource Include="Graphics\Shaders\Blindfold.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\BloomBlur.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\BrightPass.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\BrightPass.vert" />
-    <EmbeddedResource Include="Graphics\Shaders\Bullet.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\Bullet.vert" />
-    <EmbeddedResource Include="Graphics\Shaders\ColorInversion.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\OutlinedText.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\OutlinedText.vert" />
-    <EmbeddedResource Include="Graphics\Shaders\SimpleShape.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\SimpleShape.vert" />
-    <EmbeddedResource Include="Graphics\Shaders\SimpleText.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\SimpleText.vert" />
-    <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.frag" />
-    <EmbeddedResource Include="Graphics\Shaders\SimpleTexture.vert" />
-    <EmbeddedResource Include="Graphics\Shaders\TextureMask.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\Blindfold.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\BloomBlur.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\BrightPass.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\BrightPass.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\Bullet.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\Bullet.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\ColorInversion.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\OutlinedText.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\OutlinedText.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleShape.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleShape.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleText.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleText.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleTexture.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleTexture.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\TextureMask.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_SimpleShape.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_SimpleShape.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\SimpleShape.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\SimpleShape.vert" />
   </ItemGroup>
 
   <ItemGroup>

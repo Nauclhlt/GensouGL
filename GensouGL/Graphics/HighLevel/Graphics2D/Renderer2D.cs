@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Represents an abstract base class for all 2D renderers.
-/// This class basic features of screen stack, camera, and state management.
+/// This class provides basic features of screen stack, camera, and state management.
 /// </summary>
 /// <remarks>Classes derived from this class should call <see cref="Renderer.Setup(Screen)"/> in their constructor, call <see cref="LoadState()"/> before rendering, and <see cref="RestoreState()"/> after rendering.</remarks>
 public abstract class Renderer2D : Renderer
@@ -55,6 +55,7 @@ public abstract class Renderer2D : Renderer
 
         // 2D specific
         GL.Disable(EnableCap.DepthTest);
+        GL.Disable(EnableCap.CullFace);
     }
 
     /// <summary>

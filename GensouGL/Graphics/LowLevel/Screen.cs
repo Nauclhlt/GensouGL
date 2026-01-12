@@ -81,7 +81,7 @@ public sealed class Screen : IScreen, IDisposable
         FramebufferService.PushAndBind(_framebuffer);
 
         GL.ClearColor(color.R, color.G, color.B, color.A);
-        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         FramebufferService.Pop();
     }

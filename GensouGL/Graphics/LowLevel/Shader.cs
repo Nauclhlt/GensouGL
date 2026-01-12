@@ -19,6 +19,10 @@ public sealed class Shader : IDisposable
     /// Gets the source code of the fragment shader.
     /// </summary>
     public string FragmentShaderSource => _fragmentShaderSource;
+    /// <summary>
+    /// Gets the OpenGL shader program id.
+    /// </summary>
+    public int ProgramId => _program;
 
     /// <summary>
     /// Initializes a new instance of <see cref="Shader"/> with the vertex and fragment shader sources.
@@ -142,6 +146,13 @@ public sealed class Shader : IDisposable
         GL.UniformMatrix4(0, false, ref matrix);
     }
 
+    internal static void SendMatrix012(OpenTK.Mathematics.Matrix4 matrix0, OpenTK.Mathematics.Matrix4 matrix1, OpenTK.Mathematics.Matrix4 matrix2)
+    {
+        GL.UniformMatrix4(0, false, ref matrix0);
+        GL.UniformMatrix4(1, false, ref matrix1);
+        GL.UniformMatrix4(2, false, ref matrix2);
+    }
+
     private void Dispose(bool disposing)
     {
         GL.DeleteProgram(_program);
@@ -168,6 +179,7 @@ public sealed class Shader : IDisposable
 
 
 
+    // 2D
     private static Shader s_simpleShape;
     private static Shader s_simpleTexture;
     private static Shader s_bullet;
@@ -180,6 +192,13 @@ public sealed class Shader : IDisposable
     private static Shader s_colorInversion;
     private static Shader s_textureMask;
 
+
+    // 3D
+    private static Shader s_simpleShape3D;
+    private static Shader s_simpleShape3DLighting;
+
+
+    // 2D
     internal static Shader SimpleShape => s_simpleShape;
     internal static Shader SimpleTexture => s_simpleTexture;
     internal static Shader Bullet => s_bullet;
@@ -192,26 +211,49 @@ public sealed class Shader : IDisposable
     internal static Shader ColorInversion => s_colorInversion;
     internal static Shader TextureMask => s_textureMask;
 
+
+    // 3D
+    internal static Shader SimpleShape3D => s_simpleShape3D;
+    internal static Shader SimpleShape3DLighting => s_simpleShape3DLighting;
+
     internal static void LoadShaders()
     {
         Assembly asm = typeof(Shader).Assembly;
-        s_simpleShape = Gen(asm, "SimpleShape");
-        s_simpleTexture = Gen(asm, "SimpleTexture");
-        s_bullet = Gen(asm, "Bullet");
-        s_brightPass = Gen(asm, "BrightPass");
-        s_bloomBlur = Gen(asm, "BrightPass", "BloomBlur");
-        s_blindfold = Gen(asm, "BrightPass", "Blindfold");
-        s_simpleText = Gen(asm, "SimpleText");
-        s_outlinedText = Gen(asm, "OutlinedText");
-        s_colorGrading = Gen(asm, "BrightPass", "ColorGrading");
-        s_colorInversion = Gen(asm, "BrightPass", "ColorInversion");
-        s_textureMask = Gen(asm, "BrightPass", "TextureMask");
+        s_simpleShape = Gen2D(asm, "SimpleShape");
+        s_simpleTexture = Gen2D(asm, "SimpleTexture");
+        s_bullet = Gen2D(asm, "Bullet");
+        s_brightPass = Gen2D(asm, "BrightPass");
+        s_bloomBlur = Gen2D(asm, "BrightPass", "BloomBlur");
+        s_blindfold = Gen2D(asm, "BrightPass", "Blindfold");
+        s_simpleText = Gen2D(asm, "SimpleText");
+        s_outlinedText = Gen2D(asm, "OutlinedText");
+        s_colorGrading = Gen2D(asm, "BrightPass", "ColorGrading");
+        s_colorInversion = Gen2D(asm, "BrightPass", "ColorInversion");
+        s_textureMask = Gen2D(asm, "BrightPass", "TextureMask");
+
+
+        s_simpleShape3D = Gen3D(asm, "SimpleShape");
+        s_simpleShape3DLighting = Gen3D(asm, "Lighting_SimpleShape");
     }
 
-    private static Shader Gen(Assembly asm, string vert, string frag = null)
+    private static Shader Gen2D(Assembly asm, string vert, string frag = null)
     {
-        using Stream vstream = asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.{vert}.vert");
-        using Stream fstream = asm.GetManifestResourceStream(frag is null ? $"GensouGL.Graphics.Shaders.{vert}.frag" : $"GensouGL.Graphics.Shaders.{frag}.frag");
+        using Stream vstream = asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.Shader2D.{vert}.vert");
+        using Stream fstream = asm.GetManifestResourceStream(frag is null ? $"GensouGL.Graphics.Shaders.Shader2D.{vert}.frag" : $"GensouGL.Graphics.Shaders.Shader2D.{frag}.frag");
+
+        using StreamReader vreader = new StreamReader(vstream);
+        using StreamReader freader = new StreamReader(fstream);
+
+        string vsource = vreader.ReadToEnd();
+        string fsource = freader.ReadToEnd();
+
+        return new Shader(vsource, fsource);
+    }
+
+    private static Shader Gen3D(Assembly asm, string vert, string frag = null)
+    {
+        using Stream vstream = asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.Shader3D.{vert}.vert");
+        using Stream fstream = asm.GetManifestResourceStream(frag is null ? $"GensouGL.Graphics.Shaders.Shader3D.{vert}.frag" : $"GensouGL.Graphics.Shaders.Shader3D.{frag}.frag");
 
         using StreamReader vreader = new StreamReader(vstream);
         using StreamReader freader = new StreamReader(fstream);

@@ -189,14 +189,18 @@ public sealed class Game
         _sceneManager = new(this);
         
         Shader.LoadShaders();
+        Renderer3D.Initialize();
         QuickRenderer2D.Initialize();
         BatchTextRenderer2D.Initialize();
         BatchBulletRenderer2D.Initialize();
         FullscreenQuadRenderer.Initialize();
+
+        QuickRenderer3D.Initialize();
+        
         AudioPlayer.Initialize();
         InGameDebug.Initialize(this);
 
-        Screen.Default = new(0, _screenWidth, _screenHeight);
+        Screen.Default = new(0, _windowWidth, _windowHeight);
     }
 
     private void InitializeOpenGL()
@@ -212,6 +216,7 @@ public sealed class Game
 
     private void FinalizeEngineCore()
     {
+        Renderer3D.Release();
         QuickRenderer2D.Release();
         BatchTextRenderer2D.Release();
         BatchBulletRenderer2D.Release();
@@ -258,7 +263,7 @@ public sealed class Game
 
         Color bg = _sceneManager.CurrentScene.BackgroundColor;
         GL.ClearColor(bg.R, bg.G, bg.B, 1.0f);
-        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         FramebufferService.Pop();
 

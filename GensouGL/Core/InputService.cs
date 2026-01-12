@@ -88,6 +88,15 @@ public sealed class InputService
     }
 
     /// <summary>
+    /// Sets the mouse position.
+    /// </summary>
+    /// <param name="point">New mouse position.</param>
+    public void SetMousePosition(Point point)
+    {
+        _game.Window.MousePosition = new(point.X, point.Y);
+    }
+
+    /// <summary>
     /// Gets the mouse position in screen scale.
     /// </summary>
     /// <remarks>
@@ -99,6 +108,15 @@ public sealed class InputService
     {
         Point pos = GetMousePosition();
         return new Point(pos.X / _game.WindowWidth * _game.ScreenWidth, pos.Y / _game.WindowHeight * _game.ScreenHeight);
+    }
+
+    /// <summary>
+    /// Sets the mouse position in screen scale.
+    /// </summary>
+    /// <param name="point">New screen mouse point.</param>
+    public void SetScreenMousePosition(Point point)
+    {
+        _game.Window.MousePosition = new(point.X / _game.ScreenWidth * _game.WindowWidth, point.Y / _game.ScreenHeight * _game.ScreenWidth);
     }
 
     /// <summary>
