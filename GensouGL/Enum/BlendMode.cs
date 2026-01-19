@@ -40,7 +40,11 @@ public enum BlendMode
     /// <summary>
     /// Screen blend.
     /// </summary>
-    Screen = 8
+    Screen = 8,
+    /// <summary>
+    /// No blend.
+    /// </summary>
+    NoBlend = 9
 }
 
 internal static class BlendModeData

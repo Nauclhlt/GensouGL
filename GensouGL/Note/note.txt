@@ -1,170 +1,24 @@
-## Engine
+3D rendering
+・RenderContext3D
+- accumulates draw commands from graphics recorders
+- lightingFrame: LightingFrame
+- shadowFrame: ShadowFrame
+- shadowData: ShadowData
+- camera: Camera3D
+- lightingMode: LightingMode
+- settings: GraphicsSettings3D
+- brdfMode: BRDFMode
+- colorGrading: ColorGradingSettings
 
-class Scene
- - protected SceneManager SceneManager
- - protected InputService Input
- - protected OverlayService Overlay
- - virtual Update(float deltaTime) : void
- - virtual FocusUpdate(float deltaTime) : void
- - virtual Render(float deltaTime) : void
- - virtual FocusRender(float deltaTime) :void
- - virtual OnInitialize() : void
- - virtual OnLeave() : void
+・SceneRenderer
+- draws scene from RenderContext3D(draw calls are only made here)
+- make forward+ division here
 
-class GensouGL
- - Create() : Game
+・GraphicsEncoder3D
+- creates draw commands and push them to RenderContext3D
+- material: Material
 
-- class Game
- - WithTitle(string title) : Game
- - WithWindowSize(int width, int height) : Game
- - WithScreenSize(int width, int height) : Game
- - UseVSync() : Game
- - UseFullscreen() : Game
- - HideCursor() : Game
- - Run() : void
-
-class DebugLog
- - static Info(string message) : void
- - static Warn(string message) : void
- - static Error(string message) : void
- - static Clear() : void
- - static SaveToFile(string filename) : void
- - static WriteToScreen(): void
- - static WriteToConsole : bool
-
-## High-Level Rendering
-
-static class TextRenderer
- - Render(Point pos, string text, ITextFont font, Color color) : void
- - RenderCentered(Rect rect, string text, ITextFont, Color color) : void
- - RenderCharacter(Point pos, char c, ITextFont font, Color color) : void
- - WidthOf(string text, ITextFont font) : float
- - HeightOf(string text, ITextFont font) : float
-
-interface ITextFont
- - ClearCache() : void
- - WidthOf(string text): float
- - HeightOf(string text) : float
- - GetGlyph(char c) : ITexture
-
-class TextFont : ITextFont, IDisposable
- - TextFont(string filename, int size)
- - TextFont(Stream source, int size)
-
-## Low-Level Rendering
-
-static class FramebufferService
- - Push() : void
- - Pop() : void
- - Clear(color: Color) : void
- - Bind(screen: IScreen) : void
- - Unbind() : void
- - BoundScreen : IScreen
-
-interface IScreen
- - Id : int
- - Width : int
- - Height : int
-
-// Represents a frame buffer. (if the id is 0, it represents the default frame buffer)
-class Screen : IScreen, ITexture, IDisposable
- - Screen(int width, int height)
- - static Default : Screen
-
-// Used to batch draw some AABB-shaped textures.
-class BatchTextureRenderer : IDisposable
- - BatchTextureRenderer(int initialCapacity, ITexture globalTexture)
- - Begin() : void
- - DrawTexture(Rect rect, ITexture texture, Color color) : void
- - End() : void
-
-// Used to batch draw danmaku bullets.
-class BatchBulletRenderer : IDisposable
- - BatchBulletRenderer(int initialCapacity, ITexture globalTexture)
- - Begin() : void
- - DrawBullet(ITexture texture, float scaleX, float scaleY, float rotation) : void
- - End() : void
-
-static class QuickRenderer
- - DrawRect(Rect rect, Color color) : void
- - DrawWireRect(Rect rect, float lineWidth, Color color) : void
- - DrawTexture(Rect rect, ITexture texture, Color color) : void
- - DrawLine(Point start, Point end, float lineWidth, Color startColor, Color endColor) : void
- - DrawTriangle(Point p1, Point p2, Point p3, Color color) : void
- - DrawWireTriangle(Point p1, Point p2, Point p3, float lineWidth, Color color) : void
- - DrawEllipse(Point pos, float width, float height, Color color) : void
-
-class Camera
- - Camera(float x, float y, float scaleX, float scaleY, float rot)
- - internal GetMVPMatrix() : Matrix4
-
-class Shader
- - Shader(string vertexSource, string fragmentSource)
- - Bind() : void
- - Unbind() : void
-## Texture
-
-static class TextureService
- - Push() : void
- - Pop() : void
- - Bind(texture: ITexture) : void
- - Unbind() : void
- - BoundTexture : ITexture
-
-interface ITexture
- - Id : int
- - Width : int
- - Height : int
- - Coords : Rect
-
-class Texture : ITexture, IDisposable
- - Texture(string filename)
- - Texture(Stream source)
- - Texture(int width, int height, byte[] data)
- - GetPartial(Rect coords) : PartialTexture
-
-struct PartialTexture : ITexture
- - does not keep base texture reference(only texture id, in order to clarify ownership)
- - PartialTexture(Rect coords)
-
-class TiledTextureAtlas : IDisposable
- - TextureAtlas(string filename, int tileWidth, int tileHeight)
- - Get(x: int, y: int) : PartialTexture
- - Get(index: int) : PartialTexture
- - TileWidth : int
- - TileHeight : int
- - AtlasWidth : int
- - AtlasHeight : int
- - AtlasTexture : ITexture
-
-class DynamicTextureAtlas : IDisposable
- - DynamicTextureAtlas(TextureSource[] sources, int atlasWidth, int atlasHeight)
- - Get(int index) : PartialTexture
- - AtlasWidth : int
- - AtlasHeight : int
- - AtlasTexture : ITexture
-
-class TextureSource
- - TextureSource(string filename)
- - TextureSource(Stream source)
- - Type : TextureSourceType
-
-enum TextureSourceType
- - File
- - Stream
- - ByteArray
-
-## Data
-
-struct Color
-struct Point
-struct Rect
-struct Circle
-struct Key
-struct MouseButton
-struct GVector2
-
-
-## Utility
-
-//some utility classes for localization.
+・DrawCommand
+- MakeDrawCall()
+- shader: Shader
+- material: Material

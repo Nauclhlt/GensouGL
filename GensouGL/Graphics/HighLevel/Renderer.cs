@@ -79,6 +79,19 @@ public abstract class Renderer
     }
 
     /// <summary>
+    /// Loads the current blend mode.
+    /// </summary>
+    protected void LoadBlendMode()
+    {
+        if (_state.BlendMode == BlendMode.NoBlend) GL.Disable(EnableCap.Blend);
+        else
+        {
+            GL.Enable(EnableCap.Blend);
+            _state.LoadBlendMode();
+        }
+    }
+
+    /// <summary>
     /// When overridden, sets up the renderer.
     /// </summary>
     /// <param name="screen">Target screen.</param>

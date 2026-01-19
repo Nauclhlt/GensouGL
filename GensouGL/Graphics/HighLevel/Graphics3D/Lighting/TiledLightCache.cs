@@ -23,19 +23,25 @@ internal sealed class TiledLightCache
     public List<int> Indices => _indices;
     public int[] Ranges => _ranges;
 
-    public TiledLightCache(Camera3D camera, IReadOnlyList<PointLight> lights, int screenWidth, int screenHeight)
+    public TiledLightCache(int screenWidth, int screenHeight)
+    {
+        _tileCountX = (screenWidth + TileSize - 1) / TileSize;
+        _tileCountY = (screenHeight + TileSize - 1) / TileSize;
+        _tileCount = _tileCountX * _tileCountY;
+    }
+
+    public void Cache(Camera3D camera, IReadOnlyList<PointLight> lights, int screenWidth, int screenHeight)
     {
         _camera = camera;
         _lights = lights;
 
-        _tileCountX = (screenWidth + TileSize - 1) / TileSize;
-        _tileCountY = (screenHeight + TileSize - 1) / TileSize;
-        _tileCount = _tileCountX * _tileCountY;
-
-        _tileLights = new List<int>[_tileCount];
+        _tileLights ??= new List<int>[_tileCount];
         for (int i = 0; i < _tileCount; i++)
         {
-            _tileLights[i] = [];
+            if (_tileLights[i] is null)
+                _tileLights[i] = [];
+            else
+                _tileLights[i].Clear();
         }
 
         int total = 0;
@@ -93,7 +99,11 @@ internal sealed class TiledLightCache
 
     private void ConstructGpuFormat(int total)
     {
-        _indices = new(total);
+        if (_indices is null)
+        {
+            _indices = new(total);
+        }
+        _indices.Clear();
         _ranges = new int[_tileCount * 2];
 
         int offset = 0;

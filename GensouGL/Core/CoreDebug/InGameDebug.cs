@@ -27,8 +27,8 @@ public static class InGameDebug
     private static string _glRenderer;
     private static string _alVersion;
 
-    private static readonly Color Background = Color.Black.WithAlpha(150);
-    private static readonly Color BackgroundAccent = Color.DarkTurquoise.WithAlpha(50);
+    private static readonly Color Background = Color.Black.WithAlpha(0.6f);
+    private static readonly Color BackgroundAccent = Color.DarkTurquoise.WithAlpha(0.2f);
     private static readonly Color Foreground = Color.LightGray;
     private static readonly Color ForegroundAccent = Color.HotPink;
 

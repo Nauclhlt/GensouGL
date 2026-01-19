@@ -50,7 +50,7 @@ public sealed class Shader : IDisposable
             string infoLog = GL.GetShaderInfoLog(vshader);
             throw new Exception($"Vertex shader compilation failed: {infoLog}");
         }
-
+        
         GL.GetShader(fshader, ShaderParameter.CompileStatus, out int fstatus);
 
         if (fstatus != (int)All.True)
@@ -141,6 +141,13 @@ public sealed class Shader : IDisposable
         GL.Uniform4(loc, new OpenTK.Mathematics.Vector4(x, y, z, w));
     }
 
+    internal void SetUniformMatrix4(string name, bool transpose, OpenTK.Mathematics.Matrix4 matrix)
+    {
+        GL.UseProgram(_program);
+        int loc = GL.GetUniformLocation(_program, name);
+        GL.UniformMatrix4(loc, false, ref matrix);
+    }
+
     internal static void SendMatrix0(OpenTK.Mathematics.Matrix4 matrix)
     {
         GL.UniformMatrix4(0, false, ref matrix);
@@ -196,6 +203,8 @@ public sealed class Shader : IDisposable
     // 3D
     private static Shader s_simpleShape3D;
     private static Shader s_simpleShape3DLighting;
+    private static Shader s_simpleShape3DLightingShadow;
+    private static Shader s_depth3D;
 
 
     // 2D
@@ -215,10 +224,14 @@ public sealed class Shader : IDisposable
     // 3D
     internal static Shader SimpleShape3D => s_simpleShape3D;
     internal static Shader SimpleShape3DLighting => s_simpleShape3DLighting;
+    internal static Shader SimpleShape3DLightingShadow => s_simpleShape3DLightingShadow;
+    internal static Shader Depth3D => s_depth3D;
 
     internal static void LoadShaders()
     {
         Assembly asm = typeof(Shader).Assembly;
+        ShaderPreprocessor.SetSourceAssembly(asm);
+
         s_simpleShape = Gen2D(asm, "SimpleShape");
         s_simpleTexture = Gen2D(asm, "SimpleTexture");
         s_bullet = Gen2D(asm, "Bullet");
@@ -234,6 +247,8 @@ public sealed class Shader : IDisposable
 
         s_simpleShape3D = Gen3D(asm, "SimpleShape");
         s_simpleShape3DLighting = Gen3D(asm, "Lighting_SimpleShape");
+        s_simpleShape3DLightingShadow = Gen3D(asm, "Lighting_Shadow_SimpleShape");
+        s_depth3D = Gen3D(asm, "Lighting_SimpleShape", "Depth");
     }
 
     private static Shader Gen2D(Assembly asm, string vert, string frag = null)
@@ -260,6 +275,9 @@ public sealed class Shader : IDisposable
 
         string vsource = vreader.ReadToEnd();
         string fsource = freader.ReadToEnd();
+
+        vsource = ShaderPreprocessor.ExpandInclude(vsource);
+        fsource = ShaderPreprocessor.ExpandInclude(fsource);
 
         return new Shader(vsource, fsource);
     }

@@ -1,7 +1,7 @@
 ﻿namespace GensouGL.Graphics;
 
 /// <summary>
-/// Represents a lighting frame.
+/// Represents a lighting frame data.
 /// </summary>
 public sealed class LightingFrame
 {

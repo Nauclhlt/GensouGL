@@ -49,7 +49,7 @@ public abstract class Renderer2D : Renderer
     protected override void LoadState()
     {
         Screen screen = _screenStack.Peek();
-        _state.LoadBlendMode();
+        LoadBlendMode();
         FramebufferService.PushAndBind(screen.ScreenId);
         GL.Viewport(0, 0, screen.Width, screen.Height);
 

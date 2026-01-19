@@ -48,7 +48,13 @@ public sealed class Game
     /// Gets whether the cursor is hidden.
     /// </summary>
     public bool CursorHidden => _cursorHidden;
+    /// <summary>
+    /// Gets the fps.
+    /// </summary>
     public double Fps => _fps;
+    /// <summary>
+    /// Gets the window title.
+    /// </summary>
     public string Title => _title;
 
 
@@ -194,8 +200,8 @@ public sealed class Game
         BatchTextRenderer2D.Initialize();
         BatchBulletRenderer2D.Initialize();
         FullscreenQuadRenderer.Initialize();
-
-        QuickRenderer3D.Initialize();
+        SharedBuffers.Initialize();
+        SharedShaderBuffers.Initialize();
         
         AudioPlayer.Initialize();
         InGameDebug.Initialize(this);
@@ -221,6 +227,8 @@ public sealed class Game
         BatchTextRenderer2D.Release();
         BatchBulletRenderer2D.Release();
         FullscreenQuadRenderer.Release();
+        SharedBuffers.Release();
+        SharedShaderBuffers.Release();
         AudioPlayer.Release();
         InGameDebug.Release();
         PersistentResourceService.ReleaseAll();

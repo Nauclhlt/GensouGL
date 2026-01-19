@@ -2,6 +2,10 @@
 
 namespace GensouGL.Graphics;
 
+// TODO:
+// move the lighting and shadow mapping features to SceneRenderer3D.
+// Renderer3D should be removed(if possible)
+
 /// <summary>
 /// Represents an abstract base class for all 3D renderers.
 /// This class provide sbasic features of screen stack, camera, and state management.
@@ -16,6 +20,7 @@ public abstract class Renderer3D : Renderer
     private static ArrayShaderStorageBuffer<GpuPointLight> s_pointLightsSSBO;
     private static ArrayShaderStorageBuffer<int> s_lightIndicesSSBO;
     private static ArrayShaderStorageBuffer<int> s_tileRangesSSBO;
+    private static StructureUniformBuffer<GpuColorGrading> s_colorGradingUBO;
 
     internal static void Initialize()
     {
@@ -24,6 +29,7 @@ public abstract class Renderer3D : Renderer
         s_pointLightsSSBO = new();
         s_lightIndicesSSBO = new();
         s_tileRangesSSBO = new();
+        s_colorGradingUBO = new();
     }
 
     internal static void Release()
@@ -33,7 +39,37 @@ public abstract class Renderer3D : Renderer
         s_pointLightsSSBO.Dispose();
         s_lightIndicesSSBO.Dispose();
         s_tileRangesSSBO.Dispose();
+        s_colorGradingUBO.Dispose();
     }
+
+    #endregion
+
+    #region Constants
+
+    /// <summary>
+    /// Binding point for a light block.
+    /// </summary>
+    protected const int LightBlockBindingPoint = 0;
+    /// <summary>
+    /// Binding point for a material.
+    /// </summary>
+    protected const int MaterialBindingPoint = 1;
+    /// <summary>
+    /// Binding point for point lights.
+    /// </summary>
+    protected const int PointLightsBindingPoint = 2;
+    /// <summary>
+    /// Binding point for light indices.
+    /// </summary>
+    protected const int LightIndicesBindingPoint = 3;
+    /// <summary>
+    /// Binding point for tile ranges.
+    /// </summary>
+    protected const int TileRangesBindingPoint = 4;
+    /// <summary>
+    /// Binding point for color grading.
+    /// </summary>
+    protected const int ColorGradingBindingPoint = 5;
 
     #endregion
 
@@ -47,9 +83,13 @@ public abstract class Renderer3D : Renderer
     /// </summary>
     protected GraphicsSettings3D _graphicsSettings;
     /// <summary>
-    /// Current lighting frame.
+    /// Current lighting frame data.
     /// </summary>
     protected LightingFrame _lightingFrame;
+    /// <summary>
+    /// Current shadow frame data.
+    /// </summary>
+    protected ShadowFrame _shadowFrame;
     /// <summary>
     /// Current material.
     /// </summary>
@@ -63,11 +103,23 @@ public abstract class Renderer3D : Renderer
     /// </summary>
     protected BRDFMode _brdfMode;
     /// <summary>
+    /// Current color grading settings.
+    /// </summary>
+    protected ColorGradingSettings _colorGrading;
+    /// <summary>
     /// Gets if lighting is enabled.
     /// </summary>
     protected bool LightingEnabled => _lightingMode != LightingMode.NoLighting;
+    /// <summary>
+    /// Gets if shadow is enabled.
+    /// </summary>
+    protected bool ShadowAvailable => _lightingMode == LightingMode.LightingWithShadows && _shadowData is not null;
 
+    // gachi private
     private TiledLightCache _tiledLightCache;
+    private ShadowData _shadowData;
+
+    #region Public properties
 
     /// <summary>
     /// Gets or sets the current camera.
@@ -126,6 +178,21 @@ public abstract class Renderer3D : Renderer
     }
 
     /// <summary>
+    /// Gets or sets the current color grading settings.
+    /// </summary>
+    public ColorGradingSettings ColorGrading
+    {
+        get => _colorGrading;
+        set
+        {
+            if (value is null) return;
+            _colorGrading = value;
+        }
+    }
+
+    #endregion
+
+    /// <summary>
     /// Returns the current view matrix.
     /// </summary>
     protected OpenTK.Mathematics.Matrix4 ViewMatrix => _camera.GetViewMatrix();
@@ -133,6 +200,8 @@ public abstract class Renderer3D : Renderer
     /// Returns the current projection matrix.
     /// </summary>
     protected OpenTK.Mathematics.Matrix4 ProjMatrix => _camera.GetProjectionMatrix();
+
+    #region Public methods
 
     /// <summary>
     /// Sets the current lighting frame.
@@ -145,9 +214,35 @@ public abstract class Renderer3D : Renderer
             DebugLog.Error($"{nameof(Renderer3D)}: Lighting frame cannot be null.");
             return;
         }
-
+        
         _lightingFrame = lightingFrame;
     }
+
+    /// <summary>
+    /// Sets the current shadow frame.
+    /// </summary>
+    /// <param name="shadowFrame">Shadow frame.</param>
+    public void SetShadowFrame(ShadowFrame shadowFrame)
+    {
+        if (shadowFrame is null)
+        {
+            DebugLog.Error($"{nameof(Renderer3D)}: Shadow frame cannot be null.");
+            return;
+        }
+
+        _shadowFrame = shadowFrame;
+    }
+
+    /// <summary>
+    /// Sets the current shadow data.
+    /// </summary>
+    /// <param name="shadowData">Shadow data.</param>
+    public void SetShadowData(ShadowData shadowData)
+    {
+        _shadowData = shadowData;
+    }
+
+    #endregion
 
     /// <summary>
     /// Sets the default MVP matrices to the uniform variables.
@@ -167,8 +262,11 @@ public abstract class Renderer3D : Renderer
         _camera = Camera3D.Default;
         _graphicsSettings = new();
         _lightingFrame = LightingFrame.Default;
+        _shadowFrame = ShadowFrame.Default;
+        _tiledLightCache = new(_screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight);
         _material = Material.Default;
         _lightingMode = LightingMode.NoLighting;
+        _colorGrading = new();
     }
 
     /// <summary>
@@ -177,9 +275,10 @@ public abstract class Renderer3D : Renderer
     protected override void LoadState()
     {
         Screen screen = _screenStack.Peek();
-        _state.LoadBlendMode();
+        LoadBlendMode();
         FramebufferService.PushAndBind(screen.ScreenId);
         GL.Viewport(0, 0, screen.Width, screen.Height);
+
 
         // 3D specific
         GL.Enable(EnableCap.DepthTest);
@@ -203,15 +302,80 @@ public abstract class Renderer3D : Renderer
     }
 
     /// <summary>
+    /// Prepares for depth pass.
+    /// </summary>
+    protected void PrepareShadowDepth()
+    {
+        if (!ShadowAvailable) return;
+
+        
+
+        FramebufferService.PushAndBind(_shadowData.DepthFramebuffer.Framebuffer);
+        GL.Viewport(0, 0, _shadowData.ResolutionWidth, _shadowData.ResolutionHeight);
+        GL.Enable(EnableCap.DepthTest);
+        GL.Disable(EnableCap.Blend);
+
+        Shader.Depth3D.Bind();
+    }
+
+    /// <summary>
+    /// Sets the shadow depth MVP matrices to the uniform variables.
+    /// </summary>
+    protected void SetShadowDepthMVP()
+    {
+        Matrix4 view = Matrix4.LookAt((_shadowFrame.DirectionalShadow.Center - _shadowFrame.DirectionalShadow.Direction * 300f).ToOpenTK(),
+            _shadowFrame.DirectionalShadow.Center.ToOpenTK(),
+            Vector3.UnitY);
+        float size = 200f;
+        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(-size, size, -size, size, 0.1f, 700f);
+
+        Shader.SendMatrix012(Matrix4.Identity, view, projection);
+    }
+
+    /// <summary>
+    /// Finishes depth pass.
+    /// </summary>
+    protected void FinishShadowDepth()
+    {
+        if (!ShadowAvailable) return;
+
+        FramebufferService.Pop();
+    }
+
+    protected void PrepareShadowRendering(Shader shader)
+    {
+        Matrix4 view = Matrix4.LookAt((_shadowFrame.DirectionalShadow.Center - _shadowFrame.DirectionalShadow.Direction * 300f).ToOpenTK(),
+            _shadowFrame.DirectionalShadow.Center.ToOpenTK(),
+            Vector3.UnitY);
+        float size = 200f;
+        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(-size, size, -size, size, 0.1f, 700f);
+
+        shader.SetUniformInt("pDirectionalShadowEnabled", 1);
+        shader.SetUniformInt("pDirectionalShadowMap", 1);
+        shader.SetUniformMatrix4("pDirectionalLightMVP", false, view * projection);
+        TextureService.PushAndBind(_shadowData.DepthFramebuffer.Texture.TextureId, 1);
+    }
+
+    protected void FinishShadowRendering()
+    {
+        TextureService.Pop(1);
+    }
+
+
+
+
+    #region Lighting
+
+    /// <summary>
     /// Prepares for lighting.
     /// </summary>
     protected unsafe void PrepareLighting()
     {
         if (_lightingFrame is null) return;
-        if (_lightingMode == LightingMode.NoLighting) return;
+        if (!LightingEnabled) return;
 
-        _tiledLightCache = new(_camera, _lightingFrame.PointLights, _screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight);
-
+        _tiledLightCache.Cache(_camera, _lightingFrame.PointLights, _screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight);
+        
         GpuLightBlock lightBlock = default;
         lightBlock.ViewPosition = _camera.Position.ToOpenTK();
         lightBlock.Brdf = (int)_brdfMode;
@@ -236,10 +400,10 @@ public abstract class Renderer3D : Renderer
         }
 
         s_lightBlockUBO.Update(lightBlock);
-        s_lightBlockUBO.Bind(0);
+        s_lightBlockUBO.Bind(LightBlockBindingPoint);
 
         s_materialUBO.Update(_material.ToGpuMaterial());
-        s_materialUBO.Bind(1);
+        s_materialUBO.Bind(MaterialBindingPoint);
 
         GpuPointLight[] pointLights = new GpuPointLight[_lightingFrame.PointLights.Count];
         for (int i = 0; i < _lightingFrame.PointLights.Count; i++)
@@ -247,13 +411,16 @@ public abstract class Renderer3D : Renderer
             pointLights[i] = new(_lightingFrame.PointLights[i]);
         }
         s_pointLightsSSBO.Update(pointLights);
-        s_pointLightsSSBO.Bind(2);
+        s_pointLightsSSBO.Bind(PointLightsBindingPoint);
 
         s_lightIndicesSSBO.Update(CollectionsMarshal.AsSpan(_tiledLightCache.Indices));
-        s_lightIndicesSSBO.Bind(3);
+        s_lightIndicesSSBO.Bind(LightIndicesBindingPoint);
 
         s_tileRangesSSBO.Update(_tiledLightCache.Ranges);
-        s_tileRangesSSBO.Bind(4);
+        s_tileRangesSSBO.Bind(TileRangesBindingPoint);
+
+        s_colorGradingUBO.Update(_colorGrading.ToGpuColorGrading());
+        s_colorGradingUBO.Bind(ColorGradingBindingPoint);
     }
 
     /// <summary>
@@ -261,12 +428,15 @@ public abstract class Renderer3D : Renderer
     /// </summary>
     protected void FinishLighting()
     {
-        if (_lightingMode == LightingMode.NoLighting) return;
+        if (!LightingEnabled) return;
 
-        s_lightBlockUBO.Unbind(0);
-        s_materialUBO.Unbind(1);
-        s_pointLightsSSBO.Unbind(2);
-        s_lightIndicesSSBO.Unbind(3);
-        s_tileRangesSSBO.Unbind(4);
+        s_lightBlockUBO.Unbind(LightBlockBindingPoint);
+        s_materialUBO.Unbind(MaterialBindingPoint);
+        s_pointLightsSSBO.Unbind(PointLightsBindingPoint);
+        s_lightIndicesSSBO.Unbind(LightIndicesBindingPoint);
+        s_tileRangesSSBO.Unbind(TileRangesBindingPoint);
+        s_colorGradingUBO.Unbind(ColorGradingBindingPoint);
     }
+
+    #endregion
 }

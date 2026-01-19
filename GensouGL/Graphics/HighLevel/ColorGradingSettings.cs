@@ -103,4 +103,33 @@ public sealed class ColorGradingSettings
         shader.SetUniformFloat("pHueShift", HueShiftRadians);
         shader.SetUniformInt("pToneMap", (int)ToneMap);
     }
+
+    internal GpuColorGrading ToGpuColorGrading()
+    {
+        return new(this);
+    }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal readonly struct GpuColorGrading
+{
+    public readonly float Exposure;
+    public readonly float Brightness;
+    public readonly float Contrast;
+    public readonly float Saturation;
+
+    public readonly float HueShift;
+    public readonly int ToneMap;
+    private readonly OpenTK.Mathematics.Vector2 _pad0;
+
+    public GpuColorGrading(ColorGradingSettings source)
+    {
+        Exposure = source.Exposure;
+        Brightness = source.Brightness;
+        Contrast = source.Contrast;
+        Saturation = source.Saturation;
+
+        HueShift = source.HueShiftRadians;
+        ToneMap = (int)source.ToneMap;
+    }
 }

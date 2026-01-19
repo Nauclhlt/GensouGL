@@ -63,6 +63,16 @@ public struct Color
     }
 
     /// <summary>
+    /// Initializes <see cref="Color"/> using the specified RGB values. Alpha component will be 1(255 in byte).
+    /// </summary>
+    /// <param name="r">R component.</param>
+    /// <param name="g">G component.</param>
+    /// <param name="b">B component.</param>
+    public Color(float r, float g, float b) : this(r, g, b, 1.0f)
+    {
+    }
+
+    /// <summary>
     /// Initializes <see cref="Color"/> using the specified RGBA values.
     /// </summary>
     /// <param name="r">R component.</param>
