@@ -123,7 +123,7 @@ public sealed class RenderContext3D : IDisposable
     /// </summary>
     public void MakeShadowData()
     {
-        _shadowData = new(ShadowResolution, ShadowResolution);
+        _shadowData = new(ShadowResolution, ShadowResolution, SharedConstants.CascadeCount);
     }
 
     /// <summary>
@@ -154,6 +154,21 @@ public sealed class RenderContext3D : IDisposable
         }
 
         _shadowFrame = shadowFrame;
+    }
+
+    /// <summary>
+    /// Renders the shadow maps for debugging.
+    /// </summary>
+    public void DebugRenderShadowMaps()
+    {
+        if (!ShadowEnabled || !ShadowAvailable) return;
+
+        QuickRenderer2D renderer = new(Screen.Default);
+        float size = 120f;
+        for (int i = 0; i < SharedConstants.CascadeCount; i++)
+        {
+            renderer.DrawTextureWithShader(new Rect(0f, size * i, size, size), _shadowData.DepthFramebuffers[i].Texture, Shader.DepthDebug);
+        }
     }
 
     internal void Accumulate(IDrawCommand3D command) => _commands.Add(command);

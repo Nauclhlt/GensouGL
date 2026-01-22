@@ -66,14 +66,14 @@ public sealed class ShapeEncoder3D : GraphicsEncoder3D
         if (dirPositiveY)
         {
             va = [
-                rect.X, y, rect.Y + rect.Height,
                 rect.X, y, rect.Y,
-                rect.X + rect.Width, y, rect.Y + rect.Height,
+                rect.X, y, rect.Y + rect.Height,
                 rect.X + rect.Width, y, rect.Y,
+                rect.X + rect.Width, y, rect.Y + rect.Height,
             ];
 
             na = [
-                    0, 1f, 0,
+                0, 1f, 0,
                 0, 1f, 0,
                 0, 1f, 0,
                 0, 1f, 0,
@@ -82,10 +82,10 @@ public sealed class ShapeEncoder3D : GraphicsEncoder3D
         else
         {
             va = [
-                rect.X, y, rect.Y + rect.Height,
-                rect.X + rect.Width, y, rect.Y + rect.Height,
                 rect.X, y, rect.Y,
-                rect.X + rect.Width, y, rect.Y,
+                rect.Right, y, rect.Y,
+                rect.X, y, rect.Bottom,
+                rect.Right, y, rect.Bottom,
             ];
 
             na = [

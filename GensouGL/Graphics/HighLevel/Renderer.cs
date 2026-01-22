@@ -28,6 +28,14 @@ public abstract class Renderer
     }
 
     /// <summary>
+    /// Gets or sets whether this renderer uses depth testing.
+    /// </summary>
+    protected bool DepthUsed
+    {
+        get; set;
+    } = false;
+
+    /// <summary>
     /// Initializes <see cref="Renderer"/> functions.
     /// </summary>
     /// <param name="screen">Target screen.</param>
@@ -48,6 +56,8 @@ public abstract class Renderer
     public IDisposable BeginPostProc(PostProcessEffect effect)
     {
         Screen tempScreen = TempScreenPool.Rent((int)(_screenStack.BaseScreenWidth * effect.ActualSizeScale), (int)(_screenStack.BaseScreenHeight * effect.ActualSizeScale));
+        if (DepthUsed) tempScreen.UseDepth();
+
         _screenStack.Push(tempScreen);
         tempScreen.Clear(Color.Transparent);
 

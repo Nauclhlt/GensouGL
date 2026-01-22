@@ -16,6 +16,14 @@ public sealed class SceneRenderer3D : Renderer
     private const int TileRangesBindingPoint = 4;
     private const int ColorGradingBindingPoint = 5;
 
+    private const int ShadowMapTextureUnit = 2;
+
+    #endregion
+
+    #region Cached Frame shadow data
+    private float[] c_cascadeSplits;
+    private Matrix4[] c_cascadeProjection;
+    private Matrix4 c_lightViewMatrix;
     #endregion
 
     private TiledLightCache _tiledLightCache;
@@ -27,6 +35,7 @@ public sealed class SceneRenderer3D : Renderer
     public SceneRenderer3D(Screen screen)
     {
         Setup(screen);
+        DepthUsed = true;
         _tiledLightCache = new(screen.Width, screen.Height);
     }
 
@@ -60,15 +69,42 @@ public sealed class SceneRenderer3D : Renderer
 
         List<IDrawCommand3D> commands = context.GetCommands();
 
-        LoadShadowDepthState(context);
-        SetShadowDepthMVP(context);
+        ShadowFrame shadowFrame = context.ShadowFrame;
+        float[] cascadeSplits = CreateCascadeSplits(context);
+        Vec3[] frustumCorners = context.Camera.GetFrustumCorners();
+        Vec3 frustumCenter = Vec3.Zero;
+        for (int i = 0; i < frustumCorners.Length; i++) frustumCenter += frustumCorners[i] * (1.0f / frustumCorners.Length);
+        Matrix4 lightViewMatrix = Matrix4.LookAt((frustumCenter - shadowFrame.DirectionalShadow.Direction * shadowFrame.DirectionalShadow.Distance).ToOpenTK(), frustumCenter.ToOpenTK(), Vector3.UnitY);
+        Matrix4[] lightProjectionMatrices = CreateCascadeProjectionMatrices(context, lightViewMatrix, cascadeSplits, frustumCorners);
 
-        for (int i = 0; i < commands.Count; i++)
+
+
+        c_cascadeSplits = cascadeSplits;
+        c_cascadeProjection = lightProjectionMatrices;
+        c_lightViewMatrix = lightViewMatrix;
+
+        ShadowData shadowData = context.ShadowData;
+
+        LoadShadowDepthState(context);
+
+        FramebufferService.Push();
+
+        for (int c = 0; c < SharedConstants.CascadeCount; c++)
         {
-            commands[i].MakeDrawCall();
+            FramebufferService.Bind(shadowData.DepthFramebuffers[c].Framebuffer);
+            Shader.SendMatrix012(Matrix4.Identity, lightViewMatrix, lightProjectionMatrices[c]);
+
+            for (int i = 0; i < commands.Count; i++)
+            {
+                if (!commands[i].Material.CastShadows) continue;
+
+                commands[i].Prepare();
+                commands[i].MakeDrawCall();
+                commands[i].Finish();
+            }
         }
 
-        RestoreShadowDepthState(context);
+        FramebufferService.Pop();
     }
 
     private void LightingPass(RenderContext3D context)
@@ -82,8 +118,6 @@ public sealed class SceneRenderer3D : Renderer
 
         for (int i = 0; i < commands.Count; i++)
         {
-            if (!commands[i].Material.CastShadows) continue;
-
             Shader shader = commands[i].GetShader(context.LightingMode);
             shader.Bind();
             SetDefaultMVP(context);
@@ -92,7 +126,11 @@ public sealed class SceneRenderer3D : Renderer
 
             LoadMaterial(commands[i].Material);
 
+            commands[i].Prepare();
+
             commands[i].MakeDrawCall();
+
+            commands[i].Finish();
 
             if (context.ShadowEnabled && context.ShadowAvailable)
                 RestoreShadowRenderingState();
@@ -185,56 +223,148 @@ public sealed class SceneRenderer3D : Renderer
         if (!context.ShadowAvailable) return;
 
         ShadowData shadowData = context.ShadowData;
-
         shadowData.Clear();
 
-        FramebufferService.PushAndBind(shadowData.DepthFramebuffer.Framebuffer);
         GL.Viewport(0, 0, shadowData.ResolutionWidth, shadowData.ResolutionHeight);
         GL.Enable(EnableCap.DepthTest);
         GL.Disable(EnableCap.Blend);
 
+        if (context.ShadowFrame.FrontFaceCulling)
+        {
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(TriangleFace.Front);
+        }
+
         Shader.Depth3D.Bind();
-    }
-
-    private void RestoreShadowDepthState(RenderContext3D context)
-    {
-        if (!context.ShadowAvailable) return;
-
-        FramebufferService.Pop();
     }
 
     private void LoadShadowRenderingState(RenderContext3D context, Shader shader)
     {
-        ShadowFrame shadowFrame = context.ShadowFrame;
         ShadowData shadowData = context.ShadowData;
 
-        Matrix4 view = Matrix4.LookAt((shadowFrame.DirectionalShadow.Center - shadowFrame.DirectionalShadow.Direction * 300f).ToOpenTK(),
-            shadowFrame.DirectionalShadow.Center.ToOpenTK(),
-            Vector3.UnitY);
-        float size = 200f;
-        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(-size, size, -size, size, 0.1f, 700f);
-
-        shader.SetUniformInt("pDirectionalShadowEnabled", 1);
-        shader.SetUniformInt("pDirectionalShadowMap", 1);
-        shader.SetUniformMatrix4("pDirectionalLightMVP", false, view * projection);
-        TextureService.PushAndBind(shadowData.DepthFramebuffer.Texture.TextureId, 1);
+        Vec3 dir = context.ShadowFrame.DirectionalShadow.Direction;
+        shader.SetUniformVector3("pShadowLightDirection", dir.X, dir.Y, dir.Z);
+        for (int i = 0; i < SharedConstants.CascadeCount; i++)
+        {
+            TextureService.PushAndBind(shadowData.DepthFramebuffers[i].Texture.TextureId, ShadowMapTextureUnit + i);
+            shader.SetUniformMatrix4($"pCascadeLightVP[{i}]", false, c_lightViewMatrix * c_cascadeProjection[i]);
+            shader.SetUniformFloat($"pCascadeSplits[{i}]", c_cascadeSplits[i]);
+            shader.SetUniformInt($"pShadowMaps[{i}]", ShadowMapTextureUnit + i);
+        }
     }
 
     private void RestoreShadowRenderingState()
     {
-        TextureService.Pop(1);
+        for (int i = 0; i < SharedConstants.CascadeCount; i++)
+        {
+            TextureService.Pop(ShadowMapTextureUnit + i);
+        }
     }
 
-    private void SetShadowDepthMVP(RenderContext3D context)
+    private float[] CreateCascadeSplits(RenderContext3D context)
     {
-        ShadowFrame shadowFrame = context.ShadowFrame;
-        Matrix4 view = Matrix4.LookAt((shadowFrame.DirectionalShadow.Center - shadowFrame.DirectionalShadow.Direction * 300f).ToOpenTK(),
-            shadowFrame.DirectionalShadow.Center.ToOpenTK(),
-            Vector3.UnitY);
-        float size = 200f;
-        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(-size, size, -size, size, 0.1f, 700f);
+        float lambda = 0.5f;
 
-        Shader.SendMatrix012(Matrix4.Identity, view, projection);
+        float[] splits = new float[SharedConstants.CascadeCount];
+        splits[0] = context.Camera.ZNear;
+
+        for (int i = 1; i < SharedConstants.CascadeCount; i++)
+        {
+            float linearSplit = context.Camera.ZNear + (context.Camera.ZFar - context.Camera.ZNear) * (i / (float)SharedConstants.CascadeCount);
+            float logSplit = context.Camera.ZNear * MathF.Pow(context.Camera.ZFar / context.Camera.ZNear, i / (float)SharedConstants.CascadeCount);
+            splits[i] = GensouMathF.Lerp(linearSplit, logSplit, lambda);
+        }
+
+        return splits;
+    }
+
+    private Matrix4[] CreateCascadeProjectionMatrices(RenderContext3D context, Matrix4 lightViewMatrix, float[] cascadeSplits, Vec3[] frustumCorners)
+    {
+        int cascadeCount = SharedConstants.CascadeCount;
+        Matrix4[] cascadeProjections = new Matrix4[cascadeCount];
+
+        float cameraNear = context.Camera.ZNear;
+        float cameraFar = context.Camera.ZFar;
+
+        for (int i = 0; i < cascadeCount; i++)
+        {
+            float splitNear = cascadeSplits[i];
+            float splitFar = (i == cascadeCount - 1)
+                ? cameraFar
+                : cascadeSplits[i + 1];
+
+            float nearRatio = (splitNear - cameraNear) / (cameraFar - cameraNear);
+            float farRatio = (splitFar - cameraNear) / (cameraFar - cameraNear);
+
+            Vec3[] cascadeCorners = new Vec3[8];
+
+            for (int c = 0; c < 4; c++)
+            {
+                Vec3 nearCorner = frustumCorners[c];
+                Vec3 farCorner = frustumCorners[c + 4];
+
+                Vec3 cornerRay = farCorner - nearCorner;
+
+                cascadeCorners[c] = nearCorner + cornerRay * nearRatio;
+                cascadeCorners[c + 4] = nearCorner + cornerRay * farRatio;
+            }
+
+            Vector3 min = new Vector3(float.MaxValue);
+            Vector3 max = new Vector3(float.MinValue);
+
+            for (int c = 0; c < 8; c++)
+            {
+                Vector4 ls = new Vector4(
+                    cascadeCorners[c].X,
+                    cascadeCorners[c].Y,
+                    cascadeCorners[c].Z,
+                    1.0f
+                ) * lightViewMatrix;
+
+                Vector3 p = ls.Xyz;
+                min = Vector3.ComponentMin(min, p);
+                max = Vector3.ComponentMax(max, p);
+            }
+
+
+
+            // Texel Snapping
+            {
+                float width = max.X - min.X;
+                float height = max.Y - min.Y;
+
+                float texelSizeX = width / SharedConstants.ShadowResolution;
+                float texelSizeY = height / SharedConstants.ShadowResolution;
+
+                float centerX = (min.X + max.X) * 0.5f;
+                float centerY = (min.Y + max.Y) * 0.5f;
+
+                centerX = MathF.Floor(centerX / texelSizeX) * texelSizeX;
+                centerY = MathF.Floor(centerY / texelSizeY) * texelSizeY;
+
+                min.X = centerX - width * 0.5f;
+                max.X = centerX + width * 0.5f;
+                min.Y = centerY - height * 0.5f;
+                max.Y = centerY + height * 0.5f;
+            }
+
+
+
+            const float zPadding = 10f;
+
+            float zNear = -max.Z - context.ShadowFrame.DirectionalShadow.CasterExtension;
+            float zFar = -min.Z + zPadding;
+            
+
+            cascadeProjections[i] =
+                Matrix4.CreateOrthographicOffCenter(
+                    min.X, max.X,
+                    min.Y, max.Y,
+                    zNear, zFar
+                );
+        }
+
+        return cascadeProjections;
     }
 
     #endregion
@@ -253,7 +383,11 @@ public sealed class SceneRenderer3D : Renderer
             shader.Bind();
             SetDefaultMVP(context);
 
+            commands[i].Prepare();
+
             commands[i].MakeDrawCall();
+
+            commands[i].Finish();
         }
 
         RestoreState();

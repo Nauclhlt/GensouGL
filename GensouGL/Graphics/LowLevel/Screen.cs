@@ -15,6 +15,7 @@ public sealed class Screen : IScreen, IDisposable
     private Texture _texture;
     private int _width;
     private int _height;
+    private int _depthTexture = 0;
 
     private bool _disposed = false;
 
@@ -86,6 +87,26 @@ public sealed class Screen : IScreen, IDisposable
         FramebufferService.Pop();
     }
 
+    /// <summary>
+    /// Prepares the depth buffer.
+    /// </summary>
+    public void UseDepth()
+    {
+        if (_depthTexture != 0) return;
+
+        _depthTexture = GL.GenTexture();
+        TextureService.PushAndBind(_depthTexture);
+
+        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent24, _width, _height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+
+        FramebufferService.PushAndBind(_framebuffer);
+
+        GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, _depthTexture, 0);
+
+        TextureService.Pop();
+        FramebufferService.Pop();
+    }
+
     private void Dispose(bool disposing)
     {
         if (!_disposed)
@@ -97,6 +118,8 @@ public sealed class Screen : IScreen, IDisposable
 
             if (_framebuffer != 0)
                 GL.DeleteFramebuffer(_framebuffer);
+            if (_depthTexture != 0)
+                GL.DeleteTexture(_depthTexture);
 
             _disposed = true;
         }

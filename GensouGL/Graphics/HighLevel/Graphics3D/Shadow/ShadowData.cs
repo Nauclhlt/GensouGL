@@ -10,7 +10,8 @@ public sealed class ShadowData : IDisposable
     private bool _disposed = false;
     private int _resolutionWidth;
     private int _resolutionHeight;
-    private DepthFramebuffer _depthFramebuffer;
+    private int _cascadeCount;
+    private DepthFramebuffer[] _depthFramebuffers;
 
     /// <summary>
     /// Gets the X resolution of the directional shadow map.
@@ -21,19 +22,23 @@ public sealed class ShadowData : IDisposable
     /// </summary>
     public int ResolutionHeight => _resolutionHeight;
 
-    internal DepthFramebuffer DepthFramebuffer => _depthFramebuffer;
+    internal DepthFramebuffer[] DepthFramebuffers => _depthFramebuffers;
 
     /// <summary>
     /// Initializes a new instance of <see cref="ShadowData"/> with the specified shadow map resolution.
     /// </summary>
     /// <param name="resolutionWidth">X resolution.</param>
     /// <param name="resolutionHeight">Y resolution.</param>
-    public ShadowData(int resolutionWidth, int resolutionHeight)
+    /// <param name="cascadeCount">Number of cascades.</param>
+    public ShadowData(int resolutionWidth, int resolutionHeight, int cascadeCount)
     {
         _resolutionWidth = resolutionWidth;
         _resolutionHeight = resolutionHeight;
+        _cascadeCount = cascadeCount;
 
-        _depthFramebuffer = new(_resolutionWidth, _resolutionHeight);
+        _depthFramebuffers = new DepthFramebuffer[_cascadeCount];
+        for (int i = 0; i < _cascadeCount; i++)
+            _depthFramebuffers[i] = new(_resolutionWidth, _resolutionHeight);
     }
 
     /// <summary>
@@ -41,12 +46,8 @@ public sealed class ShadowData : IDisposable
     /// </summary>
     public void Clear()
     {
-        _depthFramebuffer.Clear();
-    }
-
-    public void SavePng(string filename)
-    {
-        _depthFramebuffer.Texture.SavePng(filename);
+        for (int i = 0; i < _cascadeCount; i++)
+            _depthFramebuffers[i].Clear();
     }
 
     private void Dispose(bool disposing)
@@ -55,7 +56,8 @@ public sealed class ShadowData : IDisposable
         {
             if (disposing)
             {
-                _depthFramebuffer.Dispose();
+                for (int i = 0; i < _cascadeCount; i++)
+                    _depthFramebuffers[i].Dispose();
             }
 
             _disposed = true;

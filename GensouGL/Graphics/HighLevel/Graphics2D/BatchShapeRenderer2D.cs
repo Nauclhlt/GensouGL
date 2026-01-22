@@ -70,7 +70,7 @@ public sealed class BatchShapeRenderer2D : Renderer2D
 
         Span<float> vspan = CollectionsMarshal.AsSpan(_vertices);
         Span<float> cspan = CollectionsMarshal.AsSpan(_colors);
-        QuickRenderer2D.InternalBuffer.Draw(primitiveType, vspan, cspan);
+        SharedBuffers.SimpleBuffer2D.Draw(primitiveType, vspan, cspan);
 
         RestoreState();
         _type = ShapeType.Invalid;

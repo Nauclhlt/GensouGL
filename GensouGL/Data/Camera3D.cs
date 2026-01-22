@@ -97,6 +97,15 @@ public sealed class Camera3D
     }
 
     /// <summary>
+    /// Gets the forward vector of the camera.
+    /// </summary>
+    public Vec3 Forward => (_target - _position).Normalize();
+    /// <summary>
+    /// Gets the right vector of the camera.
+    /// </summary>
+    public Vec3 Right => Vec3.Cross(Forward, _up).Normalize();
+
+    /// <summary>
     /// Initializes a new instance of <see cref="Camera3D"/> with the specified parameters.
     /// </summary>
     /// <param name="position">Camera position.</param>
@@ -107,6 +116,43 @@ public sealed class Camera3D
         _position = position;
         _target = target;
         _up = up;
+    }
+
+    internal Vec3[] GetFrustumCorners()
+    {
+        Vec3[] corners = new Vec3[8];
+
+        Vec3 forward = (_target - _position).Normalize();
+        Vec3 right = Vec3.Cross(forward, _up).Normalize();
+        Vec3 up = Vec3.Cross(right, forward).Normalize();
+
+        float tanHalfFovy = MathF.Tan(_fovy / 2f);
+
+        float nearHeight = 2f * tanHalfFovy * _zNear;
+        float nearWidth = nearHeight * _aspect;
+
+        float farHeight = 2f * tanHalfFovy * _zFar;
+        float farWidth = farHeight * _aspect;
+
+        Vec3 nearCenter = _position + forward * _zNear;
+        Vec3 farCenter = _position + forward * _zFar;
+
+        Vec3 nearUpVec = up * (nearHeight / 2f);
+        Vec3 nearRightVec = right * (nearWidth / 2f);
+        Vec3 farUpVec = up * (farHeight / 2f);
+        Vec3 farRightVec = right * (farWidth / 2f);
+
+        corners[0] = nearCenter + nearUpVec - nearRightVec; // Top-Left
+        corners[1] = nearCenter + nearUpVec + nearRightVec; // Top-Right
+        corners[2] = nearCenter - nearUpVec + nearRightVec; // Bottom-Right
+        corners[3] = nearCenter - nearUpVec - nearRightVec; // Bottom-Left
+
+        corners[4] = farCenter + farUpVec - farRightVec;    // Top-Left
+        corners[5] = farCenter + farUpVec + farRightVec;    // Top-Right
+        corners[6] = farCenter - farUpVec + farRightVec;    // Bottom-Right
+        corners[7] = farCenter - farUpVec - farRightVec;    // Bottom-Left
+
+        return corners;
     }
 
     internal OpenTK.Mathematics.Matrix4 GetViewMatrix()

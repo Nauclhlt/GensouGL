@@ -68,6 +68,22 @@ public struct Rect
     /// </summary>
     public readonly Point CenterPoint => new(X + Width / 2, Y + Height / 2);
     /// <summary>
+    /// Gets the top left point of the rectangle.
+    /// </summary>
+    public readonly Point TopLeft => new(Left, Top);
+    /// <summary>
+    /// Gets the top right point of the rectangle.
+    /// </summary>
+    public readonly Point TopRight => new(Right, Top);
+    /// <summary>
+    /// Gets the bottom left point of the rectangle.
+    /// </summary>
+    public readonly Point BottomLeft => new(Left, Bottom);
+    /// <summary>
+    /// Gets the bottom right point of the rectangle.
+    /// </summary>
+    public readonly Point BottomRight => new(Right, Bottom);
+    /// <summary>
     /// Gets whether the rectangle has positive area.
     /// </summary>
     public readonly bool HasArea => Width != 0 && Height != 0;

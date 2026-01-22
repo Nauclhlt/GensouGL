@@ -2,7 +2,7 @@
 
 namespace GensouGL.Graphics;
 
-internal sealed class DepthTexture : IDisposable
+internal sealed class DepthTexture : IDisposable, ITexture
 {
     private int _texture;
     private int _width;
@@ -10,8 +10,11 @@ internal sealed class DepthTexture : IDisposable
     private bool _disposed = false;
 
     public int TextureId => _texture;
-    public int Width => _width;
-    public int Height => _height;
+    public int BaseWidth => _width;
+    public int BaseHeight => _height;
+    public float Width => _width;
+    public float Height => _height;
+    public Rect Coords => new Rect(0, 0, 1.0f, 1.0f);
 
     public DepthTexture(int width, int height)
     {

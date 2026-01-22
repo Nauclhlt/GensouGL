@@ -11,6 +11,7 @@ layout ( location = 2 ) uniform mat4 projMatrix;
 out vec4 vColor;
 out vec3 vNormal;
 out vec3 vPosition;
+out vec4 vViewPos;
 
 void main()
 {
@@ -18,4 +19,5 @@ void main()
 	vPosition = (modelMatrix * vec4(position, 1)).xyz;
 	vColor = color;
 	vNormal = normalize(mat3(transpose(inverse(modelMatrix))) * normal);
+	vViewPos = viewMatrix * modelMatrix * vec4(position, 1);
 }

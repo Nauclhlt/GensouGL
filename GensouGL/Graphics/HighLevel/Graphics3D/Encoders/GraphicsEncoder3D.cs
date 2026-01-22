@@ -34,6 +34,7 @@ public abstract class GraphicsEncoder3D
     public GraphicsEncoder3D(RenderContext3D context)
     {
         _context = context;
+        _material = Material.Default;
     }
 
     internal void Accumulate(IDrawCommand3D command)

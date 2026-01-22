@@ -5,20 +5,6 @@
 /// </summary>
 public sealed class QuickRenderer2D : Renderer2D
 {
-    private static QuickRendererBuffer2D _buffer;
-
-    internal static QuickRendererBuffer2D InternalBuffer => _buffer;
-
-    internal static void Initialize()
-    {
-        _buffer = new QuickRendererBuffer2D();
-    }
-
-    internal static void Release()
-    {
-        _buffer.Dispose();
-    }
-
     private QuickRenderer2D()
     {
     }
@@ -104,7 +90,7 @@ public sealed class QuickRenderer2D : Renderer2D
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
-        _buffer.Draw(PrimitiveType.TriangleStrip, va, ca);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.TriangleStrip, va, ca);
 
         RestoreState();
     }
@@ -210,7 +196,7 @@ public sealed class QuickRenderer2D : Renderer2D
 
         GL.LineWidth(lineWidth);
 
-        _buffer.Draw(PrimitiveType.LineStrip, va, ca);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.LineStrip, va, ca);
 
         RestoreState();
     }
@@ -313,7 +299,7 @@ public sealed class QuickRenderer2D : Renderer2D
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
-        _buffer.Draw(PrimitiveType.Lines, va, ca);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.Lines, va, ca);
 
         RestoreState();
     }
@@ -396,7 +382,7 @@ public sealed class QuickRenderer2D : Renderer2D
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
-        _buffer.Draw(PrimitiveType.Triangles, va, ca);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.Triangles, va, ca);
 
         RestoreState();
     }
@@ -510,7 +496,7 @@ public sealed class QuickRenderer2D : Renderer2D
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
-        _buffer.Draw(PrimitiveType.LineStrip, va, ca);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.LineStrip, va, ca);
 
         RestoreState();
     }
@@ -611,7 +597,7 @@ public sealed class QuickRenderer2D : Renderer2D
         Shader.SimpleShape.Bind();
         Shader.SendMatrix0(GetDefaultVMatrix());
 
-        _buffer.Draw(PrimitiveType.TriangleFan, va, ca);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.TriangleFan, va, ca);
 
         RestoreState();
     }
@@ -697,7 +683,49 @@ public sealed class QuickRenderer2D : Renderer2D
 
         TextureService.PushAndBind(texture.TextureId);
 
-        _buffer.Draw(PrimitiveType.TriangleStrip, va, ca, ta);
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.TriangleStrip, va, ca, ta);
+
+        TextureService.Pop();
+
+        RestoreState();
+    }
+
+    internal void DrawTextureWithShader(Rect rect, ITexture texture, Shader shader)
+    {
+        texture ??= Texture.Empty;
+        Color color = Color.White;
+        float[] va =
+        {
+            rect.X, rect.Y,
+            rect.X, rect.Bottom,
+            rect.Right, rect.Y,
+            rect.Right, rect.Bottom
+        };
+
+        float[] ca =
+        {
+            color.R, color.G, color.B, color.A,
+            color.R, color.G, color.B, color.A,
+            color.R, color.G, color.B, color.A,
+            color.R, color.G, color.B, color.A
+        };
+
+        float[] ta =
+        {
+            texture.Coords.X, texture.Coords.Y,
+            texture.Coords.X, texture.Coords.Bottom,
+            texture.Coords.Right, texture.Coords.Y,
+            texture.Coords.Right, texture.Coords.Bottom
+        };
+
+        LoadState();
+
+        shader.Bind();
+        Shader.SendMatrix0(GetDefaultVMatrix());
+
+        TextureService.PushAndBind(texture.TextureId);
+
+        SharedBuffers.SimpleBuffer2D.Draw(PrimitiveType.TriangleStrip, va, ca, ta);
 
         TextureService.Pop();
 
@@ -707,7 +735,7 @@ public sealed class QuickRenderer2D : Renderer2D
     #endregion
 }
 
-internal sealed class QuickRendererBuffer2D : IDisposable
+internal sealed class SimpleBuffer2D : IDisposable
 {
     private int _vao;
     private int _vbuf;
@@ -716,7 +744,7 @@ internal sealed class QuickRendererBuffer2D : IDisposable
 
     private bool _disposed = false;
 
-    public QuickRendererBuffer2D()
+    public SimpleBuffer2D()
     {
         _vao = GL.GenVertexArray();
         _vbuf = GL.GenBuffer();

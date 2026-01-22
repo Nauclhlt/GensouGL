@@ -19,11 +19,16 @@
     <None Remove="Graphics\Shaders\Library\LightingBody.glsl" />
     <None Remove="Graphics\Shaders\Library\ProcessColorGrading.glsl" />
     <None Remove="Graphics\Shaders\OutlinedText.vert" />
+    <None Remove="Graphics\Shaders\Shader2D\DepthDebug.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Depth.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.vert" />
+    <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_Texture.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_Texture.vert" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_SimpleShape.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_SimpleShape.vert" />
+    <None Remove="Graphics\Shaders\Shader3D\Lighting_Texture.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\Lighting_Texture.vert" />
     <None Remove="Graphics\Shaders\Shader3D\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\Shader3D\SimpleShape.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
@@ -43,6 +48,7 @@
     <EmbeddedResource Include="Graphics\Shaders\Library\EvaluatePBR.glsl" />
     <EmbeddedResource Include="Graphics\Shaders\Library\LightingBody.glsl" />
     <EmbeddedResource Include="Graphics\Shaders\Library\ProcessColorGrading.glsl" />
+    <EmbeddedResource Include="Graphics\Shaders\Library\Shadow.glsl" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\ColorGrading.frag" />
   </ItemGroup>
 
@@ -55,6 +61,7 @@
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\Bullet.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\Bullet.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\ColorInversion.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\DepthDebug.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\OutlinedText.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\OutlinedText.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleShape.frag" />
@@ -67,8 +74,12 @@
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_Texture.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_Texture.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_SimpleShape.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Texture.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Texture.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\SimpleShape.vert" />
   </ItemGroup>

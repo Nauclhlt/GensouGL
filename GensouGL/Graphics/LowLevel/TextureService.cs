@@ -2,7 +2,7 @@
 
 internal static class TextureService
 {
-    private const int TextureSlotCount = 5;
+    private const int TextureSlotCount = 10;
 
     private static readonly Stack<int>[] _stack;
     private static int[] _boundTexture;

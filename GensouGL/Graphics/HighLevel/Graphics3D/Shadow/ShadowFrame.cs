@@ -10,6 +10,8 @@ public sealed class ShadowFrame
     /// </summary>
     public static ShadowFrame Default => new ShadowFrame();
 
+
+    private bool _frontFaceCulling = false;
     private DirectionalShadow _directionalShadow = DirectionalShadow.Default;
 
     /// <summary>
@@ -19,6 +21,15 @@ public sealed class ShadowFrame
     {
         get => _directionalShadow;
         set => _directionalShadow = value;
+    }
+
+    /// <summary>
+    /// Gets or sets whether to cull front faces in the depth pass.
+    /// </summary>
+    public bool FrontFaceCulling
+    {
+        get => _frontFaceCulling;
+        set => _frontFaceCulling = value;
     }
 
     /// <summary>

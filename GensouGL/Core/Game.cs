@@ -195,8 +195,6 @@ public sealed class Game
         _sceneManager = new(this);
         
         Shader.LoadShaders();
-        Renderer3D.Initialize();
-        QuickRenderer2D.Initialize();
         BatchTextRenderer2D.Initialize();
         BatchBulletRenderer2D.Initialize();
         FullscreenQuadRenderer.Initialize();
@@ -222,8 +220,6 @@ public sealed class Game
 
     private void FinalizeEngineCore()
     {
-        Renderer3D.Release();
-        QuickRenderer2D.Release();
         BatchTextRenderer2D.Release();
         BatchBulletRenderer2D.Release();
         FullscreenQuadRenderer.Release();

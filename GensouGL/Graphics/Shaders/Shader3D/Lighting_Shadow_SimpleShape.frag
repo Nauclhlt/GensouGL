@@ -2,15 +2,22 @@
 in vec4 vColor;
 in vec3 vNormal;
 in vec3 vPosition;
+in vec4 vViewPos;
 
 out vec4 FragColor;
 
-uniform mat4 pDirectionalLightMVP;
-uniform sampler2D pDirectionalShadowMap;
-uniform int pDirectionalShadowEnabled;
+#define CASCADE_COUNT 4
+
+uniform mat4 pCascadeLightVP[CASCADE_COUNT];
+uniform float pCascadeSplits[CASCADE_COUNT];
+uniform sampler2D pShadowMaps[CASCADE_COUNT];
+uniform vec3 pShadowLightDirection;
 
 vec3 ProcessLighting();
 vec3 ProcessColorGrading(vec3 color);
+float ShadowPCF(sampler2D shadowMap, vec2 uv, float currentDepth, float bias, int size);
+float ComputeBias(vec3 normal, vec3 lightDir);
+float CalcShadow(vec4 viewPos);
 
 //ignore
 uniform LightBlock
@@ -22,37 +29,17 @@ uniform LightBlock
 
 //include<LightingBody>
 
-float ShadowPCF(vec2 uv, float currentDepth)
-{
-    float shadow = 0.0;
-    float bias = 0.004;
-    vec2 texelSize = 1.0 / textureSize(pDirectionalShadowMap, 0);
-
-    for (int x = -1; x <= 1; ++x)
-    for (int y = -1; y <= 1; ++y)
-    {
-        float d = texture(pDirectionalShadowMap, uv + vec2(x, y) * texelSize).r;
-        shadow += currentDepth - bias > d ? 0.0 : 1.0;
-    }
-
-    return shadow / 9.0;
-}
-
 void main()
 {
 	vec3 ambient = lightBlock.ambientColorIntensity.rgb * lightBlock.ambientColorIntensity.a;
 	vec3 lit = vec3(0);
 
 	lit += ProcessLighting();
-	
-	vec4 lightClip = pDirectionalLightMVP * vec4(vPosition, 1.0);
-	vec3 ndc = lightClip.xyz / lightClip.w;
-	vec2 uv = ndc.xy * 0.5 + 0.5;
-	float currentDepth = ndc.z * 0.5 + 0.5;
 
-	float shadow = ShadowPCF(uv, currentDepth);
+    float shadow = CalcShadow(vViewPos);
 	
     FragColor = vec4(ProcessColorGrading(vColor.rgb * (ambient + shadow * lit)), vColor.a);
 }
 
 //include<ProcessColorGrading>
+//include<Shadow>

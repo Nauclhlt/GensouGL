@@ -133,6 +133,20 @@ public sealed class Shader : IDisposable
     /// <param name="x">X component.</param>
     /// <param name="y">Y component.</param>
     /// <param name="z">Z component.</param>
+    public void SetUniformVector3(string name, float x, float y, float z)
+    {
+        GL.UseProgram(_program);
+        int loc = GL.GetUniformLocation(_program, name);
+        GL.Uniform3(loc, new OpenTK.Mathematics.Vector3(x, y, z));
+    }
+
+    /// <summary>
+    /// Sets the specified uniform value.
+    /// </summary>
+    /// <param name="name">Name of the uniform.</param>
+    /// <param name="x">X component.</param>
+    /// <param name="y">Y component.</param>
+    /// <param name="z">Z component.</param>
     /// <param name="w">W component.</param>
     public void SetUniformVector4(string name, float x, float y, float z, float w)
     {
@@ -198,6 +212,7 @@ public sealed class Shader : IDisposable
     private static Shader s_colorGrading;
     private static Shader s_colorInversion;
     private static Shader s_textureMask;
+    private static Shader s_depthDebug;
 
 
     // 3D
@@ -205,6 +220,8 @@ public sealed class Shader : IDisposable
     private static Shader s_simpleShape3DLighting;
     private static Shader s_simpleShape3DLightingShadow;
     private static Shader s_depth3D;
+    private static Shader s_texture3DLighting;
+    private static Shader s_texture3DLightingShadow;
 
 
     // 2D
@@ -219,6 +236,7 @@ public sealed class Shader : IDisposable
     internal static Shader ColorGrading => s_colorGrading;
     internal static Shader ColorInversion => s_colorInversion;
     internal static Shader TextureMask => s_textureMask;
+    internal static Shader DepthDebug => s_depthDebug;
 
 
     // 3D
@@ -226,6 +244,8 @@ public sealed class Shader : IDisposable
     internal static Shader SimpleShape3DLighting => s_simpleShape3DLighting;
     internal static Shader SimpleShape3DLightingShadow => s_simpleShape3DLightingShadow;
     internal static Shader Depth3D => s_depth3D;
+    internal static Shader Texture3DLighting => s_texture3DLighting;
+    internal static Shader Texture3DLightingShadow => s_texture3DLightingShadow;
 
     internal static void LoadShaders()
     {
@@ -243,12 +263,15 @@ public sealed class Shader : IDisposable
         s_colorGrading = Gen2D(asm, "BrightPass", "ColorGrading");
         s_colorInversion = Gen2D(asm, "BrightPass", "ColorInversion");
         s_textureMask = Gen2D(asm, "BrightPass", "TextureMask");
+        s_depthDebug = Gen2D(asm, "SimpleTexture", "DepthDebug");
 
 
         s_simpleShape3D = Gen3D(asm, "SimpleShape");
         s_simpleShape3DLighting = Gen3D(asm, "Lighting_SimpleShape");
         s_simpleShape3DLightingShadow = Gen3D(asm, "Lighting_Shadow_SimpleShape");
         s_depth3D = Gen3D(asm, "Lighting_SimpleShape", "Depth");
+        s_texture3DLighting = Gen3D(asm, "Lighting_Texture");
+        s_texture3DLightingShadow = Gen3D(asm, "Lighting_Shadow_Texture");
     }
 
     private static Shader Gen2D(Assembly asm, string vert, string frag = null)

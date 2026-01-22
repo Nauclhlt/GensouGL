@@ -19,6 +19,16 @@ internal sealed class SimpleShapeCommand : IDrawCommand3D
         _normals = na;
     }
 
+    public void Prepare()
+    {
+
+    }
+
+    public void Finish()
+    {
+
+    }
+
     public void MakeDrawCall()
     {
         SharedBuffers.SimpleBuffer3D.Draw(_primitiveType, _vertices, _colors, _normals);

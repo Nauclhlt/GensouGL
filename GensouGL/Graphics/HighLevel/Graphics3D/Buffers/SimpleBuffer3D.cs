@@ -26,40 +26,104 @@ internal sealed class SimpleBuffer3D : IDisposable
         GL.BindVertexArray(0);
     }
 
-    public void Draw(PrimitiveType type, Span<float> va, Span<float> ca, Span<float> na)
+    public void SetData(Span<float> va, Span<float> ca, Span<float> na, Span<float> ta)
     {
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
+        if (va.Length == 0) return;
 
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
         GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Length, ref va[0], BufferUsageHint.DynamicDraw);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
-
         GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Length, ref ca[0], BufferUsageHint.DynamicDraw);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _nbuf);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * na.Length, ref na[0], BufferUsageHint.DynamicDraw);
 
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _tbuf);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ta.Length, ref ta[0], BufferUsageHint.DynamicDraw);
+
+
+        GL.BindVertexArray(_vao);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
+        GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _nbuf);
+        GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _tbuf);
+        GL.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, 0, 0);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+        GL.BindVertexArray(0);
+    }
+
+    public void SetData(Span<float> va, Span<float> ca, Span<float> na)
+    {
+        if (va.Length == 0) return;
+        
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * va.Length, ref va[0], BufferUsageHint.DynamicDraw);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
+        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * ca.Length, ref ca[0], BufferUsageHint.DynamicDraw);
+
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _nbuf);
         GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * na.Length, ref na[0], BufferUsageHint.DynamicDraw);
 
 
         GL.BindVertexArray(_vao);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vbuf);
-
         GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _cbuf);
-
         GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _nbuf);
-
         GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
-        GL.DrawArrays(type, 0, va.Length / 3);
+        GL.BindVertexArray(0);
+    }
+
+    public void DrawCall(PrimitiveType type, int vertexCount)
+    {
+        GL.BindVertexArray(_vao);
+        GL.DisableVertexAttribArray(3);
+
+        GL.DrawArrays(type, 0, vertexCount);
 
         GL.BindVertexArray(0);
+    }
+
+    public void DrawCallWithTexture(PrimitiveType type, int vertexCount)
+    {
+        GL.BindVertexArray(_vao);
+        GL.EnableVertexAttribArray(3);
+
+        GL.DrawArrays(type, 0, vertexCount);
+
+        GL.BindVertexArray(0);
+    }
+
+    public void Draw(PrimitiveType type, Span<float> va, Span<float> ca, Span<float> na)
+    {
+        SetData(va, ca, na);
+
+        DrawCall(type, va.Length / 3);
+    }
+
+    public void Draw(PrimitiveType type, Span<float> va, Span<float> ca, Span<float> na, Span<float> ta)
+    {
+        SetData(va, ca, na, ta);
+
+        DrawCallWithTexture(type, va.Length / 3);
     }
 
     public void Dispose()
