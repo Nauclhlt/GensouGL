@@ -23,7 +23,7 @@ public sealed class BufferEncoder3D : GraphicsEncoder3D
         if (buffer is null) return;
         if (!buffer.Buffered) return;
 
-        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, buffer));
+        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, _transform, buffer));
     }
 
     /// <summary>
@@ -38,6 +38,6 @@ public sealed class BufferEncoder3D : GraphicsEncoder3D
         if (!buffer.Buffered) return;
         if (!buffer.Textured) return;
 
-        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, buffer, texture));
+        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, _transform, buffer, texture));
     }
 }

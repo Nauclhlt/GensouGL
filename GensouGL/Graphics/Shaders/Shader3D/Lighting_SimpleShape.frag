@@ -17,6 +17,7 @@ uniform LightBlock
 //ignore_end
 
 //include<LightingBody>
+//include<ColorGrading>
 
 void main()
 {
@@ -27,5 +28,3 @@ void main()
 	
     FragColor = vec4(ProcessColorGrading(vColor.rgb * (ambient + lit)), vColor.a);
 }
-
-//include<ProcessColorGrading>

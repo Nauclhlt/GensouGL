@@ -206,6 +206,7 @@ public sealed class Shader : IDisposable
     private static Shader s_bullet;
     private static Shader s_brightPass;
     private static Shader s_bloomBlur;
+    private static Shader s_bloomAdd;
     private static Shader s_blindfold;
     private static Shader s_simpleText;
     private static Shader s_outlinedText;
@@ -220,6 +221,8 @@ public sealed class Shader : IDisposable
     private static Shader s_simpleShape3DLighting;
     private static Shader s_simpleShape3DLightingShadow;
     private static Shader s_depth3D;
+    private static Shader s_depthTexture3D;
+    private static Shader s_texture3D;
     private static Shader s_texture3DLighting;
     private static Shader s_texture3DLightingShadow;
 
@@ -230,6 +233,7 @@ public sealed class Shader : IDisposable
     internal static Shader Bullet => s_bullet;
     internal static Shader BrightPass => s_brightPass;
     internal static Shader BloomBlur => s_bloomBlur;
+    internal static Shader BloomAdd => s_bloomAdd;
     internal static Shader Blindfold => s_blindfold;
     internal static Shader SimpleText => s_simpleText;
     internal static Shader OutlinedText => s_outlinedText;
@@ -244,6 +248,8 @@ public sealed class Shader : IDisposable
     internal static Shader SimpleShape3DLighting => s_simpleShape3DLighting;
     internal static Shader SimpleShape3DLightingShadow => s_simpleShape3DLightingShadow;
     internal static Shader Depth3D => s_depth3D;
+    internal static Shader DepthTexture3D => s_depthTexture3D;
+    internal static Shader Texture3D => s_texture3D;
     internal static Shader Texture3DLighting => s_texture3DLighting;
     internal static Shader Texture3DLightingShadow => s_texture3DLightingShadow;
 
@@ -257,6 +263,7 @@ public sealed class Shader : IDisposable
         s_bullet = Gen2D(asm, "Bullet");
         s_brightPass = Gen2D(asm, "BrightPass");
         s_bloomBlur = Gen2D(asm, "BrightPass", "BloomBlur");
+        s_bloomAdd = Gen2D(asm, "BrightPass", "BloomAdd");
         s_blindfold = Gen2D(asm, "BrightPass", "Blindfold");
         s_simpleText = Gen2D(asm, "SimpleText");
         s_outlinedText = Gen2D(asm, "OutlinedText");
@@ -270,6 +277,8 @@ public sealed class Shader : IDisposable
         s_simpleShape3DLighting = Gen3D(asm, "Lighting_SimpleShape");
         s_simpleShape3DLightingShadow = Gen3D(asm, "Lighting_Shadow_SimpleShape");
         s_depth3D = Gen3D(asm, "Lighting_SimpleShape", "Depth");
+        s_depthTexture3D = Gen3D(asm, "Depth_Texture");
+        s_texture3D = Gen3D(asm, "Texture");
         s_texture3DLighting = Gen3D(asm, "Lighting_Texture");
         s_texture3DLightingShadow = Gen3D(asm, "Lighting_Shadow_Texture");
     }
@@ -284,6 +293,9 @@ public sealed class Shader : IDisposable
 
         string vsource = vreader.ReadToEnd();
         string fsource = freader.ReadToEnd();
+
+        vsource = ShaderPreprocessor.ExpandInclude(vsource);
+        fsource = ShaderPreprocessor.ExpandInclude(fsource);
 
         return new Shader(vsource, fsource);
     }

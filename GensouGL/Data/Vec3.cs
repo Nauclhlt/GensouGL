@@ -57,6 +57,17 @@ public struct Vec3
     }
 
     /// <summary>
+    /// Initializes <see cref="Vec3"/> using the specified component for all axes.
+    /// </summary>
+    /// <param name="component">Value for all components.</param>
+    public Vec3(float component)
+    {
+        X = component;
+        Y = component;
+        Z = component;
+    }
+
+    /// <summary>
     /// Gets the zero vector.
     /// </summary>
     public static Vec3 Zero => new(0, 0, 0);

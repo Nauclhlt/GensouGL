@@ -56,7 +56,7 @@ public sealed class ShapeEncoder3D : GraphicsEncoder3D
             color.R, color.G, color.B, color.A,
         ];
 
-        Accumulate(new SimpleShapeCommand(PrimitiveType.TriangleStrip, _material, va, ca, na));
+        Accumulate(new SimpleShapeCommand(PrimitiveType.TriangleStrip, _material, _transform, va, ca, na));
     }
 
     public void EncodeRectXZ(Rect rect, float y, bool dirPositiveY, Color color)
@@ -104,6 +104,6 @@ public sealed class ShapeEncoder3D : GraphicsEncoder3D
             color.R, color.G, color.B, color.A,
         ];
 
-        Accumulate(new SimpleShapeCommand(PrimitiveType.TriangleStrip, _material, va, ca, na));
+        Accumulate(new SimpleShapeCommand(PrimitiveType.TriangleStrip, _material, _transform, va, ca, na));
     }
 }

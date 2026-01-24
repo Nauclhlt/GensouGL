@@ -1,3 +1,15 @@
+layout (std140, binding = 5) uniform ColorGrading
+{
+    float exposure;
+    float brightness;
+    float contrast;
+    float saturation;
+
+    float hueShift;
+    int toneMap;
+    vec2 _pad0;
+} colorGrading;
+
 vec3 ProcessColorGrading(vec3 color)
 {
 	color *= exp2(colorGrading.exposure);

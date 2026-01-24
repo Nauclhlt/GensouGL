@@ -1,5 +1,7 @@
 ﻿namespace GensouGL.Graphics;
 
+// FIXME:
+
 /// <summary>
 /// A post-processing effect that simulates light bleeding (glow) by extracting bright areas and blurring them.
 /// </summary>
@@ -9,6 +11,7 @@ public sealed class BloomEffect : PostProcessEffect
     private float _intensity;
     private float _knee;
     private float _spread;
+    private ColorGradingSettings _colorGrading;
 
     /// <summary>
     /// Gets or sets the luminance threshold. Pixels brighter than this value will contribute to the bloom.
@@ -47,6 +50,19 @@ public sealed class BloomEffect : PostProcessEffect
     }
 
     /// <summary>
+    /// Gets or sets the color grading settings associated with the bloom effect.
+    /// </summary>
+    public ColorGradingSettings ColorGrading
+    {
+        get => _colorGrading;
+        set
+        {
+            if (value is null) return;
+            _colorGrading = value;
+        }
+    }
+
+    /// <summary>
     /// Gets a default instance of the bloom effect with standard parameters.
     /// </summary>
     public static BloomEffect Default { get; } = new();
@@ -71,6 +87,7 @@ public sealed class BloomEffect : PostProcessEffect
         _intensity = intensity;
         _knee = knee;
         _spread = spread;
+        _colorGrading = new();
     }
 
     internal override void Apply(Renderer renderer, Screen source, Screen dest)
@@ -84,11 +101,12 @@ public sealed class BloomEffect : PostProcessEffect
         blur.Texture.ResizeMode = TextureResizeMode.Bilinear;
 
         // Draw base
-        QuickRenderer2D qr = GetSharedQuickRenderer(dest);
-        qr.SetBlendMode(BlendMode.Normal);
-        qr.DrawTexture(0, dest.Height, dest.Width, -dest.Height, source.Texture);
+        //QuickRenderer2D qr = GetSharedQuickRenderer(dest);
+        //qr.SetBlendMode(BlendMode.Normal);
+        //qr.DrawTexture(0, dest.Height, dest.Width, -dest.Height, source.Texture);
 
         // Extract bright pixels
+        // source --> bright
         {
             Shader.BrightPass.SetUniformFloat("pThreshold", _threshold);
             Shader.BrightPass.SetUniformFloat("pKnee", _knee);
@@ -100,6 +118,7 @@ public sealed class BloomEffect : PostProcessEffect
 
         // Blur
         {
+            // bright --> blur
             Shader.BloomBlur.SetUniformFloat("pSpread", _spread);
             Shader.BloomBlur.SetUniformVector2("pDirection", 1.0f, 0.0f);
 
@@ -107,12 +126,35 @@ public sealed class BloomEffect : PostProcessEffect
 
             FullscreenQuadRenderer.Draw(blur, bright.Texture);
 
+            // blur --> bright
+            bright.Clear(Color.Transparent);
+
             Shader.BloomBlur.SetUniformFloat("pSpread", _spread);
             Shader.BloomBlur.SetUniformVector2("pDirection", 0.0f, 1.0f);
-            Shader.BloomBlur.SetUniformFloat("pIntensity", _intensity);
 
-            GL.BlendFunc(BlendingFactor.One, BlendingFactor.One);
-            FullscreenQuadRenderer.Draw(dest, blur.Texture);
+            FullscreenQuadRenderer.Draw(bright, blur.Texture);
+        }
+
+        // add
+        // bright --> dest
+        {
+            Shader.BloomAdd.SetUniformFloat("pBlurTexture", 0);
+            Shader.BloomAdd.SetUniformInt("pBaseTexture", 1);
+            Shader.BloomAdd.SetUniformFloat("pIntensity", _intensity);
+
+            Shader.BloomAdd.Bind();
+
+            SharedShaderBuffers.ColorGradingUBO.Update(_colorGrading.ToGpuColorGrading());
+            SharedShaderBuffers.ColorGradingUBO.Bind(SharedConstants.ColorGradingBindingPoint);
+
+            TextureService.PushAndBind(source.Texture.TextureId, 1);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            FullscreenQuadRenderer.Draw(dest, bright.Texture);
+            
+            SharedShaderBuffers.ColorGradingUBO.Unbind(SharedConstants.ColorGradingBindingPoint);
+            TextureService.Pop(1);
         }
 
         TempScreenPool.Return(bright);

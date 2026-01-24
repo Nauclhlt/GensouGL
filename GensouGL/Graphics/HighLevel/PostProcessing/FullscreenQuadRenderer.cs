@@ -19,6 +19,8 @@ internal static class FullscreenQuadRenderer
         TextureService.PushAndBind(texture.TextureId);
         FramebufferService.PushAndBind(target.ScreenId);
 
+        GL.Disable(EnableCap.DepthTest);
+        GL.Disable(EnableCap.CullFace);
         GL.Viewport(0, 0, target.Width, target.Height);
 
         _buffer.Draw();

@@ -37,6 +37,16 @@ public struct Vec2
     }
 
     /// <summary>
+    /// Initializes <see cref="Vec2"/> with both components set to the specified value.
+    /// </summary>
+    /// <param name="component">Value for all components.</param>
+    public Vec2(float component)
+    {
+        X = component;
+        Y = component;
+    }
+
+    /// <summary>
     /// Initializes <see cref="Vec2"/> representing the specified point.
     /// </summary>
     /// <param name="point">Source point.</param>

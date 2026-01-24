@@ -9,13 +9,6 @@ public sealed class SceneRenderer3D : Renderer
 {
     #region Constants
 
-    private const int LightBlockBindingPoint = 0;
-    private const int MaterialBindingPoint = 1;
-    private const int PointLightsBindingPoint = 2;
-    private const int LightIndicesBindingPoint = 3;
-    private const int TileRangesBindingPoint = 4;
-    private const int ColorGradingBindingPoint = 5;
-
     private const int ShadowMapTextureUnit = 2;
 
     #endregion
@@ -92,11 +85,13 @@ public sealed class SceneRenderer3D : Renderer
         for (int c = 0; c < SharedConstants.CascadeCount; c++)
         {
             FramebufferService.Bind(shadowData.DepthFramebuffers[c].Framebuffer);
-            Shader.SendMatrix012(Matrix4.Identity, lightViewMatrix, lightProjectionMatrices[c]);
-
+            
             for (int i = 0; i < commands.Count; i++)
             {
                 if (!commands[i].Material.CastShadows) continue;
+
+                commands[i].GetDepthShader().Bind();
+                Shader.SendMatrix012(commands[i].Transform.GetModelMatrix(), lightViewMatrix, lightProjectionMatrices[c]);
 
                 commands[i].Prepare();
                 commands[i].MakeDrawCall();
@@ -118,10 +113,11 @@ public sealed class SceneRenderer3D : Renderer
 
         for (int i = 0; i < commands.Count; i++)
         {
-            Shader shader = commands[i].GetShader(context.LightingMode);
+            bool useShadow = context.ShadowEnabled && context.ShadowAvailable && commands[i].Material.ReceiveShadows;
+            Shader shader = commands[i].GetShader(useShadow ? LightingMode.LightingWithShadows : LightingMode.Lighting);
             shader.Bind();
-            SetDefaultMVP(context);
-            if (context.ShadowEnabled && context.ShadowAvailable)
+            SetDefaultMVP(context, commands[i]);
+            if (useShadow)
                 LoadShadowRenderingState(context, shader);
 
             LoadMaterial(commands[i].Material);
@@ -132,7 +128,7 @@ public sealed class SceneRenderer3D : Renderer
 
             commands[i].Finish();
 
-            if (context.ShadowEnabled && context.ShadowAvailable)
+            if (useShadow)
                 RestoreShadowRenderingState();
         }
 
@@ -178,7 +174,7 @@ public sealed class SceneRenderer3D : Renderer
         }
 
         SharedShaderBuffers.LightBlockUBO.Update(lightBlock);
-        SharedShaderBuffers.LightBlockUBO.Bind(LightBlockBindingPoint);
+        SharedShaderBuffers.LightBlockUBO.Bind(SharedConstants.LightBlockBindingPoint);
 
         GpuPointLight[] pointLights = new GpuPointLight[lightingFrame.PointLights.Count];
         for (int i = 0; i < lightingFrame.PointLights.Count; i++)
@@ -186,27 +182,27 @@ public sealed class SceneRenderer3D : Renderer
             pointLights[i] = new(lightingFrame.PointLights[i]);
         }
         SharedShaderBuffers.PointLightsSSBO.Update(pointLights);
-        SharedShaderBuffers.PointLightsSSBO.Bind(PointLightsBindingPoint);
+        SharedShaderBuffers.PointLightsSSBO.Bind(SharedConstants.PointLightsBindingPoint);
 
         SharedShaderBuffers.LightIndicesSSBO.Update(CollectionsMarshal.AsSpan(_tiledLightCache.Indices));
-        SharedShaderBuffers.LightIndicesSSBO.Bind(LightIndicesBindingPoint);
+        SharedShaderBuffers.LightIndicesSSBO.Bind(SharedConstants.LightIndicesBindingPoint);
 
         SharedShaderBuffers.TileRangesSSBO.Update(_tiledLightCache.Ranges);
-        SharedShaderBuffers.TileRangesSSBO.Bind(TileRangesBindingPoint);
+        SharedShaderBuffers.TileRangesSSBO.Bind(SharedConstants.TileRangesBindingPoint);
 
         SharedShaderBuffers.ColorGradingUBO.Update(context.ColorGrading.ToGpuColorGrading());
-        SharedShaderBuffers.ColorGradingUBO.Bind(ColorGradingBindingPoint);
+        SharedShaderBuffers.ColorGradingUBO.Bind(SharedConstants.ColorGradingBindingPoint);
 
-        SharedShaderBuffers.MaterialUBO.Bind(MaterialBindingPoint);
+        SharedShaderBuffers.MaterialUBO.Bind(SharedConstants.MaterialBindingPoint);
     }
 
     private void RestoreLightingUniforms()
     {
-        SharedShaderBuffers.PointLightsSSBO.Unbind(PointLightsBindingPoint);
-        SharedShaderBuffers.LightIndicesSSBO.Unbind(LightIndicesBindingPoint);
-        SharedShaderBuffers.TileRangesSSBO.Unbind(TileRangesBindingPoint);
-        SharedShaderBuffers.ColorGradingUBO.Unbind(ColorGradingBindingPoint);
-        SharedShaderBuffers.MaterialUBO.Unbind(MaterialBindingPoint);
+        SharedShaderBuffers.PointLightsSSBO.Unbind(SharedConstants.PointLightsBindingPoint);
+        SharedShaderBuffers.LightIndicesSSBO.Unbind(SharedConstants.LightIndicesBindingPoint);
+        SharedShaderBuffers.TileRangesSSBO.Unbind(SharedConstants.TileRangesBindingPoint);
+        SharedShaderBuffers.ColorGradingUBO.Unbind(SharedConstants.ColorGradingBindingPoint);
+        SharedShaderBuffers.MaterialUBO.Unbind(SharedConstants.MaterialBindingPoint);
     }
 
     private void LoadMaterial(Material material)
@@ -224,7 +220,7 @@ public sealed class SceneRenderer3D : Renderer
 
         ShadowData shadowData = context.ShadowData;
         shadowData.Clear();
-
+        
         GL.Viewport(0, 0, shadowData.ResolutionWidth, shadowData.ResolutionHeight);
         GL.Enable(EnableCap.DepthTest);
         GL.Disable(EnableCap.Blend);
@@ -234,8 +230,6 @@ public sealed class SceneRenderer3D : Renderer
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(TriangleFace.Front);
         }
-
-        Shader.Depth3D.Bind();
     }
 
     private void LoadShadowRenderingState(RenderContext3D context, Shader shader)
@@ -381,7 +375,7 @@ public sealed class SceneRenderer3D : Renderer
         {
             Shader shader = commands[i].GetShader(LightingMode.NoLighting);
             shader.Bind();
-            SetDefaultMVP(context);
+            SetDefaultMVP(context, commands[i]);
 
             commands[i].Prepare();
 
@@ -393,9 +387,9 @@ public sealed class SceneRenderer3D : Renderer
         RestoreState();
     }
 
-    private void SetDefaultMVP(RenderContext3D context)
+    private void SetDefaultMVP(RenderContext3D context, IDrawCommand3D command)
     {
-        Shader.SendMatrix012(OpenTK.Mathematics.Matrix4.Identity, context.Camera.GetViewMatrix(), context.Camera.GetProjectionMatrix());
+        Shader.SendMatrix012(command.Transform.GetModelMatrix(), context.Camera.GetViewMatrix(), context.Camera.GetProjectionMatrix());
     }
 
 

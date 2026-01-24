@@ -17,10 +17,12 @@
     <None Remove="Graphics\Shaders\ColorInversion.frag" />
     <None Remove="Graphics\Shaders\Library\EvaluatePBR.glsl" />
     <None Remove="Graphics\Shaders\Library\LightingBody.glsl" />
-    <None Remove="Graphics\Shaders\Library\ProcessColorGrading.glsl" />
     <None Remove="Graphics\Shaders\OutlinedText.vert" />
+    <None Remove="Graphics\Shaders\Shader2D\BloomAdd.frag" />
     <None Remove="Graphics\Shaders\Shader2D\DepthDebug.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Depth.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\Depth_Texture.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\Depth_Texture.vert" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.vert" />
     <None Remove="Graphics\Shaders\Shader3D\Lighting_Shadow_Texture.frag" />
@@ -31,6 +33,8 @@
     <None Remove="Graphics\Shaders\Shader3D\Lighting_Texture.vert" />
     <None Remove="Graphics\Shaders\Shader3D\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\Shader3D\SimpleShape.vert" />
+    <None Remove="Graphics\Shaders\Shader3D\Texture.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\Texture.vert" />
     <None Remove="Graphics\Shaders\SimpleShape.frag" />
     <None Remove="Graphics\Shaders\SimpleShape.vert" />
     <None Remove="Graphics\Shaders\SimpleText.frag" />
@@ -47,8 +51,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Graphics\Shaders\Library\EvaluatePBR.glsl" />
     <EmbeddedResource Include="Graphics\Shaders\Library\LightingBody.glsl" />
-    <EmbeddedResource Include="Graphics\Shaders\Library\ProcessColorGrading.glsl" />
+    <EmbeddedResource Include="Graphics\Shaders\Library\ColorGrading.glsl" />
     <EmbeddedResource Include="Graphics\Shaders\Library\Shadow.glsl" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader2D\BloomAdd.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\ColorGrading.frag" />
   </ItemGroup>
 
@@ -72,6 +77,8 @@
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleTexture.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\TextureMask.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth_Texture.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth_Texture.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_SimpleShape.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Shadow_Texture.frag" />
@@ -82,6 +89,8 @@
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Lighting_Texture.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\SimpleShape.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\SimpleShape.vert" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Texture.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\Texture.vert" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +100,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="NLayer" Version="1.16.0" />
     <PackageReference Include="OpenTK" Version="4.9.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />

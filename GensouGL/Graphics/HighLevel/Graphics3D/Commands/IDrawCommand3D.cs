@@ -6,5 +6,7 @@ internal interface IDrawCommand3D
     void Finish();
     void MakeDrawCall();
     Shader GetShader(LightingMode lightingMode);
+    Shader GetDepthShader();
     Material Material { get; }
+    Transform3D Transform { get; }
 }

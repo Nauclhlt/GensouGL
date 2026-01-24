@@ -60,18 +60,6 @@ layout (std430, binding = 4) readonly buffer TileRanges
     ivec2 tileRanges[];
 };
 
-layout (std140, binding = 5) uniform ColorGrading
-{
-    float exposure;
-    float brightness;
-    float contrast;
-    float saturation;
-
-    float hueShift;
-    int toneMap;
-    vec2 _pad0;
-} colorGrading;
-
 
 vec3 EvaluatePhongBRDF(vec3 N, vec3 V, vec3 L, vec3 radiance);
 vec3 EvaluatePBR(vec3 N, vec3 V, vec3 L, vec3 radiance);

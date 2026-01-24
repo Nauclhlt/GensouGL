@@ -15,6 +15,7 @@ global using OpenTK.Input;
 global using OpenTK.Graphics;
 global using OpenTK.Graphics.OpenGL4;
 global using NLayer;
+global using Ai = Assimp;
 global using GensouGL.GameDev;
 global using GensouGL.Helpers;
 global using GensouGL.IO;

@@ -15,6 +15,7 @@ public sealed class Material
     private float _roughness = 0.5f;
     private Color _albedo = Color.White;
     private bool _castShadows = true;
+    private bool _receiveShadows = true;
     
     /// <summary>
     /// Gets or sets the shininess.
@@ -59,6 +60,15 @@ public sealed class Material
     {
         get => _castShadows;
         set => _castShadows = value;
+    }
+
+    /// <summary>
+    /// Gets or sets if the objects with this material should receive shadows.
+    /// </summary>
+    public bool ReceiveShadows
+    {
+        get => _receiveShadows;
+        set => _receiveShadows = value;
     }
 
     internal GpuMaterial ToGpuMaterial()

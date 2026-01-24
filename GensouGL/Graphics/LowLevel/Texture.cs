@@ -249,6 +249,12 @@ public sealed class Texture : ITexture, IDisposable
     }
 
 
+    internal static Texture LoadFromPixelArray(byte[] pixels, int width, int height)
+    {
+        IMS.Image<IMS.PixelFormats.Rgba32> img = IMS.Image.LoadPixelData<IMS.PixelFormats.Rgba32>(pixels, width, height);
+        return new(new TextureSource(img));
+    }
+
     private void Dispose(bool disposing)
     {
         if (!_disposed)

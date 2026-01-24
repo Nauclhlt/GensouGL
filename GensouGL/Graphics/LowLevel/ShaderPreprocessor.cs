@@ -14,6 +14,7 @@ internal static partial class ShaderPreprocessor
     private static string ReadLibrary(string libraryName)
     {
         using Stream stream = _asm.GetManifestResourceStream($"GensouGL.Graphics.Shaders.Library.{libraryName}.glsl");
+        if (stream is null) return null;
 
         using StreamReader reader = new(stream, true);
 
@@ -39,6 +40,11 @@ internal static partial class ShaderPreprocessor
                 string targetName = shaderSource.Substring(i + IncludeHeader.Length, nameLength);
 
                 string libraryBody = ReadLibrary(targetName);
+                if (libraryBody is null)
+                {
+                    DebugLog.Error($"{nameof(ShaderPreprocessor)}: Library not found.");
+                    continue;
+                }
                 string expandedLibraryBody = ExpandInclude(libraryBody);
 
                 sb.Append(expandedLibraryBody);

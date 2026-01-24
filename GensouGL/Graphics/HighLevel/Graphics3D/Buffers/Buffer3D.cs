@@ -155,6 +155,7 @@ public sealed class Buffer3D : IDisposable
     
     internal void Draw(PrimitiveType type)
     {
+        if (_buffer is null) return;
         if (_textured)
             _buffer.DrawCallWithTexture(type, _bufferedVertexCount);
         else

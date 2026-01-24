@@ -10,6 +10,10 @@ public abstract class GraphicsEncoder3D
     /// </summary>
     protected Material _material;
     /// <summary>
+    /// Current transform.
+    /// </summary>
+    protected Transform3D _transform;
+    /// <summary>
     /// Current context.
     /// </summary>
     protected RenderContext3D _context;
@@ -28,6 +32,19 @@ public abstract class GraphicsEncoder3D
     }
 
     /// <summary>
+    /// Gets or sets the current transform.
+    /// </summary>
+    public Transform3D Transform
+    {
+        get => _transform;
+        set
+        {
+            if (value is null) return;
+            _transform = value;
+        }
+    }
+
+    /// <summary>
     /// Initializes a new instance of <see cref="GraphicsEncoder3D"/> using the specified context.
     /// </summary>
     /// <param name="context">Rendering context.</param>
@@ -35,6 +52,7 @@ public abstract class GraphicsEncoder3D
     {
         _context = context;
         _material = Material.Default;
+        _transform = Transform3D.Identity;
     }
 
     internal void Accumulate(IDrawCommand3D command)
