@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using System.Reflection.Metadata.Ecma335;
+using OpenTK.Mathematics;
 
 namespace GensouGL.Graphics;
 
@@ -106,8 +107,20 @@ public sealed class SceneRenderer3D : Renderer
     {
         if (!context.LightingEnabled) return;
 
-        List<IDrawCommand3D> commands = context.GetCommands();
+        List<IDrawCommand3D> opaque = ListPool<IDrawCommand3D>.Rent();
+        List<IDrawCommand3D> transparent = ListPool<IDrawCommand3D>.Rent();
 
+        PrioritizeCommands(context, opaque, transparent);
+
+        LightingPassCommands(context, opaque);
+        LightingPassCommands(context, transparent);
+
+        ListPool<IDrawCommand3D>.Return(opaque);
+        ListPool<IDrawCommand3D>.Return(transparent);
+    }
+
+    private void LightingPassCommands(RenderContext3D context, List<IDrawCommand3D> commands)
+    {
         LoadState(context);
         LoadLightingUniforms(context);
 
@@ -363,12 +376,53 @@ public sealed class SceneRenderer3D : Renderer
 
     #endregion
 
+    private void PrioritizeCommands(RenderContext3D context, List<IDrawCommand3D> opaqueBuffer, List<IDrawCommand3D> transparentBuffer)
+    {
+        opaqueBuffer.Clear();
+        transparentBuffer.Clear();
 
+        List<IDrawCommand3D> commands = context.GetCommands();
+
+        for (int i = 0; i < commands.Count; i++)
+        {
+            if (commands[i].Key.Priority == RenderPriority.Opaque)
+            {
+                opaqueBuffer.Add(commands[i]);
+            }
+            else if (commands[i].Key.Priority == RenderPriority.Transparent)
+            {
+                transparentBuffer.Add(commands[i]);
+            }
+        }
+
+        // Sort transparent
+        float calcViewSpaceDepth(IDrawCommand3D c)
+        {
+            Vector3 rp = c.Key.RepresentativePoint.ToOpenTK();
+            Vector4 world = new Vector4(rp, 1f) * c.Transform.GetModelMatrix();
+            Vector4 view = world * context.Camera.GetViewMatrix();
+            return -view.Z;
+        }
+
+        transparentBuffer.Sort((x, y) => calcViewSpaceDepth(y).CompareTo(calcViewSpaceDepth(x)));
+    }
 
     private void RenderNoLighting(RenderContext3D context)
     {
-        List<IDrawCommand3D> commands = context.GetCommands();
+        List<IDrawCommand3D> opaque = ListPool<IDrawCommand3D>.Rent();
+        List<IDrawCommand3D> transparent = ListPool<IDrawCommand3D>.Rent();
 
+        PrioritizeCommands(context, opaque, transparent);
+
+        NoLightingPassCommands(context, opaque);
+        NoLightingPassCommands(context, transparent);
+
+        ListPool<IDrawCommand3D>.Return(opaque);
+        ListPool<IDrawCommand3D>.Return(transparent);
+    }
+
+    private void NoLightingPassCommands(RenderContext3D context, List<IDrawCommand3D> commands)
+    {
         LoadState(context);
 
         for (int i = 0; i < commands.Count; i++)

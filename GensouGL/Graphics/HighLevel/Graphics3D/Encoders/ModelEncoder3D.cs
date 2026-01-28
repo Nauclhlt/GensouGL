@@ -17,7 +17,8 @@ public sealed class ModelEncoder3D : GraphicsEncoder3D
     /// Encodes the specified 3D model for rendering.
     /// </summary>
     /// <param name="model">3D model to encode.</param>
-    public void Encode(StaticModel3D model)
+    /// <param name="key">Render key.</param>
+    public void Encode(StaticModel3D model, RenderKey key = default)
     {
         for (int i = 0; i < model.MeshCount; i++)
         {
@@ -27,7 +28,7 @@ public sealed class ModelEncoder3D : GraphicsEncoder3D
             {
                 Material = mesh.Material;
             }
-            Accumulate(new StaticMeshCommand(mesh, _transform));
+            Accumulate(new StaticMeshCommand(mesh, _transform, key));
             _material = previousMaterial;
         }
     }

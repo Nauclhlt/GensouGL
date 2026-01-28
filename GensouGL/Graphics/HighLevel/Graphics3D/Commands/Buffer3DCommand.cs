@@ -6,24 +6,28 @@ internal sealed class Buffer3DCommand : IDrawCommand3D
     private Buffer3D _buffer;
     private Material _material;
     private Transform3D _transform;
+    private RenderKey _key;
     private ITexture _texture;
 
     public Material Material => _material;
     public Transform3D Transform => _transform;
+    public RenderKey Key => _key;
 
-    public Buffer3DCommand(PrimitiveType primitiveType, Material material, Transform3D transform, Buffer3D buffer)
+    public Buffer3DCommand(PrimitiveType primitiveType, Material material, Transform3D transform, RenderKey key, Buffer3D buffer)
     {
         _primitiveType = primitiveType;
         _material = material;
         _transform = transform.Clone();
+        _key = key;
         _buffer = buffer;
     }
 
-    public Buffer3DCommand(PrimitiveType primitiveType, Material material, Transform3D transform, Buffer3D buffer, ITexture texture)
+    public Buffer3DCommand(PrimitiveType primitiveType, Material material, Transform3D transform, RenderKey key, Buffer3D buffer, ITexture texture)
     {
         _primitiveType = primitiveType;
         _material = material;
         _transform = transform;
+        _key = key;
         _buffer = buffer;
         _texture = texture;
     }

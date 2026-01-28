@@ -18,12 +18,17 @@ public sealed class BufferEncoder3D : GraphicsEncoder3D
     /// </summary>
     /// <param name="buffer">Buffer to encode.</param>
     /// <param name="primitiveType">Type of primitives to render.</param>
-    public void Encode(Buffer3D buffer, PrimitiveType3D primitiveType)
+    /// <param name="key">Render key.</param>
+    public void Encode(Buffer3D buffer, PrimitiveType3D primitiveType, RenderKey key = default)
     {
         if (buffer is null) return;
         if (!buffer.Buffered) return;
 
-        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, _transform, buffer));
+        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, 
+            _material, 
+            _transform, 
+            key,
+            buffer));
     }
 
     /// <summary>
@@ -32,12 +37,13 @@ public sealed class BufferEncoder3D : GraphicsEncoder3D
     /// <param name="buffer">Buffer to encode.</param>
     /// <param name="primitiveType">Type of primitives to render.</param>
     /// <param name="texture">Texture to apply.</param>
-    public void Encode(Buffer3D buffer, PrimitiveType3D primitiveType, ITexture texture)
+    /// <param name="key">Render key.</param>
+    public void Encode(Buffer3D buffer, PrimitiveType3D primitiveType, ITexture texture, RenderKey key = default)
     {
         if (buffer is null) return;
         if (!buffer.Buffered) return;
         if (!buffer.Textured) return;
 
-        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, _transform, buffer, texture));
+        Accumulate(new Buffer3DCommand((PrimitiveType)primitiveType, _material, _transform, key, buffer, texture));
     }
 }

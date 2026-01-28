@@ -8,15 +8,18 @@ internal sealed class SimpleShapeCommand : IDrawCommand3D
     private float[] _normals;
     private Material _material;
     private Transform3D _transform;
+    private RenderKey _key;
 
     public Material Material => _material;
     public Transform3D Transform => _transform;
+    public RenderKey Key => _key;
 
-    public SimpleShapeCommand(PrimitiveType primitiveType, Material material, Transform3D transform, float[] va, float[] ca, float[] na)
+    public SimpleShapeCommand(PrimitiveType primitiveType, Material material, Transform3D transform, RenderKey key, float[] va, float[] ca, float[] na)
     {
         _primitiveType = primitiveType;
         _material = material;
         _transform = transform.Clone();
+        _key = key;
         _vertices = va;
         _colors = ca;
         _normals = na;

@@ -4,14 +4,17 @@ internal sealed class StaticMeshCommand : IDrawCommand3D
 {
     private StaticMesh3D _mesh;
     private Transform3D _transform;
+    private RenderKey _key;
 
     public Material Material => _mesh.Material;
     public Transform3D Transform => _transform;
+    public RenderKey Key => _key;
 
-    public StaticMeshCommand(StaticMesh3D mesh, Transform3D transform)
+    public StaticMeshCommand(StaticMesh3D mesh, Transform3D transform, RenderKey key)
     {
         _mesh = mesh;
         _transform = transform.Clone();
+        _key = key;
     }
 
     public void Prepare()
