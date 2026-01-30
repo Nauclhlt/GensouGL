@@ -69,9 +69,14 @@ public sealed class TextureSource
 
     internal Image<Rgba32> LoadImageSharpImage()
     {
+        if (_type == TextureSourceType.File)
+        {
+            using var fileStream = GensouFileSystem.OpenReadFile(_filename);
+            return Image.Load<Rgba32>(fileStream);
+        }
+
         return _type switch
         {
-            TextureSourceType.File => Image.Load<Rgba32>(_filename),
             TextureSourceType.Stream => Image.Load<Rgba32>(_stream),
             TextureSourceType.ByteArray => Image.Load<Rgba32>(_byteArray),
             TextureSourceType.Temporary => _image,
@@ -81,9 +86,14 @@ public sealed class TextureSource
 
     internal async Task<Image<Rgba32>> LoadImageSharpImageAsync()
     {
+        if (_type == TextureSourceType.File)
+        {
+            byte[] bytes = await GensouFileSystem.ReadAllBytesAsync(_filename);
+            return Image.Load<Rgba32>(bytes);
+        }
+
         return _type switch
         {
-            TextureSourceType.File => await Image.LoadAsync<Rgba32>(_filename),
             TextureSourceType.Stream => await Image.LoadAsync<Rgba32>(_stream),
             TextureSourceType.ByteArray => Image.Load<Rgba32>(_byteArray),
             TextureSourceType.Temporary => _image,

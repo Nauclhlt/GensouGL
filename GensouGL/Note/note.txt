@@ -1,24 +1,5 @@
-3D rendering
-・RenderContext3D
-- accumulates draw commands from graphics recorders
-- lightingFrame: LightingFrame
-- shadowFrame: ShadowFrame
-- shadowData: ShadowData
-- camera: Camera3D
-- lightingMode: LightingMode
-- settings: GraphicsSettings3D
-- brdfMode: BRDFMode
-- colorGrading: ColorGradingSettings
-
-・SceneRenderer
-- draws scene from RenderContext3D(draw calls are only made here)
-- make forward+ division here
-
-・GraphicsEncoder3D
-- creates draw commands and push them to RenderContext3D
-- material: Material
-
-・DrawCommand
-- MakeDrawCall()
-- shader: Shader
-- material: Material
+TODO:
+- Sky box
+- Video playback
+- 3D text rendering
+- Async loading support for 3D objects

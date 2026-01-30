@@ -111,7 +111,8 @@ public sealed class AudioSource
     {
         if (_type == AudioSourceType.Mp3File)
         {
-            using var mp3 = new MpegFile(_filename);
+            using var stream = GensouFileSystem.OpenReadFile(_filename);
+            using var mp3 = new MpegFile(stream);
             int sampleRate = mp3.SampleRate;
             int channels = mp3.Channels;
 

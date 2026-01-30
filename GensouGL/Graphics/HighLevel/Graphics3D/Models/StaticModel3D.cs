@@ -40,8 +40,9 @@ public sealed class StaticModel3D : IDisposable
         string parentDirectory = Path.GetDirectoryName(Path.GetFullPath(filename));
 
 
+        using var fileStream = GensouFileSystem.OpenReadFile(filename);
         using Ai.AssimpContext importer = new();
-        Ai.Scene scene = importer.ImportFile(filename, Ai.PostProcessSteps.Triangulate |
+        Ai.Scene scene = importer.ImportFileFromStream(fileStream, Ai.PostProcessSteps.Triangulate |
             Ai.PostProcessSteps.GenerateSmoothNormals |
             Ai.PostProcessSteps.GenerateUVCoords |
             Ai.PostProcessSteps.FindDegenerates |

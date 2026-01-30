@@ -18,7 +18,7 @@ internal sealed class WavePcmSource : StreamingSource
 
     public WavePcmSource(string filename)
     {
-        _reader = new(File.OpenRead(filename));
+        _reader = new(GensouFileSystem.OpenReadFile(filename));
         Init();
     }
 

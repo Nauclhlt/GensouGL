@@ -395,6 +395,8 @@ public sealed class SceneRenderer3D : Renderer
             }
         }
 
+        if (transparentBuffer.Count == 0) return;
+
         // Sort transparent
         float calcViewSpaceDepth(IDrawCommand3D c)
         {

@@ -30,8 +30,9 @@ public sealed class FontSource
     public FontSource(string filename)
     {
         _filename = filename;
+        using var fileStream = GensouFileSystem.OpenReadFile(filename);
         _collection = new();
-        _collection.Add(filename);
+        _collection.Add(fileStream);
         _type = FontSourceType.File;
     }
 

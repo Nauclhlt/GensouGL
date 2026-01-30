@@ -3,10 +3,12 @@
 internal sealed class MpegFileAdapter : StreamingSource
 {
     private MpegFile _mpegFile;
+    private Stream _fileStream;
 
     public MpegFileAdapter(string filename)
     {
-        _mpegFile = new MpegFile(filename);
+        _fileStream = GensouFileSystem.OpenReadFile(filename);
+        _mpegFile = new MpegFile(_fileStream);
     }
 
     public MpegFileAdapter(Stream stream)
@@ -35,7 +37,8 @@ internal sealed class MpegFileAdapter : StreamingSource
         {
             if (disposing)
             {
-                _mpegFile.Dispose();
+                _mpegFile?.Dispose();
+                _fileStream?.Dispose();
             }
 
             _disposed = true;

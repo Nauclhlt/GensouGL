@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace GensouGL.Graphics;
+﻿namespace GensouGL.Graphics;
 
 /// <summary>
 /// Represents a 3D vertex buffer.
@@ -134,6 +132,17 @@ public sealed class Buffer3D : IDisposable
 
         _texCoords.Add(tx);
         _texCoords.Add(ty);
+    }
+
+    /// <summary>
+    /// Clears all vertex data stored in the buffer.
+    /// </summary>
+    public void Clear()
+    {
+        _vertices.Clear();
+        _colors.Clear();
+        _normals.Clear();
+        _texCoords.Clear();
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
 ﻿namespace GensouGL.Audio;
 
-public sealed class WavPcmDecoder
+internal sealed class WavPcmDecoder
 {
     public int Channels { get; private set; }
     public int SampleRate { get; private set; }
@@ -12,15 +12,13 @@ public sealed class WavPcmDecoder
     {
         using (var br = new BinaryReader(stream, Encoding.Unicode, true))
         {
-            // --- RIFF チェック ---
             if (Encoding.ASCII.GetString(br.ReadBytes(4)) != "RIFF")
                 throw new Exception("Invalid WAV: Missing RIFF");
 
-            br.ReadInt32(); // file size 忘れてよい
+            br.ReadInt32();
             if (Encoding.ASCII.GetString(br.ReadBytes(4)) != "WAVE")
                 throw new Exception("Invalid WAV: Missing WAVE");
 
-            // --- Chunk 読み込みループ ---
             bool fmtFound = false;
             bool dataFound = false;
 
@@ -32,7 +30,6 @@ public sealed class WavPcmDecoder
                 switch (chunkId)
                 {
                     case "fmt ":
-                        // PCM フォーマット読み込み
                         int audioFormat = br.ReadInt16();
                         if (audioFormat != 1)
                             throw new Exception("Only PCM WAV is supported.");
@@ -45,7 +42,6 @@ public sealed class WavPcmDecoder
 
                         BitsPerSample = br.ReadInt16();
 
-                        // fmt chunk が16以上の場合、追加スキップ
                         if (chunkSize > 16)
                             br.ReadBytes(chunkSize - 16);
                         
@@ -53,13 +49,11 @@ public sealed class WavPcmDecoder
                         break;
 
                     case "data":
-                        // PCM データをそのまま取り出す
                         PcmData = br.ReadBytes(chunkSize);
                         dataFound = true;
                         break;
 
                     default:
-                        // その他のチャンクはスキップ
                         br.ReadBytes(chunkSize);
                         break;
                 }
