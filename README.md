@@ -1,5 +1,5 @@
 ﻿<blockquote>
-So, in this Gensoukyo, you can't be bound by common sense!
+So, in this Gensoukyo, common sense doesn't apply!
 </blockquote>
 
 # 📘Introduction
