@@ -79,7 +79,7 @@ By passing the instance of `MyScene` to WithInitialScene(), you will get a red w
 
 ### Rendering textures
 
-All rendering processes should be done in `Scene.Render(float)`. Most easy way to render textures is to use `QuickRenderer2D`.
+All rendering processes should be done in `Scene.Render(float)`. The easiest way to render textures is to use `QuickRenderer2D`.
 This renderer supports *quick* rendering, which means the renderer immediately flushes data and makes a draw call for each objects.
 
 ```C#
