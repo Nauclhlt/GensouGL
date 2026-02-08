@@ -211,6 +211,7 @@ public sealed class Game
     {
         GL.Viewport(0, 0, _window.ClientSize.X, _window.ClientSize.Y);
         GL.Enable(EnableCap.Texture2D);
+        GL.Enable(EnableCap.TextureCubeMap);
         GL.Enable(EnableCap.Blend);
 
 

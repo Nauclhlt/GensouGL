@@ -20,6 +20,8 @@
     <None Remove="Graphics\Shaders\OutlinedText.vert" />
     <None Remove="Graphics\Shaders\Shader2D\BloomAdd.frag" />
     <None Remove="Graphics\Shaders\Shader2D\DepthDebug.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\CubemapSkybox.frag" />
+    <None Remove="Graphics\Shaders\Shader3D\CubemapSkybox.vert" />
     <None Remove="Graphics\Shaders\Shader3D\Depth.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Depth_Texture.frag" />
     <None Remove="Graphics\Shaders\Shader3D\Depth_Texture.vert" />
@@ -76,6 +78,8 @@
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleTexture.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\SimpleTexture.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader2D\TextureMask.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\CubemapSkybox.frag" />
+    <EmbeddedResource Include="Graphics\Shaders\Shader3D\CubemapSkybox.vert" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth_Texture.frag" />
     <EmbeddedResource Include="Graphics\Shaders\Shader3D\Depth_Texture.vert" />

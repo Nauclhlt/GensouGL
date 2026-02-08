@@ -6,7 +6,7 @@ namespace GensouGL.Graphics;
 /// <summary>
 /// Provides the rendering pipeline to draw rendering contexts.
 /// </summary>
-public sealed class SceneRenderer3D : Renderer
+public sealed class SceneRenderer3D : Renderer3D
 {
     #region Constants
 
@@ -28,8 +28,8 @@ public sealed class SceneRenderer3D : Renderer
     /// <param name="screen">Screen(render target).</param>
     public SceneRenderer3D(Screen screen)
     {
-        Setup(screen);
         DepthUsed = true;
+        Setup(screen);
         _tiledLightCache = new(screen.Width, screen.Height);
     }
 
@@ -65,7 +65,7 @@ public sealed class SceneRenderer3D : Renderer
 
         ShadowFrame shadowFrame = context.ShadowFrame;
         float[] cascadeSplits = CreateCascadeSplits(context);
-        Vec3[] frustumCorners = context.Camera.GetFrustumCorners();
+        Vec3[] frustumCorners = _camera.GetFrustumCorners();
         Vec3 frustumCenter = Vec3.Zero;
         for (int i = 0; i < frustumCorners.Length; i++) frustumCenter += frustumCorners[i] * (1.0f / frustumCorners.Length);
         Matrix4 lightViewMatrix = Matrix4.LookAt((frustumCenter - shadowFrame.DirectionalShadow.Direction * shadowFrame.DirectionalShadow.Distance).ToOpenTK(), frustumCenter.ToOpenTK(), Vector3.UnitY);
@@ -121,7 +121,7 @@ public sealed class SceneRenderer3D : Renderer
 
     private void LightingPassCommands(RenderContext3D context, List<IDrawCommand3D> commands)
     {
-        LoadState(context);
+        LoadState();
         LoadLightingUniforms(context);
 
         for (int i = 0; i < commands.Count; i++)
@@ -161,10 +161,10 @@ public sealed class SceneRenderer3D : Renderer
         if (lightingFrame is null) return;
         if (!context.LightingEnabled) return;
 
-        _tiledLightCache.Cache(context.Camera, lightingFrame.PointLights, _screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight);
+        _tiledLightCache.Cache(_camera, lightingFrame.PointLights, _screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight);
 
         GpuLightBlock lightBlock = default;
-        lightBlock.ViewPosition = context.Camera.Position.ToOpenTK();
+        lightBlock.ViewPosition = _camera.Position.ToOpenTK();
         lightBlock.Brdf = (int)context.BRDFMode;
         lightBlock.TileCount = new(_tiledLightCache.TileCountX, _tiledLightCache.TileCountY);
         lightBlock.AmbientColorIntensity = new(lightingFrame.Ambient.Color.R, lightingFrame.Ambient.Color.G, lightingFrame.Ambient.Color.B, lightingFrame.Ambient.Intensity);
@@ -273,12 +273,12 @@ public sealed class SceneRenderer3D : Renderer
         float lambda = 0.5f;
 
         float[] splits = new float[SharedConstants.CascadeCount];
-        splits[0] = context.Camera.ZNear;
+        splits[0] = _camera.ZNear;
 
         for (int i = 1; i < SharedConstants.CascadeCount; i++)
         {
-            float linearSplit = context.Camera.ZNear + (context.Camera.ZFar - context.Camera.ZNear) * (i / (float)SharedConstants.CascadeCount);
-            float logSplit = context.Camera.ZNear * MathF.Pow(context.Camera.ZFar / context.Camera.ZNear, i / (float)SharedConstants.CascadeCount);
+            float linearSplit = _camera.ZNear + (_camera.ZFar - _camera.ZNear) * (i / (float)SharedConstants.CascadeCount);
+            float logSplit = _camera.ZNear * MathF.Pow(_camera.ZFar / _camera.ZNear, i / (float)SharedConstants.CascadeCount);
             splits[i] = GensouMathF.Lerp(linearSplit, logSplit, lambda);
         }
 
@@ -290,8 +290,8 @@ public sealed class SceneRenderer3D : Renderer
         int cascadeCount = SharedConstants.CascadeCount;
         Matrix4[] cascadeProjections = new Matrix4[cascadeCount];
 
-        float cameraNear = context.Camera.ZNear;
-        float cameraFar = context.Camera.ZFar;
+        float cameraNear = _camera.ZNear;
+        float cameraFar = _camera.ZFar;
 
         for (int i = 0; i < cascadeCount; i++)
         {
@@ -402,7 +402,7 @@ public sealed class SceneRenderer3D : Renderer
         {
             Vector3 rp = c.Key.RepresentativePoint.ToOpenTK();
             Vector4 world = new Vector4(rp, 1f) * c.Transform.GetModelMatrix();
-            Vector4 view = world * context.Camera.GetViewMatrix();
+            Vector4 view = world * _camera.GetViewMatrix();
             return -view.Z;
         }
 
@@ -425,7 +425,7 @@ public sealed class SceneRenderer3D : Renderer
 
     private void NoLightingPassCommands(RenderContext3D context, List<IDrawCommand3D> commands)
     {
-        LoadState(context);
+        LoadState();
 
         for (int i = 0; i < commands.Count; i++)
         {
@@ -445,56 +445,6 @@ public sealed class SceneRenderer3D : Renderer
 
     private void SetDefaultMVP(RenderContext3D context, IDrawCommand3D command)
     {
-        Shader.SendMatrix012(command.Transform.GetModelMatrix(), context.Camera.GetViewMatrix(), context.Camera.GetProjectionMatrix());
-    }
-
-
-    private void LoadState(RenderContext3D context)
-    {
-        Screen screen = _screenStack.Peek();
-        LoadBlendMode();
-        FramebufferService.PushAndBind(screen.ScreenId);
-        GL.Viewport(0, 0, screen.Width, screen.Height);
-
-
-        // 3D specific
-        GL.Enable(EnableCap.DepthTest);
-        if (context.GraphicsSettings.BackfaceCulling)
-        {
-            GL.Enable(EnableCap.CullFace);
-            GL.CullFace(TriangleFace.Back);
-        }
-        else
-        {
-            GL.Disable(EnableCap.CullFace);
-        }
-    }
-
-    /// <summary>
-    /// Restores the state.
-    /// </summary>
-    protected override void RestoreState()
-    {
-        FramebufferService.Pop();
-    }
-
-
-
-
-    /// <summary>
-    /// Loads the current state.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    protected override void LoadState()
-    {
-    }
-
-    /// <summary>
-    /// On set up.
-    /// </summary>
-    /// <param name="screen"></param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    protected override void OnSetup(Screen screen)
-    {
+        Shader.SendMatrix012(command.Transform.GetModelMatrix(), _camera.GetViewMatrix(), _camera.GetProjectionMatrix());
     }
 }

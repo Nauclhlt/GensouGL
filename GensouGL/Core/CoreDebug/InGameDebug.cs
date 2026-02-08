@@ -49,7 +49,6 @@ public static class InGameDebug
         _quickRenderer = new QuickRenderer2D(Screen.Default);
         _batchTextRenderer = new BatchTextRenderer2D(Screen.Default);
 
-
         // info
         _glVersion = GL.GetString(StringName.Version);
         _glVendor = GL.GetString(StringName.Vendor);

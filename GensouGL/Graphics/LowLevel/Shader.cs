@@ -225,6 +225,7 @@ public sealed class Shader : IDisposable
     private static Shader s_texture3D;
     private static Shader s_texture3DLighting;
     private static Shader s_texture3DLightingShadow;
+    private static Shader s_cubemapSkybox;
 
 
     // 2D
@@ -252,6 +253,7 @@ public sealed class Shader : IDisposable
     internal static Shader Texture3D => s_texture3D;
     internal static Shader Texture3DLighting => s_texture3DLighting;
     internal static Shader Texture3DLightingShadow => s_texture3DLightingShadow;
+    internal static Shader CubemapSkybox => s_cubemapSkybox;
 
     internal static void LoadShaders()
     {
@@ -281,6 +283,7 @@ public sealed class Shader : IDisposable
         s_texture3D = Gen3D(asm, "Texture");
         s_texture3DLighting = Gen3D(asm, "Lighting_Texture");
         s_texture3DLightingShadow = Gen3D(asm, "Lighting_Shadow_Texture");
+        s_cubemapSkybox = Gen3D(asm, "CubemapSkybox");
     }
 
     private static Shader Gen2D(Assembly asm, string vert, string frag = null)

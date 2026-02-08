@@ -19,17 +19,23 @@ public sealed class BatchTextRenderer2D : Renderer2D
         Setup(screen);
         _buffers = [new()];
         _used = [false];
+        _layoutProvider = StandardLayoutProvider.Default;
     }
 
-    /// <summary>Initializes static resources required for text rendering.</summary>
+    /// <summary>
+    /// Initializes static resources required for text rendering.
+    /// </summary>
     internal static void Initialize() => _buffer = new();
 
-    /// <summary>Releases static resources used by the renderer.</summary>
+    /// <summary>
+    /// Releases static resources used by the renderer.
+    /// </summary>
     internal static void Release() => _buffer.Dispose();
 
     private TextFont _currentFont = null;
     private List<PageBuffer> _buffers;
     private List<bool> _used;
+    private ITextLayoutProvider _layoutProvider;
 
     /// <summary>
     /// Prepares the renderer for drawing text using the specified font.
@@ -72,7 +78,6 @@ public sealed class BatchTextRenderer2D : Renderer2D
 
         Shader.SendMatrix0(GetDefaultVMatrix());
 
-        // Iterate through font pages (textures) and draw their respective buffers
         for (int p = 0; p < _buffers.Count; p++)
         {
             if (!_used[p]) continue;
@@ -95,12 +100,26 @@ public sealed class BatchTextRenderer2D : Renderer2D
         RestoreState();
     }
 
+    /// <summary>
+    /// Sets the current text layout provider.
+    /// </summary>
+    /// <param name="provider">New text layout provider.</param>
+    public void SetLayoutProvider(ITextLayoutProvider provider)
+    {
+        if (provider is null) return;
+        _layoutProvider = provider;
+    }
+
     #region Centered Drawing Methods
 
-    /// <summary>Draws text centered within a specified rectangle.</summary>
+    /// <summary>
+    /// Draws text centered within a specified rectangle.
+    /// </summary>
     public void DrawCentered(Rect rect, string text, Color color) => DrawCentered(rect.X, rect.Y, rect.Width, rect.Height, text, color);
 
-    /// <summary>Draws text centered within the specified bounds.</summary>
+    /// <summary>
+    /// Draws text centered within the specified bounds.
+    /// </summary>
     public void DrawCentered(float x, float y, float width, float height, string text, Color color)
     {
         float tw = _currentFont.WidthOf(text);
@@ -108,10 +127,14 @@ public sealed class BatchTextRenderer2D : Renderer2D
         Draw(x + (width - tw) / 2, y + (height - th) / 2, text, color);
     }
 
-    /// <summary>Draws text with a color gradient centered within a rectangle.</summary>
+    /// <summary>
+    /// Draws text with a color gradient centered within a rectangle.
+    /// </summary>
     public void DrawGradientCentered(Rect rect, string text, RectGradient gradient) => DrawGradientCentered(rect.X, rect.Y, rect.Width, rect.Height, text, gradient);
 
-    /// <summary>Draws text with a color gradient centered within the specified bounds.</summary>
+    /// <summary>
+    /// Draws text with a color gradient centered within the specified bounds.
+    /// </summary>
     public void DrawGradientCentered(float x, float y, float width, float height, string text, RectGradient gradient)
     {
         float tw = _currentFont.WidthOf(text);
@@ -123,19 +146,65 @@ public sealed class BatchTextRenderer2D : Renderer2D
 
     #region Standard Drawing Methods
 
-    /// <summary>Draws text at the specified point.</summary>
+    /// <summary>
+    /// Draws text at the specified point.
+    /// </summary>
     public void Draw(Point point, string text, Color color) => Draw(point.X, point.Y, text, color);
 
-    /// <summary>Draws text at the specified coordinates.</summary>
+    /// <summary>
+    /// Draws text at the specified coordinates.
+    /// </summary>
     public void Draw(float x, float y, string text, Color color) => DrawGradient(x, y, text, new RectGradient(color));
 
-    /// <summary>Draws text with a gradient at the specified point.</summary>
+    /// <summary>
+    /// Draws text with a gradient at the specified point.
+    /// </summary>
     public void DrawGradient(Point point, string text, RectGradient gradient) => DrawGradient(point.X, point.Y, text, gradient);
 
     /// <summary>
     /// Accumulates text into the batch buffers, handling layout, spacing, and special characters.
     /// </summary>
     public void DrawGradient(float x, float y, string text, RectGradient gradient)
+        => DrawGradient(x, y, 1000000000f, 1000000000f, text, gradient);
+
+    #endregion
+
+    #region Rect Drawing Methods
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    public void Draw(Rect rect, string text, Color color)
+        => DrawGradient(rect.X, rect.Y, rect.Width, rect.Height, text, new RectGradient(color));
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    /// <param name="x">X of the rectangle.</param>
+    /// <param name="y">Y of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="text">Text.</param>
+    /// <param name="color">Color of the text.</param>
+    public void Draw(float x, float y, float width, float height, string text, Color color)
+        => DrawGradient(x, y, width, height, text, new(color));
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    public void DrawGradient(Rect rect, string text, RectGradient gradient)
+        => DrawGradient(rect.X, rect.Y, rect.Width, rect.Height, text, gradient);
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    /// <param name="x">X of the rectangle.</param>
+    /// <param name="y">Y of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="text">Text.</param>
+    /// <param name="gradient">Gradient colors.</param>
+    public void DrawGradient(float x, float y, float width, float height, string text, RectGradient gradient)
     {
         if (_currentFont is null)
         {
@@ -143,34 +212,16 @@ public sealed class BatchTextRenderer2D : Renderer2D
             return;
         }
 
-        float cursorX = x;
-        float cursorY = y;
-        int lineHeight = 0;
+        if (!_layoutProvider.CanBegin) return;
+
+        _layoutProvider.Begin(_currentFont, new Vec2(width, height));
 
         ReadOnlySpan<char> span = text.AsSpan();
 
         for (int i = 0; i < span.Length; i++)
         {
-            if (span[i] == '\r') continue;
-            if (span[i] == '\n')
-            {
-                cursorX = x;
-                cursorY += lineHeight;
-                lineHeight = 0;
-                continue;
-            }
-            if (span[i] == ' ')
-            {
-                cursorX += _currentFont.WidthOf('w');
-                lineHeight = int.Max(lineHeight, _currentFont.HeightOf('w'));
-                continue;
-            }
-            if (span[i] == '\t')
-            {
-                cursorX += _currentFont.WidthOf('w') * 4;
-                lineHeight = int.Max(lineHeight, _currentFont.HeightOf('w'));
-                continue;
-            }
+            Rect bounds = _layoutProvider.WriteChar(span[i]);
+            if (bounds.Width == 0f) continue;
 
             GlyphInfo info = _currentFont.GetGlyph(span[i]);
 
@@ -181,36 +232,48 @@ public sealed class BatchTextRenderer2D : Renderer2D
             }
 
             if (_currentFont.IsOutlined)
-                _buffers[info.Page].AddWithBorder(cursorX, cursorY, info.Width, info.Height, info.Coords, gradient, Color.Black);
+                _buffers[info.Page].AddWithBorder(x + bounds.X, y + bounds.Y, bounds.Width, bounds.Height, info.Coords, gradient, Color.Black);
             else
-                _buffers[info.Page].Add(cursorX, cursorY, info.Width, info.Height, info.Coords, gradient);
+                _buffers[info.Page].Add(x + bounds.X, y + bounds.Y, bounds.Width, bounds.Height, info.Coords, gradient);
 
             _used[info.Page] = true;
-            cursorX += info.Width;
-            lineHeight = int.Max(lineHeight, _currentFont.HeightOf(span[i]));
         }
+
+        _layoutProvider.End();
     }
 
     #endregion
 
     #region Outlined Drawing Methods
 
-    /// <summary>Draws text with an outline at the specified point.</summary>
+    /// <summary>
+    /// Draws text with an outline at the specified point.
+    /// </summary>
     public void DrawOutlined(Point point, string text, Color color, Color outlineColor) => DrawOutlined(point.X, point.Y, text, color, outlineColor);
 
-    /// <summary>Draws text with an outline at the specified coordinates.</summary>
+    /// <summary>
+    /// Draws text with an outline at the specified coordinates.
+    /// </summary>
     public void DrawOutlined(float x, float y, string text, Color color, Color outlineColor) => DrawGradientOutlined(x, y, text, new RectGradient(color), outlineColor);
 
-    /// <summary>Draws outlined text centered within a rectangle.</summary>
+    /// <summary>
+    /// Draws outlined text centered within a rectangle.
+    /// </summary>
     public void DrawOutlinedCentered(Rect rect, string text, Color color, Color outlineColor) => DrawOutlinedCentered(rect.X, rect.Y, rect.Width, rect.Height, text, color, outlineColor);
 
-    /// <summary>Draws outlined text centered within specified bounds.</summary>
+    /// <summary>
+    /// Draws outlined text centered within specified bounds.
+    /// </summary>
     public void DrawOutlinedCentered(float x, float y, float width, float height, string text, Color color, Color outlineColor) => DrawGradientOutlinedCentered(x, y, width, height, text, new RectGradient(color), outlineColor);
 
-    /// <summary>Draws outlined text with a gradient centered within a rectangle.</summary>
+    /// <summary>
+    /// Draws outlined text with a gradient centered within a rectangle.
+    /// </summary>
     public void DrawGradientOutlinedCentered(Rect rect, string text, RectGradient gradient, Color outlineColor) => DrawGradientOutlinedCentered(rect.X, rect.Y, rect.Width, rect.Height, text, gradient, outlineColor);
 
-    /// <summary>Draws outlined text with a gradient centered within specified bounds.</summary>
+    /// <summary>
+    /// Draws outlined text with a gradient centered within specified bounds.
+    /// </summary>
     public void DrawGradientOutlinedCentered(float x, float y, float width, float height, string text, RectGradient gradient, Color outlineColor)
     {
         float tw = _currentFont.WidthOf(text);
@@ -218,13 +281,56 @@ public sealed class BatchTextRenderer2D : Renderer2D
         DrawGradientOutlined(x + (width - tw) / 2, y + (height - th) / 2, text, gradient, outlineColor);
     }
 
-    /// <summary>Draws outlined text with a gradient at the specified point.</summary>
+    /// <summary>
+    /// Draws outlined text with a gradient at the specified point.
+    /// </summary>
     public void DrawGradientOutlined(Point point, string text, RectGradient gradient, Color outlineColor) => DrawGradientOutlined(point.X, point.Y, text, gradient, outlineColor);
 
     /// <summary>
     /// Accumulates outlined text into batch buffers. Requires a font initialized with outline support.
     /// </summary>
     public void DrawGradientOutlined(float x, float y, string text, RectGradient gradient, Color outlineColor)
+        => DrawGradientOutlined(x, y, 1000000000f, 1000000000f, text, gradient, outlineColor);
+
+    #endregion
+
+    #region Outlined Rect Drawing Methods
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    public void DrawOutlined(Rect rect, string text, Color color, Color outlineColor)
+        => DrawGradientOutlined(rect.X, rect.Y, rect.Width, rect.Height, text, new RectGradient(color), outlineColor);
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    /// <param name="x">X of the rectangle.</param>
+    /// <param name="y">Y of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="text">Text.</param>
+    /// <param name="color">Color of the text.</param>
+    public void DrawOutlined(float x, float y, float width, float height, string text, Color color, Color outlineColor)
+        => DrawGradientOutlined(x, y, width, height, text, new(color), outlineColor);
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    public void DrawGradientOutlined(Rect rect, string text, RectGradient gradient, Color outlineColor)
+        => DrawGradientOutlined(rect.X, rect.Y, rect.Width, rect.Height, text, gradient, outlineColor);
+
+    /// <summary>
+    /// Draws the text to fit within the specified rectangle.
+    /// </summary>
+    /// <param name="x">X of the rectangle.</param>
+    /// <param name="y">Y of the rectangle.</param>
+    /// <param name="width">Width of the rectangle.</param>
+    /// <param name="height">Height of the rectangle.</param>
+    /// <param name="text">Text.</param>
+    /// <param name="gradient">Gradient colors.</param>
+    /// <param name="outlineColor">Outline color.</param>
+    public void DrawGradientOutlined(float x, float y, float width, float height, string text, RectGradient gradient, Color outlineColor)
     {
         if (_currentFont is null)
         {
@@ -238,34 +344,16 @@ public sealed class BatchTextRenderer2D : Renderer2D
             return;
         }
 
-        float cursorX = x;
-        float cursorY = y;
-        int lineHeight = 0;
+        if (!_layoutProvider.CanBegin) return;
+
+        _layoutProvider.Begin(_currentFont, new Vec2(width, height));
 
         ReadOnlySpan<char> span = text.AsSpan();
 
         for (int i = 0; i < span.Length; i++)
         {
-            if (span[i] == '\r') continue;
-            if (span[i] == '\n')
-            {
-                cursorX = x;
-                cursorY += lineHeight;
-                lineHeight = 0;
-                continue;
-            }
-            if (span[i] == ' ')
-            {
-                cursorX += _currentFont.WidthOf('w');
-                lineHeight = int.Max(lineHeight, _currentFont.HeightOf('w'));
-                continue;
-            }
-            if (span[i] == '\t')
-            {
-                cursorX += _currentFont.WidthOf('w') * 4;
-                lineHeight = int.Max(lineHeight, _currentFont.HeightOf('w'));
-                continue;
-            }
+            Rect bounds = _layoutProvider.WriteChar(span[i]);
+            if (bounds.Width == 0f) continue;
 
             GlyphInfo info = _currentFont.GetGlyph(span[i]);
 
@@ -275,12 +363,12 @@ public sealed class BatchTextRenderer2D : Renderer2D
                 _used.Add(false);
             }
 
-            _buffers[info.Page].AddWithBorder(cursorX, cursorY, info.Width, info.Height, info.Coords, gradient, outlineColor);
-            _used[info.Page] = true;
+            _buffers[info.Page].AddWithBorder(x + bounds.X, y + bounds.Y, bounds.Width, bounds.Height, info.Coords, gradient, outlineColor);
 
-            cursorX += info.Width;
-            lineHeight = int.Max(lineHeight, _currentFont.HeightOf(span[i]));
+            _used[info.Page] = true;
         }
+
+        _layoutProvider.End();
     }
 
     #endregion

@@ -88,6 +88,12 @@ public struct Rect
     /// </summary>
     public readonly bool HasArea => Width != 0 && Height != 0;
 
+
+    /// <summary>
+    /// Returns a rectangle with the top left point (0, 0) and size (0, 0).
+    /// </summary>
+    public static Rect Zero => new(0, 0, 0, 0);
+
     /// <summary>
     /// Returns a rectangle whose top left point is (X + offsetX, Y + offsetY).
     /// </summary>

@@ -13,8 +13,6 @@ public sealed class RenderContext3D : IDisposable
     private ShadowData _shadowData;
     private LightingMode _lightingMode;
     private BRDFMode _brdfMode;
-    private Camera3D _camera;
-    private GraphicsSettings3D _graphicsSettings;
     private ColorGradingSettings _colorGrading;
     private bool _disposed = false;
     // -----------------
@@ -46,32 +44,6 @@ public sealed class RenderContext3D : IDisposable
     {
         get => _brdfMode;
         set => _brdfMode = value;
-    }
-
-    /// <summary>
-    /// Gets or sets the camera associated with the current context.
-    /// </summary>
-    public Camera3D Camera
-    {
-        get => _camera;
-        set
-        {
-            if (value is null) return;
-            _camera = value;
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the graphics settings associated with the current context.
-    /// </summary>
-    public GraphicsSettings3D GraphicsSettings
-    {
-        get => _graphicsSettings;
-        set
-        {
-            if (value is null) return;
-            _graphicsSettings = value;
-        }
     }
 
     /// <summary>
@@ -110,10 +82,8 @@ public sealed class RenderContext3D : IDisposable
         _lightingFrame = LightingFrame.Default;
         _shadowFrame = ShadowFrame.Default;
         _shadowData = null;
-        _camera = Camera3D.Default;
         _lightingMode = LightingMode.NoLighting;
         _brdfMode = BRDFMode.Phong;
-        _graphicsSettings = new();
         _colorGrading = new();
         _commands = [];
     }

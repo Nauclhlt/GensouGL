@@ -42,6 +42,10 @@ public abstract class Renderer
     protected void Setup(Screen screen)
     {
         _screenStack = new(screen);
+        if (DepthUsed)
+        {
+            screen.UseDepth();
+        }
         _state = RenderState.Default;
 
         OnSetup(screen);
