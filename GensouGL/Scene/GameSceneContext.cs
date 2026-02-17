@@ -3,10 +3,12 @@
 internal sealed class GameSceneContext : ISceneContext
 {
     private Game _game;
+    private IControlContext _controlContext;
 
     public GameSceneContext(Game game)
     {
         _game = game;
+        _controlContext = new GameControlContext(game);
     }
 
     public int ScreenWidth => _game.ScreenWidth;
@@ -16,11 +18,7 @@ internal sealed class GameSceneContext : ISceneContext
     public ISceneNavigator SceneNavigator => _game.SceneManager;
     public OverlayService OverlayService => _game.OverlayService;
     public InputService InputService => _game.InputService;
-
-    public void ExitGame()
-    {
-        _game.ExitGame();
-    }
+    public IControlContext ControlContext => _controlContext;
 
     public void SetCursorVisibility(bool visible)
     {

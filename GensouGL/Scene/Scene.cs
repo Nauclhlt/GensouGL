@@ -79,7 +79,22 @@ public class Scene
     /// <summary>
     /// Ends the game.
     /// </summary>
-    protected void ExitGame() => _context.ExitGame();
+    protected void ExitGame() => _context.ControlContext.ExitGame();
+    /// <summary>
+    /// Sets the fullscreen flag.
+    /// </summary>
+    /// <param name="fullscreen">New fullscreen flag.</param>
+    protected void SetFullscreenMode(bool fullscreen) => _context.ControlContext.SetFullscreenMode(fullscreen);
+    /// <summary>
+    /// Sets the FPS.
+    /// </summary>
+    /// <param name="fps">New fps value.</param>
+    protected void SetFps(float fps) => _context.ControlContext.SetFps(fps);
+    /// <summary>
+    /// Sets the window title.
+    /// </summary>
+    /// <param name="title">New window title.</param>
+    protected void SetTitle(string title) => _context.ControlContext.SetTitle(title);
 
     /// <summary>
     /// Sets the visibility of the mouse cursor.

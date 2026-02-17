@@ -204,7 +204,7 @@ public sealed class Game
         AudioPlayer.Initialize();
         InGameDebug.Initialize(this);
 
-        Screen.Default = new(0, _windowWidth, _windowHeight);
+        ReloadWindowSize();
     }
 
     private void InitializeOpenGL()
@@ -234,6 +234,14 @@ public sealed class Game
     internal void ExitGame()
     {
         _window.Close();
+    }
+
+    internal void ReloadWindowSize()
+    {
+        _windowWidth = _window.ClientSize.X;
+        _windowHeight = _window.ClientSize.Y;
+
+        Screen.Default.__SetSize(_windowWidth, _windowHeight);
     }
 
 

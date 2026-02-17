@@ -139,6 +139,16 @@ public sealed class AsyncResourceLoader : IDisposable
         QueueCore(name, new AsyncTextLoader(filename));
     }
 
+    /// <summary>
+    /// Queues a new loading process of the static 3D model.
+    /// </summary>
+    /// <param name="name">Name of the resource.</param>
+    /// <param name="source">Source file name.</param>
+    public void QueueStaticModel3D(string name, string source)
+    {
+        QueueCore(name, new AsyncStaticModelLoader(source));
+    }
+
     private void QueueCore(string name, IAsyncResourceLoadingProcess proc)
     {
         if (_map.ContainsKey(name))

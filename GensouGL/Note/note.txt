@@ -1,5 +1,3 @@
 TODO:
-- Sky box
 - Video playback
 - 3D text rendering
-- Async loading support for 3D objects

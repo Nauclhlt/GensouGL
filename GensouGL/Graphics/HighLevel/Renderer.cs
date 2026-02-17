@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Represents an abstract base class for all renderers.
-/// This class basic features of screen stack, and state management.
+/// This class provides basic features of screen stack, and state management.
 /// </summary>
 public abstract class Renderer
 {

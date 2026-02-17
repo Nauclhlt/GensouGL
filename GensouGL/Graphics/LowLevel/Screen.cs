@@ -107,6 +107,13 @@ public sealed class Screen : IScreen, IDisposable
         FramebufferService.Pop();
     }
 
+    internal void __SetSize(int width, int height)
+    {
+        if (_framebuffer != 0) return;
+        _width = width;
+        _height = height;
+    }
+
     private void Dispose(bool disposing)
     {
         if (!_disposed)

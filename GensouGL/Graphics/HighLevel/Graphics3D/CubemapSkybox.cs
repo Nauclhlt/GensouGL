@@ -204,47 +204,6 @@ public sealed class CubemapSkybox : IDisposable
         GL.BindTexture(TextureTarget.TextureCubeMap, 0);
     }
 
-    /// <summary>
-    /// Renders the current cubemap sky box.
-    /// </summary>
-    //public void Render(Camera3D camera)
-    //{
-    //    if (s_buffer is null)
-    //    {
-    //        s_buffer = new();
-    //        PersistentResourceService.Register(s_buffer);
-    //    }
-
-    //    Shader shader = Shader.CubemapSkybox;
-
-    //    shader.Bind();
-
-    //    GL.ActiveTexture(TextureUnit.Texture0);
-    //    GL.BindTexture(TextureTarget.TextureCubeMap, _cubemapTexture);
-
-    //    GL.DepthMask(false);
-    //    GL.DepthFunc(DepthFunction.Lequal);
-
-    //    GL.Enable(EnableCap.Blend);
-    //    GL.Enable(EnableCap.DepthTest);
-    //    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-    //    Matrix4 view = Matrix4.Identity;
-    //    Matrix3 mat3 = new Matrix3(camera.GetViewMatrix());
-    //    view.Row0 = new Vector4(mat3.Row0, 0);
-    //    view.Row1 = new Vector4(mat3.Row1, 0);
-    //    view.Row2 = new Vector4(mat3.Row2, 0);
-
-    //    Shader.SendMatrix012(Matrix4.Identity, view, camera.GetProjectionMatrix());
-
-    //    s_buffer.Draw();
-
-    //    GL.DepthMask(true);
-    //    GL.DepthFunc(DepthFunction.Less);
-
-    //    GL.BindTexture(TextureTarget.TextureCubeMap, 0);
-    //}
-
     private void Dispose(bool disposing)
     {
         if (!_disposed)

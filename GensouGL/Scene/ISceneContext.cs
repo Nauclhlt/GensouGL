@@ -9,7 +9,7 @@ internal interface ISceneContext
     public InputService InputService { get; }
     public OverlayService OverlayService { get; }
     public ISceneNavigator SceneNavigator { get; }
+    public IControlContext ControlContext { get; }
 
-    public void ExitGame();
     public void SetCursorVisibility(bool visible);
 }

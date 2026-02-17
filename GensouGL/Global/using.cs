@@ -22,4 +22,5 @@ global using GensouGL.IO;
 global using GensouGL.Audio;
 global using GensouGL.Core;
 global using GensouGL.Graphics;
+global using GensouGL.Graphics.Models;
 global using GensouGL.Core.AsyncLoaders;
