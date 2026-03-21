@@ -122,7 +122,6 @@ internal sealed class IndexedSimpleBuffer3D : IDisposable
     public void DrawCallWithTexture(PrimitiveType type, int vertexCount)
     {
         GL.BindVertexArray(_vao);
-        GL.EnableVertexAttribArray(3);
         GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
 
         GL.DrawElements(type, vertexCount, DrawElementsType.UnsignedInt, 0);

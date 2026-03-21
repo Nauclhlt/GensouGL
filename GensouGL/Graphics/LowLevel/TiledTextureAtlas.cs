@@ -103,7 +103,7 @@ public sealed class TiledTextureAtlas : IDisposable
             throw new IndexOutOfRangeException();
         }
 
-        return Get(index / _countX, index % _countX);
+        return Get(index % _countX, index / _countX);
     }
 
     private void Dispose(bool disposing)

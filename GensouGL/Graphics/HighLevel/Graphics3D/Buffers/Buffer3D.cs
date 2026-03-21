@@ -142,7 +142,7 @@ public sealed class Buffer3D : IDisposable
         _vertices.Clear();
         _colors.Clear();
         _normals.Clear();
-        _texCoords.Clear();
+        _texCoords?.Clear();
     }
 
     /// <summary>

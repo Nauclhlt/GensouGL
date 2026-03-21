@@ -26,7 +26,7 @@ internal sealed class Buffer3DCommand : IDrawCommand3D
     {
         _primitiveType = primitiveType;
         _material = material;
-        _transform = transform;
+        _transform = transform.Clone();
         _key = key;
         _buffer = buffer;
         _texture = texture;

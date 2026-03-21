@@ -71,6 +71,10 @@ public sealed class RenderContext3D : IDisposable
     /// Determines if shadow map is available.
     /// </summary>
     public bool ShadowAvailable => _shadowData is not null;
+    /// <summary>
+    /// Gets the number of the currently accumulated commands.
+    /// </summary>
+    public int CommandCount => _commands.Count;
 
     #endregion
 

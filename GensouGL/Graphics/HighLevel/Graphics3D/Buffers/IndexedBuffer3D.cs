@@ -192,7 +192,7 @@ public sealed class IndexedBuffer3D : IDisposable
         else
             _buffer.SetData(CollectionsMarshal.AsSpan(_vertices), CollectionsMarshal.AsSpan(_colors), CollectionsMarshal.AsSpan(_normals));
         _buffer.SetIndices(CollectionsMarshal.AsSpan(_indices));
-        _bufferedVertexCount = _vertices.Count / 3;
+        _bufferedVertexCount = _indices.Count;
     }
 
 

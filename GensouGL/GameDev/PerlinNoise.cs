@@ -4,10 +4,9 @@
 /// Provides the functionality to generate 2D perlin noise.
 /// </summary>
 /// <typeparam name="TGradient">Gradient vector generator type.</typeparam>
-public sealed class PerlinNoise2D<TGradient> where TGradient : IGradientVectorGenerator2D, new()
+public sealed class PerlinNoise2D<TGradient> where TGradient : IPerlinGradient2D, new()
 {
     private TGradient _generator;
-    private Random _random;
 
     /// <summary>
     /// Initializes a new instance of <see cref="PerlinNoise2D{TGradient}"/> using the specified seed value.
@@ -15,9 +14,8 @@ public sealed class PerlinNoise2D<TGradient> where TGradient : IGradientVectorGe
     /// <param name="seed">Seed value.</param>
     public PerlinNoise2D(int seed)
     {
-        _random = new Random(seed);
         _generator = new();
-        _generator.Initialize(_random);
+        _generator.Initialize(seed);
     }
 
     private float SmoothStep(float edge0, float edge1, float x)
@@ -94,13 +92,13 @@ public sealed class PerlinNoise2D<TGradient> where TGradient : IGradientVectorGe
 /// <summary>
 /// Provides the base interface for gradient vector generators.
 /// </summary>
-public interface IGradientVectorGenerator2D
+public interface IPerlinGradient2D
 {
     /// <summary>
     /// Initializes the gradient vector generator with the random instance.
     /// </summary>
-    /// <param name="random">Random instance.</param>
-    void Initialize(Random random);
+    /// <param name="seed">Seed value.</param>
+    void Initialize(int seed);
     /// <summary>
     /// Returns the gradient vector associated with the point (x, y).
     /// </summary>
@@ -111,18 +109,67 @@ public interface IGradientVectorGenerator2D
 }
 
 /// <summary>
+/// Provides the gradient vector generator that uses hash.
+/// </summary>
+/// <remarks>Use for infinite world generation etc.</remarks>
+public sealed class HashGradient2D : IPerlinGradient2D
+{
+    private uint _seed = 0u;
+
+    /// <summary>
+    /// Initializes the gradient vector generator with the random instance.
+    /// </summary>
+    /// <param name="seed">Seed value.</param>
+    public void Initialize(int seed)
+    {
+        _seed = (uint)seed;
+    }
+
+    /// <summary>
+    /// Returns the gradient vector associated with the point (x, y).
+    /// </summary>
+    /// <param name="x">X coordinate.</param>
+    /// <param name="y">Y coordinate.</param>
+    /// <returns>Gradient vector.</returns>
+    public Vec2 GradientAt(int x, int y)
+    {
+        uint hash = Hash(x, y);
+
+        float angle = (hash & 0xFFFF) / 65536.0f * 6.2831853f; // 2π
+        return new Vec2(MathF.Cos(angle), MathF.Sin(angle));
+    }
+
+    private uint Hash(int x, int y)
+    {
+        uint h = _seed;
+
+        h ^= (uint)x * 0x27d4eb2d;
+        h ^= (uint)y * 0x165667b1;
+
+        h ^= h >> 15;
+        h *= 0x2c1b3c6d;
+        h ^= h >> 12;
+        h *= 0x297a2d39;
+        h ^= h >> 15;
+
+        return h;
+    }
+}
+
+/// <summary>
 /// Provides the gradient vector generator that uses a random permutation.
 /// </summary>
-public sealed class PermutationGradientGenerator : IGradientVectorGenerator2D
+public sealed class PermutationGradient2D : IPerlinGradient2D
 {
     private int[] _permutation;
 
     /// <summary>
     /// Initializes the gradient vector generator with the random instance.
     /// </summary>
-    /// <param name="random">Random instance.</param>
-    public void Initialize(Random random)
+    /// <param name="seed">Seed value.</param>
+    public void Initialize(int seed)
     {
+        Random random = new(seed);
         _permutation = new int[256];
         for (int i = 0; i < 256; i++)
             _permutation[i] = i;
