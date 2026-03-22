@@ -17,11 +17,19 @@ public enum AudioSourceType
     /// </summary>
     WaveFile,
     /// <summary>
+    /// From a Ogg file.
+    /// </summary>
+    OggFile,
+    /// <summary>
     /// From a MP3 stream.
     /// </summary>
     Mp3Stream,
     /// <summary>
     /// From a Wave stream.
     /// </summary>
-    WaveStream
+    WaveStream,
+    /// <summary>
+    /// From a Ogg stream.
+    /// </summary>
+    OggStream
 }

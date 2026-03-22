@@ -13,11 +13,11 @@ namespace GensouGL.Audio;
 /// threads.</remarks>
 public sealed class StreamingAudio : Audio, IDisposable
 {
-    private const int BufferCount = 3;
-    private const int BufferSize = 4096 * 4;
-
+    private int c_bufferSize;
+    private int c_bufferCount;
     private Guid _uniqueId;
     private int[] _buffers;
+    private byte[] _tempBuffer;
     private StreamingSource _streamingSource;
     private ALFormat _format;
     private AudioState _state;
@@ -78,7 +78,7 @@ public sealed class StreamingAudio : Audio, IDisposable
                 return;
             }
 
-            if (_loopEnd < 0)
+            if (value < 0)
             {
                 return;
             }
@@ -91,7 +91,7 @@ public sealed class StreamingAudio : Audio, IDisposable
     /// <summary>
     /// Gets the current playback position in seconds.
     /// </summary>
-    public float Position => _info.BytesToSeconds((long)_buffersPlayed * BufferSize) + AL.GetSource(_source, ALSourcef.SecOffset);    
+    public float Position => _info.BytesToSeconds((long)_buffersPlayed * c_bufferSize) + AL.GetSource(_source, ALSourcef.SecOffset);    
     /// <summary>
     /// Gets the current state of the audio.
     /// </summary>
@@ -108,6 +108,9 @@ public sealed class StreamingAudio : Audio, IDisposable
 
     private StreamingAudio(StreamingSource streamingSource)
     {
+        c_bufferCount = GlobalAudioSettings.StreamingBufferCount;
+        c_bufferSize = GlobalAudioSettings.StreamingBufferSize;
+
         _uniqueId = Guid.NewGuid();
         _streamingSource = streamingSource;
         _info = _streamingSource.GetInfo();
@@ -118,21 +121,23 @@ public sealed class StreamingAudio : Audio, IDisposable
 
         _source = AL.GenSource();
 
-        _buffers = new int[BufferCount];
-        for (int i = 0; i < BufferCount; i++)
+        _buffers = new int[c_bufferCount];
+        for (int i = 0; i < c_bufferCount; i++)
         {
             _buffers[i] = AL.GenBuffer();
         }
+
+        _tempBuffer = new byte[c_bufferSize];
     }
 
 
     private bool QueueNewBuffer(int buffer)
     {
-        byte[] buf = new byte[BufferSize];
-        int read = _streamingSource.Read(buf, BufferSize);
+        //byte[] buf = new byte[BufferSize];
+        int read = _streamingSource.Read(_tempBuffer, c_bufferSize);
         if (read <= 0) return false;
 
-        AL.BufferData(buffer, _format, ref buf[0], read, SampleRate);
+        AL.BufferData(buffer, _format, ref _tempBuffer[0], read, SampleRate);
         AL.SourceQueueBuffer(_source, buffer);
 
         return true;
@@ -170,7 +175,7 @@ public sealed class StreamingAudio : Audio, IDisposable
 
             DequeueAllBuffers();
             
-            for (int i = 0; i < BufferCount; i++)
+            for (int i = 0; i < c_bufferCount; i++)
             {
                 QueueNewBuffer(_buffers[i]);
             }
@@ -245,11 +250,11 @@ public sealed class StreamingAudio : Audio, IDisposable
 
         long offset = _info.SecondsToBytes(position);
         _streamingSource.Seek(offset);
-        _buffersPlayed = offset / BufferSize;
+        _buffersPlayed = offset / c_bufferSize;
 
         if (_state != AudioState.Stopped)
         {
-            for (int i = 0; i < BufferCount; i++)
+            for (int i = 0; i < c_bufferCount; i++)
             {
                 QueueNewBuffer(_buffers[i]);
             }
@@ -266,9 +271,9 @@ public sealed class StreamingAudio : Audio, IDisposable
 
         long start = _info.SecondsToBytes(LoopStart);
         _streamingSource.Seek(start);
-        _buffersPlayed = start / BufferSize;
+        _buffersPlayed = start / c_bufferSize;
 
-        for (int i = 0; i < BufferCount; i++)
+        for (int i = 0; i < c_bufferCount; i++)
         {
             QueueNewBuffer(_buffers[i]);
         }
@@ -313,27 +318,24 @@ public sealed class StreamingAudio : Audio, IDisposable
         }
     }
 
-
-
-
     /// <summary>
-    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified MP3 file name.
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified Ogg file name.
     /// </summary>
     /// <param name="filename">File name to be used to initialize <see cref="StreamingAudio"/>.</param>
     /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
-    public static StreamingAudio FromMp3(string filename)
+    public static StreamingAudio FromOgg(string filename)
     {
-        return new StreamingAudio(new MpegFileAdapter(filename));
+        return new StreamingAudio(new OggVorbisAdapter(filename));
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="StreamingAudio "/> using the specified MP3 stream.
+    /// Initializes a new instance of <see cref="StreamingAudio"/> using the specified Oggstream.
     /// </summary>
-    /// <param name="stream">MP3 stream to be used to initialize <see cref="StreamingAudio"/>.</param>
+    /// <param name="stream">Ogg stream to be used to initialize <see cref="StreamingAudio"/>.</param>
     /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
-    public static StreamingAudio FromMp3(Stream stream)
+    public static StreamingAudio FromOgg(Stream stream)
     {
-        return new StreamingAudio(new MpegFileAdapter(stream));
+        return new StreamingAudio(new OggVorbisAdapter(stream));
     }
 
     /// <summary>
@@ -363,6 +365,11 @@ public sealed class StreamingAudio : Audio, IDisposable
     /// <returns>Instance of <see cref="StreamingAudio"/>.</returns>
     public static StreamingAudio From(AudioSource source)
     {
+        if (source.Type == AudioSourceType.Mp3Stream || source.Type == AudioSourceType.Mp3File)
+        {
+            throw new InvalidOperationException($"{nameof(StreamingAudio)} does not support mp3 playback.");
+        }
+
         return new StreamingAudio(source.CreateStreamingSource());
     }
 
@@ -381,13 +388,18 @@ public sealed class StreamingAudio : Audio, IDisposable
     {
         if (!_disposed)
         {
+            if (_state == AudioState.Playing)
+            {
+                Stop();
+            }
+
             if (disposing)
             {
                 _streamingSource.Dispose();
             }
 
             AL.DeleteSource(_source);
-            for (int i = 0; i < BufferCount; i++)
+            for (int i = 0; i < c_bufferCount; i++)
             {
                 AL.DeleteBuffer(_buffers[i]);
             }

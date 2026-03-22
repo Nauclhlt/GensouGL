@@ -144,6 +144,22 @@ public sealed class MemoryAudio : Audio, IDisposable
     public static MemoryAudio FromWave(Stream stream)
         => From(AudioSource.FromWave(stream));
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="MemoryAudio"/> using the specified Ogg file name.
+    /// </summary>
+    /// <param name="filename">File name to be used to initialize <see cref="MemoryAudio"/>.</param>
+    /// <returns>Instance of <see cref="MemoryAudio"/>.</returns>
+    public static MemoryAudio FromOgg(string filename)
+        => From(AudioSource.FromOgg(filename));
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="MemoryAudio"/> using the specified Ogg stream.
+    /// </summary>
+    /// <param name="stream">Ogg stream to be used to initialize <see cref="MemoryAudio"/>.</param>
+    /// <returns>Instance of <see cref="MemoryAudio"/>.</returns>
+    public static MemoryAudio FromOgg(Stream stream)
+        => From(AudioSource.FromOgg(stream));
+
     private static MemoryAudio BufferCreate(byte[] pcm, AudioInfo info)
     {
         int buffer = AL.GenBuffer();

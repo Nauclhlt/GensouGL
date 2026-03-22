@@ -64,6 +64,37 @@ public sealed class AudioSource
     }
 
     /// <summary>
+    /// Creates a new AudioSource instance that contains the specified Ogg file.
+    /// </summary>
+    /// <param name="filename">The path to the Ogg file to use as the audio source. Cannot be null or empty.</param>
+    /// <returns>An AudioSource configured to contain the specified Ogg file.</returns>
+    public static AudioSource FromOgg(string filename)
+    {
+        return new()
+        {
+            _filename = filename,
+            _type = AudioSourceType.OggFile
+        };
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="AudioSource"/> instance that reads audio data from the specified Ogg stream.
+    /// </summary>
+    /// <remarks>The caller is responsible for managing the lifetime of the provided stream. The stream must
+    /// remain open and readable for the duration of the <see cref="AudioSource"/>'s use.</remarks>
+    /// <param name="stream">The stream containing Ogg audio data. The stream must be readable and positioned at the beginning of the Ogg
+    /// content.</param>
+    /// <returns>An <see cref="AudioSource"/> that provides audio data from the specified Ogg stream.</returns>
+    public static AudioSource FromOgg(Stream stream)
+    {
+        return new()
+        {
+            _stream = stream,
+            _type = AudioSourceType.OggStream
+        };
+    }
+
+    /// <summary>
     /// Creates a new <see cref="AudioSource"/> instance that contains audio from the specified Wave file.
     /// </summary>
     /// <param name="filename">The path to the Wave (.wav) file to use as the audio source. Cannot be null or empty.</param>
@@ -98,11 +129,11 @@ public sealed class AudioSource
     internal StreamingSource CreateStreamingSource()
     {
         return _type switch
-        {
-            AudioSourceType.Mp3File => new MpegFileAdapter(_filename),
+        {           
             AudioSourceType.WaveFile => new WavePcmSource(_filename),
-            AudioSourceType.Mp3Stream => new MpegFileAdapter(_stream),
             AudioSourceType.WaveStream => new WavePcmSource(_stream),
+            AudioSourceType.OggFile => new OggVorbisAdapter(_filename),
+            AudioSourceType.OggStream => new OggVorbisAdapter(_stream),
             _ => null
         };
     }
@@ -148,6 +179,15 @@ public sealed class AudioSource
             decoder.Load(_stream);
 
             return (decoder.PcmData, new AudioInfo(decoder.Duration, decoder.SampleRate, decoder.BitsPerSample, decoder.Channels));
+        }
+        else if (_type == AudioSourceType.OggFile)
+        {
+            return OggDecoder.Load(_filename);
+        }
+        else if (_type == AudioSourceType.OggStream)
+        {
+            _stream.Seek(0, SeekOrigin.Begin);
+            return OggDecoder.Load(_stream, false);
         }
 
         return default;
