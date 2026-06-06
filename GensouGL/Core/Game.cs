@@ -242,6 +242,7 @@ public sealed class Game
         _windowHeight = _window.ClientSize.Y;
 
         Screen.Default.__SetSize(_windowWidth, _windowHeight);
+        Screen.Default.__SetProjSize(_screenWidth, _screenHeight);
     }
 
 

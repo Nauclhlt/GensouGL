@@ -30,7 +30,7 @@ public abstract class Renderer2D : Renderer
     /// <returns></returns>
     protected OpenTK.Mathematics.Matrix4 GetDefaultVMatrix()
     {
-        OpenTK.Mathematics.Matrix4 projMatrix = OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0, _screenStack.BaseScreenWidth, _screenStack.BaseScreenHeight, 0, -1, 1);
+        OpenTK.Mathematics.Matrix4 projMatrix = OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0, _screenStack.BaseScreen.ProjectionWidth, _screenStack.BaseScreen.ProjectionHeight, 0, -1, 1);
         return projMatrix * _camera.GetModelMatrix();
     }
 

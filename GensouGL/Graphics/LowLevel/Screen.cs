@@ -9,12 +9,14 @@ public sealed class Screen : IScreen, IDisposable
     /// Gets the default screen.
     /// </summary>
     /// <remarks>When you use the default screen, that means you are drawing directly on the game window buffer.</remarks>
-    public static Screen Default { get; internal set; } = new Screen(0, 0, 0);
+    public static Screen Default { get; internal set; } = new Screen(0, 0, 0, 0, 0);
 
     private int _framebuffer;
     private Texture _texture;
     private int _width;
     private int _height;
+    private int _projectionWidth;
+    private int _projectionHeight;
     private int _depthTexture = 0;
 
     private bool _disposed = false;
@@ -35,12 +37,22 @@ public sealed class Screen : IScreen, IDisposable
     /// Gets the height of the screen.
     /// </summary>
     public int Height => _height;
+    /// <summary>
+    /// Gets the width value used to make projection matrices.
+    /// </summary>
+    public int ProjectionWidth => _projectionWidth;
+    /// <summary>
+    /// Gets the height value used to make projection matrices.
+    /// </summary>
+    public int ProjectionHeight => _projectionHeight;
 
-    internal Screen(int framebuffer, int width, int height)
+    internal Screen(int framebuffer, int width, int height, int projectionWidth, int projectionHeight)
     {
         _framebuffer = framebuffer;
         _width = width;
         _height = height;
+        _projectionWidth = projectionWidth;
+        _projectionHeight = projectionHeight;
         _texture = null;
     }
 
@@ -59,6 +71,8 @@ public sealed class Screen : IScreen, IDisposable
 
         _width = width;
         _height = height;
+        _projectionWidth = width;
+        _projectionHeight = height;
 
         _texture = new Texture(width, height);
 
@@ -112,6 +126,13 @@ public sealed class Screen : IScreen, IDisposable
         if (_framebuffer != 0) return;
         _width = width;
         _height = height;
+    }
+
+    internal void __SetProjSize(int width, int height)
+    {
+        if (_framebuffer != 0) return;
+        _projectionWidth = width;
+        _projectionHeight = height;
     }
 
     private void Dispose(bool disposing)
